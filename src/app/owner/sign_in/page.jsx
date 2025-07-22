@@ -76,7 +76,7 @@ function SignIn() {
 
         <p className="mt-4 text-sm font-Inter text-[#715045]">
           ยังไม่มีบัญชี?{" "}
-          <Link href="/register" className="text-[#F17F1F] font-bold font-Inter hover:underline">
+          <Link href="/owner/register" className="text-[#F17F1F] font-bold font-Inter hover:underline">
             สมัครบัญชี
           </Link>
         </p>
