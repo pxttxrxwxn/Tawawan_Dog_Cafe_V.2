@@ -1,9 +1,13 @@
 import React from 'react'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/app/components/Navbar'
+
 
 function order() {
   return (
-    <Navbar activePage="order" />
+    <div className="">
+      <Navbar activePage="order" />
+      <div className="">ggggg</div>
+    </div>
   )
 }
 
