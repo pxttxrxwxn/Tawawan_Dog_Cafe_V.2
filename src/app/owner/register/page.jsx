@@ -86,6 +86,8 @@ export default function Register() {
       const resData = await response.json();
 
       if (response.ok) {
+         console.log("สมัครสำเร็จ กำลังไปหน้า sign_in");
+         alert("สมัครสำเร็จ! กำลังไปหน้าเข้าสู่ระบบ");
         router.push("/owner/sign_in");
       } else {
         if (resData.message === "อีเมลนี้ถูกใช้งานแล้ว") {
