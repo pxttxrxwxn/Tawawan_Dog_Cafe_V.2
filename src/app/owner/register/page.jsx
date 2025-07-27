@@ -107,16 +107,16 @@ export default function Register() {
       </div>
       <div className="bg-[#FFE8A3] h-screen w-[60%] flex flex-col items-right rounded-l-[100px]">
         <div className="flex flex-col justify-center items-center h-screen space-y-[5px]">
-          <h1 className="text-[#715045] font-Inter text-[60px]">สมัครบัญชี</h1>
+          <h1 className="text-[#715045] font-Inter font-bold text-[60px]">สมัครบัญชี</h1>
           <form className="w-full mt-6 flex flex-col gap-4 px-[10%]" onSubmit={handleSubmit}>
             <div className="relative z-10 w-full">
-              <label htmlFor="username" className="text-sm font-Inter text-[#715045] text-[22px]">
+              <label htmlFor="username" className="font-Inter text-[#715045] text-[20px]">
                 ชื่อผู้ใช้
               </label>
               <input
                 type="text"
                 id="username"
-                placeholder="กรอกชื่อผู้ใช้"
+                placeholder="ชื่อผู้ใช้งาน"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black font-Inter 
@@ -126,13 +126,13 @@ export default function Register() {
             </div>
 
             <div className="relative z-10 w-full">
-              <label htmlFor="email" className="text-sm font-Inter text-[#715045]">
+              <label htmlFor="email" className="text-[20px] font-Inter text-[#715045]">
                 อีเมล
               </label>
               <input
                 type="email"
                 id="email"
-                placeholder="กรอกอีเมล"
+                placeholder="tawawandogcafe@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black font-Inter 
@@ -142,7 +142,7 @@ export default function Register() {
             </div>
 
             <div className="w-full">
-            <label htmlFor="password" className="text-sm font-Inter text-[#715045] block mb-1">
+            <label htmlFor="password" className="text-[18px] font-Inter text-[#715045] block mb-1">
               รหัสผ่าน ({password.length} ตัวอักษร)
             </label>
             <div className="relative">
@@ -194,7 +194,7 @@ export default function Register() {
           </div>
 
           <div className="relative w-full">
-            <label htmlFor="confirmPassword" className="text-sm font-Inter text-[#715045] block mb-1">
+            <label htmlFor="confirmPassword" className="text-[18px] font-Inter text-[#715045] block mb-1">
               ยืนยันรหัสผ่าน({confirmPassword.length} ตัวอักษร)
             </label>
             <div className="relative">
@@ -231,14 +231,14 @@ export default function Register() {
           </div>
             <button
               type="submit"
-              className="bg-[#D64545] text-white py-2 rounded-md hover:bg-[#8D5E3F] mt-4"
+              className="bg-[#D64545] text-white text-[35px] font-bold font-[Inter] py-2 rounded-md hover:bg-[#8D5E3F] mt-4 mx-auto w-[450px] h-[70px]"
             >
               สร้างบัญชี
             </button>
           </form>
-          <p className="mt-4 text-sm font-Inter text-[#715045]">
+          <p className="mt-4 text-[16px] font-Inter text-[#715045]">
             มีบัญชีอยู่แล้ว?{" "}
-              <Link href="/owner/sign_in" className="text-[#8D6E63] font-bold font-Inter hover:underline">
+              <Link href="/owner/sign_in" className="text-[#F4A261] font-bold font-Inter underline">
               เข้าสู่ระบบ
             </Link>
           </p>

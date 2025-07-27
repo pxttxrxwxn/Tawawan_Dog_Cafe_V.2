@@ -66,9 +66,7 @@ function SignIn() {
     const data = await res.json();
 
     if (!res.ok) {
-      // แสดง error จาก API
       if (res.status === 401) {
-        // อีเมลหรือรหัสผ่านผิด
         setEmailError(data.error.includes("อีเมล") ? data.error : "");
         setPasswordError(data.error.includes("รหัสผ่าน") ? data.error : "");
       } else {
@@ -77,7 +75,6 @@ function SignIn() {
       return;
     }
 
-    // เข้าสู่ระบบสำเร็จ
     router.push("/owner/order");
 
   } catch (error) {
@@ -92,16 +89,16 @@ function SignIn() {
         <div className="relative w-[150px] h-[150px]">
           <Image src="/logo.png" alt="Logo" fill style={{ objectFit: 'contain' }} />
         </div>
-        <h1 className="text-[32px] font-Inter text-[#A1724E] mt-6 text-center">
+        <h1 className="text-[32px] font-Kanit text-[#A1724E] mt-6 text-center">
           เข้าสู่ระบบเจ้าของร้าน
         </h1>
-        <p className="text-xs text-[#D64545] font-Inter mt-1 underline">
+        <p className="text-xs text-[#D64545] font-Kanit mt-1 underline">
           สำหรับเจ้าของร้านเท่านั้น
         </p>
 
         <form className="w-full mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="w-full">
-            <label htmlFor="email" className="text-sm font-Inter text-[#845C44]">
+            <label htmlFor="email" className="text-sm font-Kanit text-[#845C44]">
               อีเมล
             </label>
             <input
@@ -110,14 +107,14 @@ function SignIn() {
               placeholder="กรอกอีเมล"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#D1D1D1] focus:outline-none text-black font-Inter 
+              className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#D1D1D1] focus:outline-none text-black font-Kanit 
                 ${emailError ? "border-red-500" : "border-[#A1724E]"}`}
             />
             {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
           </div>
 
           <div className="w-full">
-            <label htmlFor="password" className="text-sm font-Inter text-[#845C44] block mb-1">
+            <label htmlFor="password" className="text-sm font-Kanit text-[#845C44] block mb-1">
               รหัสผ่าน ({password.length} ตัวอักษร)
             </label>
             <div className="relative">
@@ -127,7 +124,7 @@ function SignIn() {
                 placeholder="รหัสผ่าน"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#D1D1D1] focus:outline-none text-black pr-10 font-Inter 
+                className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#D1D1D1] focus:outline-none text-black pr-10 font-Kanit 
                   ${passwordError ? "border-red-500" : "border-[#A1724E]"}`}
               />
               <button
@@ -170,15 +167,15 @@ function SignIn() {
 
           <button
             type="submit"
-            className="mt-4 w-full bg-[#8C6B5C] text-white py-3 rounded-md text-lg font-bold font-Inter hover:bg-[#7a5c4d] transition"
+            className="mt-4 w-full bg-[#8C6B5C] text-white py-3 rounded-md text-lg font-bold font-Kanit hover:bg-[#7a5c4d] transition"
           >
             เข้าสู่ระบบ
           </button>
         </form>
 
-        <p className="mt-4 text-sm font-Inter text-[#715045]">
+        <p className="mt-4 text-sm font-Kanit text-[#715045]">
           ยังไม่มีบัญชี?{" "}
-          <Link href="/owner/register" className="text-[#F17F1F] font-bold font-Inter hover:underline">
+          <Link href="/owner/register" className="text-[#F17F1F] font-bold font-Kanit underline">
             สมัครบัญชี
           </Link>
         </p>
