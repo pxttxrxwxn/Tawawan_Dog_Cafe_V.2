@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Navbar({ activePage }) {
   const [userName, setUserName] = useState("");
@@ -26,9 +27,9 @@ export default function Navbar({ activePage }) {
       }, []);
 
   const buttons = [
-    { id: 1, label: "คำสั่งซื้อ", key: "order", baseColor: "#8D6E63" },
-    { id: 2, label: "รายรับ-รายจ่าย", key: "income", baseColor: "#8D6E63" },
-    { id: 3, label: "เมนู", key: "menu", baseColor: "#8D6E63" },
+    { id: 1, label: "คำสั่งซื้อ", key: "order", baseColor: "#8D6E63" , Link:"/owner/order"},
+    { id: 2, label: "รายรับ-รายจ่าย", key: "income", baseColor: "#8D6E63" , Link:"/owner/Income_and_expenses"},
+    { id: 3, label: "เมนู", key: "menu", baseColor: "#8D6E63" , Link:"/owner/menu"},
   ];
 
   return (
@@ -40,17 +41,18 @@ export default function Navbar({ activePage }) {
 
         <nav className="flex space-x-20">
           {buttons.map((btn) => (
-            <button
-              key={btn.key}
-              className="w-[209px] h-[75px] rounded-md text-white font-semibold"
-              style={{
-                backgroundColor:
-                  activePage === btn.key ? "#D64545" : btn.baseColor,
-                cursor: "pointer",
-              }}
-            >
-              {btn.label}
-            </button>
+            <Link key={btn.key} href={btn.Link}>
+              <button
+                className="w-[209px] h-[75px] rounded-md text-white font-semibold"
+                style={{
+                  backgroundColor:
+                    activePage === btn.key ? "#D64545" : btn.baseColor,
+                  cursor: "pointer",
+                }}
+              >
+                {btn.label}
+              </button>
+            </Link>
           ))}
         </nav>
 
