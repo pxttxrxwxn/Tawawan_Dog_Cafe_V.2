@@ -28,7 +28,7 @@ export default function Navbar({ activePage }) {
 
   const buttons = [
     { id: 1, label: "คำสั่งซื้อ", key: "order", baseColor: "#8D6E63" , Link:"/owner/order"},
-    { id: 2, label: "รายรับ-รายจ่าย", key: "income", baseColor: "#8D6E63" , Link:"/owner/Income_and_expenses"},
+    { id: 2, label: "รายรับ-รายจ่าย", key: "income_and_expenses", baseColor: "#8D6E63" , Link:"/owner/Income_and_expenses"},
     { id: 3, label: "เมนู", key: "menu", baseColor: "#8D6E63" , Link:"/owner/menu"},
   ];
 
