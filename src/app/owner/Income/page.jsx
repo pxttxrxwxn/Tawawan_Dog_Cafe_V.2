@@ -45,7 +45,7 @@ export default function Income() {
                 <th className="border border-black px-4 py-2 ">โต๊ะ</th>
                 <th className="border border-black px-4 py-2">รายละเอียด</th>
                 <th className="border border-black px-4 py-2 ">จำนวนเงิน</th>
-                <th className="border border-black px-4 py-2">จัดการ [บาท]</th>
+                <th className="border border-black px-4 py-2">จัดการ</th>
               </tr>
             </thead>
             <tbody>

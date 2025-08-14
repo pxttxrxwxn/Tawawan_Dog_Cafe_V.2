@@ -36,7 +36,7 @@ export default function Expenses() {
           </div>
         </div>
         <div className="flex justify-end mb-4">
-          <div className="flex justify-center items-center w-[173px] h-[52px] bg-[#C49A6C] px-2 py-1 rounded-[5px] font-bold gap-1">
+          <div className="flex justify-center items-center w-[173px] h-[52px] bg-[#C49A6C] px-2 py-1 rounded-[10px] font-bold gap-1">
             <svg 
             xmlns="http://www.w3.org/2000/svg" 
             height="24px" 
