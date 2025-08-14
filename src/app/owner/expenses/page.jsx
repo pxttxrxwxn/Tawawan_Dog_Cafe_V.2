@@ -1,4 +1,3 @@
-// app/owner/income_and_expenses/page.jsx  (หรือ pages/owner/income_and_expenses/index.jsx ถ้าใช้ pages router)
 "use client";
 import React from "react";
 import Navbar from "../../components/Navbarincome_and_expenses";
