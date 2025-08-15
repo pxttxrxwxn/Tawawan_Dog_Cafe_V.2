@@ -51,29 +51,31 @@ export default function Menu() {
     return;
   }
 
-  const newMenu = {
-    code: form.menuCode.value,
-    name: form.menuName.value,
-    category: form.menuCategory.value,
-    type: form.menuType.value,
-    price: form.menuPrice.value,
-    desc: form.menuDesc.value,
-    image: form.menuImage.files[0]
-      ? URL.createObjectURL(form.menuImage.files[0])
-      : editingMenu
-      ? editingMenu.image
-      : null,
-  };
+  const originalCode = editingMenu ? editingMenu.code : null;
+
+    const newMenu = {
+      code: form.menuCode.value,
+      name: form.menuName.value,
+      category: form.menuCategory.value,
+      type: form.menuType.value,
+      price: form.menuPrice.value,
+      desc: form.menuDesc.value,
+      image: form.menuImage.files[0]
+        ? URL.createObjectURL(form.menuImage.files[0])
+        : editingMenu
+        ? editingMenu.image
+        : null,
+    };
 
     try {
       if (editingMenu) {
         await fetch("/api/menus", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newMenu),
+          body: JSON.stringify({ ...newMenu, originalCode }),
         });
         setMenus((prev) =>
-          prev.map((m) => (m.code === newMenu.code ? newMenu : m))
+          prev.map((m) => (m.code === originalCode ? newMenu : m))
         );
       } else {
 
@@ -154,8 +156,8 @@ export default function Menu() {
               </thead>
               <tbody>
                 {menus.map((menu, index) => (
-                  <tr key={index}>
-                    <td className="border border-black px-4 py-2 text-center">
+                  <tr key={index} className="bg-white">
+                    <td className="border border-black px-4 py-2 text-center ">
                       {menu.image ? <img src={menu.image} alt={menu.name} className="w-[80px] h-[80px] object-cover mx-auto" /> : "-"}
                     </td>
                     <td className="border border-black px-4 py-2">{menu.code}</td>
@@ -201,6 +203,7 @@ export default function Menu() {
                 <input
                   type="text"
                   id="menuCode"
+                  name="menuCode"
                   defaultValue={editingMenu ? editingMenu.code : ""}
                   placeholder="เช่น M002"
                   className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"

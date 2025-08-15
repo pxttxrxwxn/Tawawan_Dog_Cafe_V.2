@@ -34,11 +34,12 @@ export async function PUT(req) {
     const data = await fs.readFile(filePath, "utf-8");
     const menus = JSON.parse(data);
 
-    const index = menus.findIndex(m => m.code === updatedMenu.code);
+    const index = menus.findIndex(m => m.code === updatedMenu.originalCode);
     if (index !== -1) {
-      menus[index] = updatedMenu;
+      menus[index] = { ...updatedMenu, code: updatedMenu.code || updatedMenu.originalCode };
+      delete menus[index].originalCode;
       await fs.writeFile(filePath, JSON.stringify(menus, null, 2));
-      return new Response(JSON.stringify(updatedMenu), { status: 200 });
+      return new Response(JSON.stringify(menus[index]), { status: 200 });
     } else {
       return new Response(JSON.stringify({ error: "ไม่พบเมนู" }), { status: 404 });
     }
@@ -46,6 +47,7 @@ export async function PUT(req) {
     return new Response(JSON.stringify({ error: "ไม่สามารถแก้ไขข้อมูลได้" }), { status: 500 });
   }
 }
+
 
 export async function DELETE(req) {
   try {
