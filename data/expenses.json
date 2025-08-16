@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2025-08-15",
+    "detail": "4598",
+    "amount": 65,
+    "category": "วัตถุดิบ"
+  },
+  {
+    "date": "2025-08-16",
+    "detail": "hh",
+    "amount": 45252,
+    "category": "ค่าแรง"
+  },
+  {
+    "date": "2025-08-12",
+    "detail": "4598",
+    "amount": 523,
+    "category": "ค่าแรง"
+  },
+  {
+    "date": "2025-08-10",
+    "detail": "ddd",
+    "amount": 56,
+    "category": "ค่าใช้จ่ายทั่วไป"
+  }
+]
