@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@next/font": "^14.2.15",
+    "multer": "^2.0.2",
     "next": "^15.4.6",
+    "next-connect": "^1.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

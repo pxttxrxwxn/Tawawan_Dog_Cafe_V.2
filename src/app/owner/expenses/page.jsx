@@ -109,9 +109,9 @@ export default function Expenses() {
 
       if (filter === "week") {
         const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay()); // วันอาทิตย์
+        startOfWeek.setDate(today.getDate() - today.getDay());
         const endOfWeek = new Date(today);
-        endOfWeek.setDate(today.getDate() + (6 - today.getDay())); // วันเสาร์
+        endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
         return expDate >= startOfWeek && expDate <= endOfWeek;
       }
 
