@@ -125,8 +125,7 @@ export default function Menu() {
           </div>
           <button 
             onClick={() => openModal()}
-            className="bg-[#C49A6C] h-[75px] w-[243px] flex justify-center items-center rounded-[10px] font-bold text-white gap-1 text-[32px] cursor-pointer"
-          >
+            className="bg-[#C49A6C] h-[75px] w-[243px] flex justify-center items-center rounded-[10px] font-bold text-white gap-1 text-[32px] cursor-pointer">
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
               height="48px" 
