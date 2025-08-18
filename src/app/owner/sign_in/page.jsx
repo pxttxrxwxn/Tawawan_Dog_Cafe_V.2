@@ -74,6 +74,8 @@ function SignIn() {
       }
       return;
     }
+    
+    localStorage.setItem("loggedInEmail", email);
 
     router.push("/owner/order");
 
