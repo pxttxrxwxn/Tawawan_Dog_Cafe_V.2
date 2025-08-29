@@ -1,7 +1,12 @@
 [
-    {
-        "username" : "fff",
-        "email" : "inthitanan2548@gmail.com",
-        "password" : "A@a11111"
-    }
+  {
+      "username" : "fff",
+      "email" : "inthitanan2548@gmail.com",
+      "password" : "A@a11111"
+  },
+  {
+    "username": "admin",
+    "email": "admin@gmail.com",
+    "password": "Aa@11111"
+  }
 ]
