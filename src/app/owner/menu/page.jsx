@@ -6,17 +6,39 @@ export default function Menu() {
   const [menus, setMenus] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [drinkTypes, setDrinkTypes] = useState({
+    ร้อน: { checked: false, price: 0 },
+    เย็น: { checked: false, price: 0 },
+    ปั่น: { checked: false, price: 0 }
+  });
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-  const editingMenu = editingIndex !== null ? menus[editingIndex] : null;
+  const editingMenu = editingIndex !== null && menus[editingIndex] ? menus[editingIndex] : null;
 
   const openModal = (index = null) => {
     setEditingIndex(index);
     setIsModalOpen(true);
+    if (index !== null) {
+      setSelectedCategory(menus[index].category);
+      if (menus[index].category === "เครื่องดื่ม") {
+      setDrinkTypes({
+        ร้อน: menus[index].type?.ร้อน || { checked: false, price: 0 },
+        เย็น: menus[index].type?.เย็น || { checked: false, price: 0 },
+        ปั่น: menus[index].type?.ปั่น || { checked: false, price: 0 }
+      });
+    }
+    }
   };
 
   const closeModal = () => {
     setEditingIndex(null);
     setIsModalOpen(false);
+    setDrinkTypes({
+      ร้อน: { checked: false, price: 0 },
+      เย็น: { checked: false, price: 0 },
+      ปั่น: { checked: false, price: 0 }
+    });
+    setSelectedCategory("");
   };
   
   useEffect(() => {
@@ -32,33 +54,57 @@ export default function Menu() {
     fetchMenus();
   }, []);
 
+  const handleDrinkTypeChange = (type, field, value) => {
+    setDrinkTypes((prev) => ({
+      ...prev,
+      [type]: {
+        ...prev[type],
+        [field]: field === "checked" ? value : Number(value)
+      }
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
 
-  if (!form.menuCategory.value) {
-    alert("กรุณาเลือกหมวดหมู่");
-    return;
-  }
+    if (!form.menuCategory.value) {
+      alert("กรุณาเลือกหมวดหมู่");
+      return;
+    }
 
-  if (!form.menuType.value) {
-    alert("กรุณาเลือกรูปแบบ");
-    return;
-  }
+    if (form.menuCategory.value === "เครื่องดื่ม") {
+      const hasSelected = Object.values(drinkTypes).some((t) => t.checked);
+      if (!hasSelected) {
+        alert("กรุณาเลือกประเภทและกรอกราคาอย่างน้อย 1 ประเภท");
+        return;
+      }
+    }
 
-  if (!editingMenu && !form.menuImage.files[0]) {
-    alert("กรุณาใส่รูปเมนู");
-    return;
-  }
+    if (!editingMenu && !form.menuImage.files[0]) {
+      alert("กรุณาใส่รูปเมนู");
+      return;
+    }
 
-  const originalCode = editingMenu ? editingMenu.code : null;
+    const originalCode = editingMenu ? editingMenu.code : null;
+    const basePrice = Number(form.menuPrice.value) || 0;
 
     const newMenu = {
       code: form.menuCode.value,
       name: form.menuName.value,
       category: form.menuCategory.value,
-      type: form.menuType.value,
-      price: form.menuPrice.value,
+      type: form.menuCategory.value === "เครื่องดื่ม" ? 
+        Object.fromEntries(
+          Object.entries(drinkTypes).map(([t, data]) => [
+            t,
+            {
+              checked: data.checked,
+              price: data.checked ? data.price : 0
+            }
+          ])
+        )
+        : form.menuType?.value || "",
+      price: form.menuCategory.value === "เครื่องดื่ม" ? basePrice : form.menuPrice.value || "",
       desc: form.menuDesc.value,
       image: form.menuImage.files[0]
         ? URL.createObjectURL(form.menuImage.files[0])
@@ -66,7 +112,6 @@ export default function Menu() {
         ? editingMenu.image
         : null,
     };
-
     try {
       if (editingMenu) {
         await fetch("/api/menus", {
@@ -78,7 +123,6 @@ export default function Menu() {
           prev.map((m) => (m.code === originalCode ? newMenu : m))
         );
       } else {
-
         await fetch("/api/menus", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -91,8 +135,7 @@ export default function Menu() {
     }
 
     form.reset();
-    setEditingIndex(null);
-    setIsModalOpen(false);
+    closeModal();
   };
 
   const handleDelete = async (code) => {
@@ -162,8 +205,17 @@ export default function Menu() {
                     <td className="border border-black px-4 py-2">{menu.code}</td>
                     <td className="border border-black px-4 py-2">{menu.name}</td>
                     <td className="border border-black px-4 py-2">{menu.category}</td>
-                    <td className="border border-black px-4 py-2">{menu.type}</td>
-                    <td className="border border-black px-4 py-2">{menu.price} ฿</td>
+                    <td className="border border-black px-4 py-2">
+                      {typeof menu.type === "object"
+                        ? Object.entries(menu.type)
+                            .filter(([type, data]) => data.checked)
+                            .map(([type, data]) => `${type}+${data.price}`)
+                            .join(", ")
+                        : menu.type || "-"}
+                    </td>
+                    <td className="border border-black px-4 py-2">
+                      {menu.price ? `${menu.price} ฿` : "-"}
+                    </td>
                     <td className="border border-black px-4 py-2">{menu.desc}</td>
                     <td className="border border-black px-1 py-2">
                       <div className="flex justify-center items-center gap-5">
@@ -229,6 +281,7 @@ export default function Menu() {
                 <select
                   name="menuCategory"
                   defaultValue={editingMenu ? editingMenu.category : ""}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
                   className="border border-[#715045] rounded-md p-2 shadow-sm bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                 >
                   <option value="" disabled hidden>หมวดหมู่</option>
@@ -238,19 +291,39 @@ export default function Menu() {
                 </select>
               </div>
 
-              <div className="flex flex-col">
-                <label className="font-bold text-[#715045] text-lg mb-1">รูปแบบ</label>
-                <select
-                  name="menuType"
-                  defaultValue={editingMenu ? editingMenu.type : ""}
-                  className="border border-[#715045] rounded-md p-2 shadow-sm bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
-                >
-                  <option value="" disabled hidden>รูปแบบ</option>
-                  <option>ร้อน</option>
-                  <option>เย็น</option>
-                  <option>ปั่น</option>
-                </select>
-              </div>
+              {selectedCategory === "เครื่องดื่ม" && (
+                <div className="flex flex-col gap-2">
+                  <label className="font-bold text-[#715045] text-lg mb-1">ประเภทและราคา</label>
+                  <div className="flex flex-row items-center gap-4">
+                    {["ร้อน", "เย็น", "ปั่น"].map((type) => (
+                      <div key={type} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={drinkTypes[type].checked}
+                          onChange={(e) => handleDrinkTypeChange(type, "checked", e.target.checked)}
+                        />
+                        <span
+                          className={
+                            type === "ร้อน" ? "text-[#000000]" :
+                            type === "เย็น" ? "text-[#000000]" :
+                            type === "ปั่น" ? "text-[#000000]" :
+                            "text-[#000000]"
+                          }
+                        >
+                          {type}
+                        </span>
+                        <input
+                          type="number"
+                          value={drinkTypes[type].price}
+                          onChange={(e) => handleDrinkTypeChange(type, "price", e.target.value)}
+                          className="border p-1 rounded w-20 text-black"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
 
               <div className="flex flex-col">
                 <label htmlFor="menuPrice" className="font-bold text-[#715045] text-lg mb-1">
@@ -262,7 +335,6 @@ export default function Menu() {
                   defaultValue={editingMenu ? editingMenu.price : ""}
                   placeholder="เช่น 45"
                   className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
-                  required
                 />
               </div>
 
@@ -291,17 +363,17 @@ export default function Menu() {
                 ></textarea>
               </div>
 
-              <div className="flex justify-end gap-3 mt-4">
+              <div className="flex justify-center gap-5 mt-4">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 border border-[#715045] text-[#715045] rounded hover:bg-[#F2D8A3] transition"
+                  className="px-10 py-3 text-[20px] bg-[#D64545] text-[#ffffff] rounded transition"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-[#C49A6C] text-white rounded hover:bg-[#B6794F] transition"
+                  className="px-15 py-3 text-[20px] bg-[#8D6E63] text-white rounded transition"
                 >
                   {editingMenu ? "บันทึก" : "เพิ่ม"}
                 </button>
