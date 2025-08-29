@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 
-export default function Index() {
+export default function choose_table() {
     return(
         <div className="min-h-screen bg-[#fdf6e3]">
             <div className="flex justify-start mt-[35px] ml-[20px]">
