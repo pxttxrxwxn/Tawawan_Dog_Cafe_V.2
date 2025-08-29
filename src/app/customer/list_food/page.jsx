@@ -67,11 +67,10 @@ export default function ListFood() {
                         </div>
                         <p className="text-gray-600 pl-2">{menu.desc}</p>
 
-                        {/* เพิ่มไอคอนบวกสีเขียวในทุกหมวด */}
                         <div className="flex justify-end mt-3">
                           <div className="flex justify-end">
                             <svg
-                              onClick={() => handleSelectDrinkMenu(menu)} // เมื่อคลิกจะเซฟข้อมูลลง localStorage
+                              onClick={() => handleSelectDrinkMenu(menu)}
                               xmlns="http://www.w3.org/2000/svg"
                               height="24px"
                               viewBox="0 -960 960 960"
@@ -85,7 +84,6 @@ export default function ListFood() {
                       </div>
                     );
 
-                    // ทุกหมวดจะลิงก์ไปที่หน้ารายละเอียด
                     return (
                       <Link
                         key={menu.code}
