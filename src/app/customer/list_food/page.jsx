@@ -116,7 +116,7 @@ export default function ListFood() {
                                     </div>
                                     <span className="w-6 text-center">{qty}</span>
                                     <div
-                                        onClick={() => increment(menu.code)}  // <-- แก้ตรงนี้
+                                        onClick={() => increment(menu.code)}
                                         className="text-black"
                                     >
                                         +
