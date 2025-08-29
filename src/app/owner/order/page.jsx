@@ -57,8 +57,8 @@ export default function order() {
                       className="mr-2">
                       <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v120H280v-120h-80v560Zm280-560q17 0 28.5-11.5T520-800q0-17-11.5-28.5T480-840q-17 0-28.5 11.5T440-800q0 17 11.5 28.5T480-760Z"/>
                     </svg>
-                    <span>ออเดอร์ #{order.id}</span>
-                    <p className="text-[30px] ml-[30px] mt-2">โต๊ะ: {order.table}</p>
+                    <span className='text-[#000000]'>ออเดอร์ #{order.id}</span>
+                    <p className="text-[30px] ml-[30px] mt-2 text-[#000000]">โต๊ะ: {order.table}</p>
                   </div>
 
                   <p className="text-sm text-black w-full ml-9">
@@ -90,7 +90,7 @@ export default function order() {
                 </p>
               </div>
               <div className='flex justify-end'>
-                <button className="w-[141px] h-[42px] bg-[#0FA958] text-white text-[15px] px-3 py-1 rounded">
+                <button className="w-[141px] h-[42px] bg-[#0FA958] text-white text-[15px] px-3 py-1 rounded cursor-pointer">
                   ออเดอร์เสร็จสิ้น
                 </button>
               </div>

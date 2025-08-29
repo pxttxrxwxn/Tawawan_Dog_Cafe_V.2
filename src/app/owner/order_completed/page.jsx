@@ -6,7 +6,7 @@ export default function oder_completed() {
     return (
         <div className="min-h-screen">
             <Navbar activePage="order" />
-            <div className="p-6 ">
+            <div className="pt-6 pl-6 pr-6">
                 <div className="mb-4 mt-[200px] pl-[80px] pr-[80px] flex">
                     <Link href="/owner/order" className="w-[454px] h-[99px] p-5 rounded-sm bg-[#FFE7A1] flex items-center text-[#000000] cursor-pointer">
                         <svg 
@@ -28,6 +28,29 @@ export default function oder_completed() {
                         <path d="m419-321 289-290-43-43-246 247-119-119-43 43 162 162ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Z"/></svg>
                         <span className="font-bold text-[30px] m-5">ออเดอร์เสร็จสิ้น</span>
                     </Link>
+                </div>
+            </div>
+            <div className="bg-[#FFFFFF] m-8">
+                <div className="p-5 flex flex-col">
+                    <div className="flex justify-start items-center mb-6">
+                        <h2 className="text-[#D64545] font-bold text-[25px]">
+                            ประวัติการสั่งซื้อที่เสร็จสิ้น
+                        </h2>
+                    </div>
+                    <div className="overflow-x-auto flex justify-center mb-10">
+                        <table className="border-collapse w-[95%] text-center text-black">
+                            <thead>
+                                <tr className="bg-[#F79C4B] text-white">
+                                <th className="border border-black px-1 py-2">หมายเลขออเดอร์</th>
+                                <th className="border border-black px-4 py-2">วันที่/เวลา</th>
+                                <th className="border border-black px-4 py-2">รายการ</th>
+                                <th className="border border-black px-4 py-2">โต๊ะ</th>
+                                <th className="border border-black px-4 py-2">ยอดรวม</th>
+                                <th className="border border-black px-4 py-2">สถานะ</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
