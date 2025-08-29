@@ -1,4 +1,4 @@
-"use client";  // ต้องใส่ไว้บรรทัดแรกเสมอ
+"use client"; 
 
 import React from 'react'
 import Image from 'next/image'
