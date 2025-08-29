@@ -1,23 +1,22 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import Image from 'next/image'
-import Link from "next/link"
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Register() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-
-  const [usernameError, setUsernameError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [usernameError, setUsernameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [showPasswordCriteria, setShowPasswordCriteria] = useState(false);
 
   const router = useRouter();
@@ -31,76 +30,75 @@ export default function Register() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  let hasError = false;
+    let hasError = false;
 
-  if (!username.trim()) {
-    setUsernameError("กรุณากรอกชื่อผู้ใช้");
-    hasError = true;
-  } else {
-    setUsernameError("");
-  }
-
-  if (!email.trim()) {
-    setEmailError("กรุณากรอกอีเมล");
-    hasError = true;
-  } else {
-    setEmailError("");
-  }
-
-  if (!password.trim()) {
-    setPasswordError("กรุณากรอกรหัสผ่าน");
-    hasError = true;
-    setShowPasswordCriteria(true);
-  } else if (
-    !passwordCriteria.length ||
-    !passwordCriteria.upper ||
-    !passwordCriteria.lower ||
-    !passwordCriteria.number ||
-    !passwordCriteria.special
-  ) {
-    setPasswordError("รหัสผ่านไม่ตรงตามเงื่อนไขด้านล่าง");
-    hasError = true;
-    setShowPasswordCriteria(true);
-  } else {
-    setPasswordError("");
-    setShowPasswordCriteria(false);
-  }
-
-  if (confirmPassword !== password) {
-    setConfirmPasswordError("รหัสผ่านไม่ตรงกัน");
-    hasError = true;
-  } else {
-    setConfirmPasswordError("");
-  }
-
-  if (!hasError) {
-    try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      const resData = await response.json();
-
-      if (response.ok) {
-         console.log("สมัครสำเร็จ กำลังไปหน้า sign_in");
-         alert("สมัครสำเร็จ! กำลังไปหน้าเข้าสู่ระบบ");
-        router.push("/owner/sign_in");
-      } else {
-        if (resData.message === "อีเมลนี้ถูกใช้งานแล้ว") {
-          setEmailError("อีเมลนี้ถูกใช้งานแล้ว");
-        } else {
-          alert("เกิดข้อผิดพลาด: " + (resData.error || "ไม่สามารถบันทึกข้อมูลได้"));
-        }
-      }
-    } catch (error) {
-      alert("เกิดข้อผิดพลาด: " + error.message);
+    if (!username.trim()) {
+      setUsernameError("กรุณากรอกชื่อผู้ใช้");
+      hasError = true;
+    } else {
+      setUsernameError("");
     }
-  }
-};
+
+    if (!email.trim()) {
+      setEmailError("กรุณากรอกอีเมล");
+      hasError = true;
+    } else {
+      setEmailError("");
+    }
+
+    if (!password.trim()) {
+      setPasswordError("กรุณากรอกรหัสผ่าน");
+      hasError = true;
+      setShowPasswordCriteria(true);
+    } else if (
+      !passwordCriteria.length ||
+      !passwordCriteria.upper ||
+      !passwordCriteria.lower ||
+      !passwordCriteria.number ||
+      !passwordCriteria.special
+    ) {
+      setPasswordError("รหัสผ่านไม่ตรงตามเงื่อนไข");
+      hasError = true;
+      setShowPasswordCriteria(true);
+    } else {
+      setPasswordError("");
+      setShowPasswordCriteria(false);
+    }
+
+    if (confirmPassword !== password) {
+      setConfirmPasswordError("รหัสผ่านไม่ตรงกัน");
+      hasError = true;
+    } else {
+      setConfirmPasswordError("");
+    }
+
+    if (!hasError) {
+      try {
+        const response = await fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password }),
+        });
+
+        const resData = await response.json();
+
+        if (response.ok) {
+          alert("สมัครสำเร็จ! กำลังไปหน้าเข้าสู่ระบบ");
+          router.push("/owner/sign_in");
+        } else {
+          if (resData.message === "อีเมลนี้ถูกใช้งานแล้ว") {
+            setEmailError("อีเมลนี้ถูกใช้งานแล้ว");
+          } else {
+            alert("เกิดข้อผิดพลาด: " + (resData.error || "ไม่สามารถบันทึกข้อมูลได้"));
+          }
+        }
+      } catch (error) {
+        alert("เกิดข้อผิดพลาด: " + error.message);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-between">

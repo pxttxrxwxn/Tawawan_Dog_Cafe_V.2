@@ -1,66 +1,97 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { NextResponse } from "next/server";
 
-const filePath = path.join(process.cwd(), "data", "menus.json");
+const dataFile = path.join(process.cwd(), "data", "menus.json");
+const uploadDir = path.join(process.cwd(), "public", "uploads");
+
+async function readData() {
+  try {
+    const data = await fs.readFile(dataFile, "utf8");
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+async function writeData(data) {
+  await fs.writeFile(dataFile, JSON.stringify(data, null, 2));
+}
 
 export async function GET() {
-  try {
-    const data = await fs.readFile(filePath, "utf-8");
-    const menus = JSON.parse(data);
-    return new Response(JSON.stringify(menus), { status: 200 });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "ไม่สามารถอ่านข้อมูลได้" }), { status: 500 });
-  }
+  const menus = await readData();
+  return NextResponse.json(menus);
 }
 
 export async function POST(req) {
-  try {
-    const newMenu = await req.json();
-    const data = await fs.readFile(filePath, "utf-8");
-    const menus = JSON.parse(data);
+  const formData = await req.formData();
+  const menus = await readData();
 
-    menus.push(newMenu);
-    await fs.writeFile(filePath, JSON.stringify(menus, null, 2));
+  const code = formData.get("code");
+  const name = formData.get("name");
+  const category = formData.get("category");
+  const type = formData.get("type") ? JSON.parse(formData.get("type")) : "";
+  const price = formData.get("price");
+  const desc = formData.get("desc");
+  const file = formData.get("image");
 
-    return new Response(JSON.stringify(newMenu), { status: 201 });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "ไม่สามารถบันทึกข้อมูลได้" }), { status: 500 });
+  let imageUrl = null;
+  if (file && file.name) {
+    await fs.mkdir(uploadDir, { recursive: true });
+    const filePath = path.join(uploadDir, file.name);
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await fs.writeFile(filePath, buffer);
+    imageUrl = `/uploads/${file.name}`;
   }
+
+  const newMenu = { code, name, category, type, price, desc, image: imageUrl };
+  menus.push(newMenu);
+  await writeData(menus);
+
+  return NextResponse.json(newMenu);
 }
 
 export async function PUT(req) {
-  try {
-    const updatedMenu = await req.json();
-    const data = await fs.readFile(filePath, "utf-8");
-    const menus = JSON.parse(data);
+  const formData = await req.formData();
+  const menus = await readData();
 
-    const index = menus.findIndex(m => m.code === updatedMenu.originalCode);
-    if (index !== -1) {
-      menus[index] = { ...updatedMenu, code: updatedMenu.code || updatedMenu.originalCode };
-      delete menus[index].originalCode;
-      await fs.writeFile(filePath, JSON.stringify(menus, null, 2));
-      return new Response(JSON.stringify(menus[index]), { status: 200 });
-    } else {
-      return new Response(JSON.stringify({ error: "ไม่พบเมนู" }), { status: 404 });
-    }
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "ไม่สามารถแก้ไขข้อมูลได้" }), { status: 500 });
+  const originalCode = formData.get("originalCode");
+  const code = formData.get("code");
+  const name = formData.get("name");
+  const category = formData.get("category");
+  const type = formData.get("type") ? JSON.parse(formData.get("type")) : "";
+  const price = formData.get("price");
+  const desc = formData.get("desc");
+  const file = formData.get("image");
+
+  const idx = menus.findIndex((m) => m.code === originalCode);
+  if (idx === -1) {
+    return NextResponse.json({ error: "Menu not found" }, { status: 404 });
   }
+
+  let imageUrl = menus[idx].image;
+  if (file && file.name) {
+    await fs.mkdir(uploadDir, { recursive: true });
+    const filePath = path.join(uploadDir, file.name);
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await fs.writeFile(filePath, buffer);
+    imageUrl = `/uploads/${file.name}`;
+  }
+
+  menus[idx] = { code, name, category, type, price, desc, image: imageUrl };
+  await writeData(menus);
+
+  return NextResponse.json(menus[idx]);
 }
 
 
 export async function DELETE(req) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const code = searchParams.get("code");
+  const { searchParams } = new URL(req.url);
+  const code = searchParams.get("code");
 
-    const data = await fs.readFile(filePath, "utf-8");
-    let menus = JSON.parse(data);
-    menus = menus.filter(m => m.code !== code);
+  let menus = await readData();
+  menus = menus.filter((m) => m.code !== code);
+  await writeData(menus);
 
-    await fs.writeFile(filePath, JSON.stringify(menus, null, 2));
-    return new Response(JSON.stringify({ message: "ลบเมนูเรียบร้อยแล้ว" }), { status: 200 });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "ไม่สามารถลบข้อมูลได้" }), { status: 500 });
-  }
+  return NextResponse.json({ success: true });
 }

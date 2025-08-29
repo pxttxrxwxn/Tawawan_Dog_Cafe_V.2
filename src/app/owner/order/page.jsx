@@ -71,9 +71,9 @@ export default function order() {
               <hr className="my-2 ml-[-16px] text-gray-300 w-[388px]"/>
 
               <div>
-                <p className="font-semibold text-[40px]">รายการ</p>
+                <p className="font-semibold text-[40px] text-[#000000]">รายการ</p>
                 {order.items.map((item, index) => (
-                  <p className='ml-5' key={index}>{item}</p>
+                  <p className='ml-5 text-[#000000]' key={index}>{item}</p>
                 ))}
               </div>
               <hr className="my-2 ml-3 text-gray-300 w-[320px]"/>
