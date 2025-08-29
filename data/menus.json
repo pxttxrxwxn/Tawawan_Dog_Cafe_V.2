@@ -49,15 +49,6 @@
     "image": "/uploads/bx.jpg"
   },
   {
-    "code": "D003",
-    "name": "เค้กช็อก",
-    "category": "อาหารทานเล่น",
-    "type": "",
-    "price": "150",
-    "desc": "",
-    "image": "/uploads/bxxx.jpg"
-  },
-  {
     "code": "M002",
     "name": "กาแฟน้ำส้ม",
     "category": "เครื่องดื่ม",

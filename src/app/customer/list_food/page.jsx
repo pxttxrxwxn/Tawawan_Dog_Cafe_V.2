@@ -28,20 +28,39 @@ export default function ListFood() {
           if (filteredMenus.length === 0) return null;
 
           return (
-            <div key={category} className="mb-10">
-              <div className="flex justify-between items-center mb-6 mt-6">
-                <h1 className="text-[#D64545] text-4xl">{category}</h1>
+            <div key={category} id={category} className="mb-10 scroll-mt-[200px]">
+              <div
+                className={`mb-6 mt-6 ${
+                  category === "เมนูแนะนำ"
+                    ? "flex justify-center"
+                    : "flex justify-between items-center"
+                }`}
+              >
+                <h1 className="text-[#D64545] text-4xl font-bold">{category}</h1>
               </div>
+
               <div className="w-[80%] mx-auto">
                 <div className="grid grid-cols-3 gap-12">
                   {filteredMenus.map((menu) => (
-                    <div key={menu.code} className="bg-white rounded-lg shadow-md p-4 mx-10">
+                    <div
+                      key={menu.code}
+                      className="bg-white rounded-lg shadow-md p-4 mx-10"
+                    >
                       <div className="flex justify-center p-5">
-                        <Image src={menu.image} width={180} height={170} alt={menu.name} />
+                        <Image
+                          src={menu.image}
+                          width={180}
+                          height={170}
+                          alt={menu.name}
+                        />
                       </div>
                       <div className="flex items-center justify-between p-2">
-                        <h1 className="text-xl font-semibold mb-2 text-[#000000]">{menu.name}</h1>
-                        <h1 className="text-xl font-semibold mb-2 text-[#000000]">{menu.price}</h1>
+                        <h1 className="text-xl font-semibold mb-2 text-[#000000]">
+                          {menu.name}
+                        </h1>
+                        <h1 className="text-xl font-semibold mb-2 text-[#000000]">
+                          {menu.price}
+                        </h1>
                       </div>
                       <p className="text-gray-600 pl-2">{menu.desc}</p>
                       <div className="flex justify-end">
