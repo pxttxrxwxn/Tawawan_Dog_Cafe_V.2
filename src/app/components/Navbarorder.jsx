@@ -14,9 +14,9 @@ export default function Navbar({ activePage }) {
       }, []);
 
   const buttons = [
-    { id: 1, label: "1", key: "1",baseColor: "#F4A261" , Link:""},
-    { id: 2, label: "2", key: "2",baseColor: "#D7D6D6" , Link:""},
-    { id: 3, label: "3", key: "3",baseColor: "#D7D6D6" , Link:""},
+    { id: 1, label: "1", key: "1",baseColor: "#F4A261" , text: "ตะกร้าของฉัน"},
+    { id: 2, label: "2", key: "2",baseColor: "#D7D6D6" , text: "สั่งซื้อสินค้า" },
+    { id: 3, label: "3", key: "3",baseColor: "#D7D6D6" , text: "ข้อมูลการชำระเงิน"},
   ];
 
   return (
@@ -29,7 +29,7 @@ export default function Navbar({ activePage }) {
         <nav className="flex">
             {buttons.map((btn, index) => {
                 const isActiveDefault =
-                    (activePage === "" && (btn.key === "1" || btn.key === "2")) ||
+                    (activePage === "2" && (btn.key === "1" || btn.key === "2")) ||
                     (activePage === "3" && (btn.key === "1" || btn.key === "2" || btn.key === "3"));
                 const btnColor = activePage === btn.key || isActiveDefault ? "#F4A261" : btn.baseColor;
 
@@ -42,21 +42,22 @@ export default function Navbar({ activePage }) {
 
                 return (
                 <div key={btn.id} className="flex items-center">
-                    <Link href={btn.Link}>
-                    <button
-                        className="w-[76px] h-[76px] rounded-[50%] text-black font-semibold"
-                        style={{
-                        backgroundColor: btnColor,
-                        cursor: "pointer",
-                        }}
-                    >
-                        {btn.label}
-                    </button>
-                    </Link>
+                    <div className=" flex-col items-center">
+                        <button
+                            className="w-[76px] h-[76px] rounded-[50%] text-black font-semibold"
+                            style={{
+                            backgroundColor: btnColor,
+                            cursor: "pointer",
+                            }}
+                        >
+                            {btn.label}
+                        </button>
+                        <p className="mt-2 text-black text-sm">{btn.text}</p>
+                    </div>
 
                     {index < buttons.length - 1 && (
                     <div
-                        className="flex w-[350px] h-[5px]"
+                        className="flex mb-5 w-[350px] h-[5px]"
                         style={{ backgroundColor: lineColor }}
                     ></div>
                     )}
