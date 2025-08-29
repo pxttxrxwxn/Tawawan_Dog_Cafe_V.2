@@ -116,7 +116,7 @@ export default function Menu() {
     formData.append("price", newMenu.price);
     formData.append("desc", newMenu.desc);
     if (form.menuImage.files[0]) {
-      formData.append("image", form.menuImage.files[0]); // ถ้าเปลี่ยนรูป
+      formData.append("image", form.menuImage.files[0]);
     }
     try {
       if (editingMenu) {
@@ -184,7 +184,7 @@ export default function Menu() {
 
         {menus.length > 0 && (
           <div className="overflow-x-auto flex justify-center mb-10">
-            <table className="border-collapse w-[80%] text-center text-black">
+            <table className="border-collapse w-[95%] text-center text-black">
               <thead>
                 <tr className="bg-[#F79C4B] text-white">
                   <th className="border border-black px-4 py-2">รูป</th>
