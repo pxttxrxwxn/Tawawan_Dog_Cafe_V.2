@@ -6,7 +6,7 @@ import Image from "next/image";
 
 export default function ListFood() {
   const [menus, setMenus] = useState([]);
-  const [cart, setCart] = useState({}); // {menuCode: qty}
+  const [cart, setCart] = useState({}); 
 
   useEffect(() => {
     import("/data/menus.json").then((data) => {
@@ -89,8 +89,6 @@ export default function ListFood() {
                         </div>
                         <p className="text-gray-600 pl-2">{menu.desc}</p>
                         
-                        {/* ถ้า qty == 0 → แสดงปุ่ม + สีเขียว */}
-                        {/* ถ้ามีแล้ว → แสดง - qty + */}
                         <div className="flex justify-end mt-3">
                           {qty === 0 ? (
                             <div className="flex justify-end">
