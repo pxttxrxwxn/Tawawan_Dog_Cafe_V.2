@@ -112,7 +112,7 @@ export default function ListFood() {
                                     >
                                         -
                                     </div>
-                                    <span className="w-6 text-center">{qty}</span>
+                                    <span className="w-6 text-center text-black">{qty}</span>
                                     <div
                                         onClick={() => increment(menu.code)}
                                         className="text-black"
