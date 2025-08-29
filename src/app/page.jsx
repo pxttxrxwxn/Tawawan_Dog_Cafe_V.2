@@ -12,11 +12,13 @@ export default function Index() {
       <div className="bg-[#FFE8A3] h-screen w-[60%] flex flex-col items-right rounded-l-[100px]">
         <div className="flex flex-col justify-center items-center h-screen space-y-[5%]">
           <div className="flex flex-col justify-center items-center gap-y-6">
-            <button className="bg-[#8D6E63] w-[80%] md:w-[500px] h-[80px] md:h-[103px] rounded-2xl font-Inter text-xl md:text-4xl lg:text-[48px] text-white 
-              flex justify-center items-center shadow-md cursor-pointer 
-              hover:opacity-90 hover:text-black transform transition-transform duration-300 hover:scale-105">
-              Customer
-            </button>
+            <Link href="/customer/choose_table">
+              <button className="bg-[#8D6E63] w-[80%] md:w-[500px] h-[80px] md:h-[103px] rounded-2xl font-Inter text-xl md:text-4xl lg:text-[48px] text-white 
+                flex justify-center items-center shadow-md cursor-pointer 
+                hover:opacity-90 hover:text-black transform transition-transform duration-300 hover:scale-105">
+                Customer
+              </button>
+            </Link>
             <p className="text-[#D64545] font-Inter text-[20px] underline">
               สำหรับลูกค้าที่ต้องการสั่งอาหารในร้าน
             </p>
