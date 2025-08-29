@@ -1,7 +1,5 @@
 import React from 'react'
 import Navbar from '../../components/Navbar'
-import TodayIcon from '@mui/icons-material/Today'
-import { Alarm, CheckBox, ContentPaste } from '@mui/icons-material'
 
 
 export default function order() {
@@ -101,6 +99,6 @@ export default function order() {
         </div>
       </div>
     </div>
-    </div>
+  </div>
   )
 }
