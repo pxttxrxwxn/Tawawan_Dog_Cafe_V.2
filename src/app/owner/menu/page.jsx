@@ -106,29 +106,30 @@ export default function Menu() {
         : form.menuType?.value || "",
       price: form.menuCategory.value === "เครื่องดื่ม" ? basePrice : form.menuPrice.value || "",
       desc: form.menuDesc.value,
-      image: form.menuImage.files[0]
-        ? URL.createObjectURL(form.menuImage.files[0])
-        : editingMenu
-        ? editingMenu.image
-        : null,
     };
+    const formData = new FormData();
+    formData.append("originalCode", originalCode || "");
+    formData.append("code", newMenu.code);
+    formData.append("name", newMenu.name);
+    formData.append("category", newMenu.category);
+    formData.append("type", JSON.stringify(newMenu.type));
+    formData.append("price", newMenu.price);
+    formData.append("desc", newMenu.desc);
+    if (form.menuImage.files[0]) {
+      formData.append("image", form.menuImage.files[0]); // ถ้าเปลี่ยนรูป
+    }
     try {
       if (editingMenu) {
-        await fetch("/api/menus", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...newMenu, originalCode }),
-        });
+        await fetch("/api/menus", 
+          { method: "PUT", 
+            body: formData 
+          });
         setMenus((prev) =>
-          prev.map((m) => (m.code === originalCode ? newMenu : m))
+          prev.map((m) => m.code === originalCode ? { ...newMenu, image: form.menuImage.files[0] ? `/uploads/${form.menuImage.files[0].name}` : editingMenu.image } : m)
         );
       } else {
-        await fetch("/api/menus", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newMenu),
-        });
-        setMenus((prev) => [...prev, newMenu]);
+        await fetch("/api/menus", { method: "POST", body: formData });
+        setMenus((prev) => [...prev, { ...newMenu, image: `/uploads/${form.menuImage.files[0].name}` }]);
       }
     } catch (err) {
       console.error(err);
