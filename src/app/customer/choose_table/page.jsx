@@ -10,12 +10,12 @@ export default function ChooseTable() {
     };
 
     return (
-        <div className="min-h-screen bg-[#fdf6e3] flex">
-            <div className="flex justify-start mt-[35px] ml-[20px]">
+        <div className="min-w-screen">
+            <div className="flex  mt-[35px] ml-[20px]">
                 <div>
                     <Image src="/logo.png" alt="Logo" width={180} height={170} />
                 </div>
-                <div className='ml-[50px] mt-[30px]'>
+                <div className='mx-auto mt-[30px]'>
                     <div className='flex justify-center w-[925px] bg-[#FFE8A3] rounded-2xl'>
                         <div className='mt-[50px] mb-[50px]'>
                             <p className='text-[40px] text-[#D64545]'>
