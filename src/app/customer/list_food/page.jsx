@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbarfood";
 import Image from "next/image";
 import Link from "next/link";
-import { type } from "os";
 
 export default function ListFood() {
   const [menus, setMenus] = useState([]);
