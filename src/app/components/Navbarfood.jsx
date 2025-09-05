@@ -18,8 +18,8 @@ export default function Navbar({ activePage }) {
 
   const buttons = [
     { id: 1, label: "เครื่องดื่ม", baseColor: "#8D6E63", link: "/customer/list_food" },
-    { id: 2, label: "ขนมหวาน", baseColor: "#8D6E63" },
-    { id: 3, label: "อาหารทานเล่น", baseColor: "#8D6E63" },
+    { id: 2, label: "ขนมหวาน", baseColor: "#8D6E63" , link: "/customer/list_food"},
+    { id: 3, label: "อาหารทานเล่น", baseColor: "#8D6E63" , link: "/customer/list_food"},
   ];
 
   const handleClick = (btn) => {

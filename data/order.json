@@ -1,0 +1,26 @@
+[
+  {
+    "code": "M002",
+    "name": "กาแฟน้ำส้ม",
+    "basePrice": 40,
+    "type": "เย็น",
+    "typePrice": 5,
+    "sugarLevel": "50%",
+    "quantity": 1,
+    "totalPrice": 45,
+    "note": "",
+    "image": "/uploads/dx.jpg"
+  },
+  {
+    "code": "M001",
+    "name": "ลาเต้",
+    "basePrice": 35,
+    "type": "ปั่น",
+    "typePrice": 10,
+    "sugarLevel": "75%",
+    "quantity": 1,
+    "totalPrice": 45,
+    "note": "",
+    "image": "/uploads/ลาเต้เย็น 1.png"
+  }
+]
