@@ -57,21 +57,13 @@ export default function ShowDetail() {
       image: menu.image,
     };
 
-    try {
-      const res = await fetch("/api/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(order),
-      });
+  router.push("/customer/list_food");
 
-      if (res.ok) {
-        router.push("/customer/list_food");
-      } else {
-        console.error("เพิ่มออเดอร์ไม่สำเร็จ");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    fetch("/api/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(order),
+    }).catch((err) => console.error("เพิ่มออเดอร์ไม่สำเร็จ:", err));
   };
   return (
     <div className="min-h-screen">

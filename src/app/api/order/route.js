@@ -35,11 +35,10 @@ export async function POST(req) {
       (orders[index].basePrice + (orders[index].typePrice || 0)) *
       orders[index].quantity;
   } else {
-      const basePrice = Number(newOrder.basePrice || newOrder.price || 0);
-      const typePrice = Number(newOrder.typePrice || 0);
-      const quantity = Number(newOrder.quantity || 1);
-
-      const totalPrice = (basePrice + typePrice) * quantity;
+    const basePrice = Number(newOrder.basePrice || newOrder.price || 0);
+    const typePrice = Number(newOrder.typePrice || 0);
+    const quantity = Number(newOrder.quantity || 1);
+    const totalPrice = (basePrice + typePrice) * quantity;
 
     orders.push({
       ...newOrder,
@@ -50,11 +49,9 @@ export async function POST(req) {
     });
   }
 
-  await writeOrders(orders);
+  writeOrders(orders).catch((err) => console.error("เขียนไฟล์ order.json ไม่สำเร็จ:", err));
 
-  return new Response(JSON.stringify({ success: true, orders }), {
-    status: 200,
-  });
+  return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
 }
 
 export async function DELETE(req) {
