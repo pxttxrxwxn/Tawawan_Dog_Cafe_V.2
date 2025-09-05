@@ -7,19 +7,30 @@ import Link from "next/link";
 
 export default function ListFood() {
   const [menus, setMenus] = useState([]);
-  const [counts, setCounts] = useState({}); // เก็บจำนวนของแต่ละเมนู
+  const [counts, setCounts] = useState({});
 
   useEffect(() => {
+    // โหลดเมนู
     import("/data/menus.json").then((data) => {
       setMenus(data.default || data);
     });
+
+    // โหลด order.json
+    fetch("/api/order")
+      .then((res) => res.json())
+      .then((data) => {
+        const initialCounts = {};
+        data.forEach((item) => {
+          initialCounts[item.code] = (initialCounts[item.code] || 0) + item.quantity;
+        });
+        setCounts(initialCounts);
+      });
   }, []);
 
   const handleSelectDrinkMenu = (menu) => {
     localStorage.setItem("selectedDrinkMenu", JSON.stringify(menu));
   };
 
-  // เพิ่มจำนวน → POST ไป API
   const handleIncrease = async (menu) => {
     setCounts((prev) => ({ ...prev, [menu.code]: (prev[menu.code] || 0) + 1 }));
 
@@ -37,7 +48,6 @@ export default function ListFood() {
     });
   };
 
-  // ลดจำนวน → DELETE ไป API
   const handleDecrease = async (menu) => {
     setCounts((prev) => {
       const newCount = (prev[menu.code] || 0) - 1;
