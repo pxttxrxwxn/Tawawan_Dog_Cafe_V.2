@@ -2,12 +2,10 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
 
-export default function Navbar({ activePage }) {
+
+export default function Navbar() {
   const [tableNumber, setTableNumber] = useState("");
-  const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     const selectedTable = localStorage.getItem("selectedTable");
@@ -17,29 +15,10 @@ export default function Navbar({ activePage }) {
   }, []);
 
   const buttons = [
-    { id: 1, label: "เครื่องดื่ม", baseColor: "#8D6E63", link: "/customer/list_food" },
-    { id: 2, label: "ขนมหวาน", baseColor: "#8D6E63" , link: "/customer/list_food"},
-    { id: 3, label: "อาหารทานเล่น", baseColor: "#8D6E63" , link: "/customer/list_food"},
+    { id: 1, label: "เครื่องดื่ม", baseColor: "#8D6E63", link: "/customer/list_food#เครื่องดื่ม" },
+    { id: 2, label: "ขนมหวาน", baseColor: "#8D6E63", link: "/customer/list_food#ขนมหวาน" },
+    { id: 3, label: "อาหารทานเล่น", baseColor: "#8D6E63", link: "/customer/list_food#อาหารทานเล่น" },
   ];
-
-  const handleClick = (btn) => {
-    if (btn.label === "เครื่องดื่ม") {
-      if (pathname === "/customer/list_food") {
-        scrollToCategory(btn.label);
-      } else {
-        router.push(btn.link);
-      }
-    } else {
-      scrollToCategory(btn.label);
-    }
-  };
-
-  const scrollToCategory = (id) => {
-    const section = document.getElementById(id);
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   return (
     <div className="fixed top-0 left-0 w-screen h-[187px] bg-[#FFE8A3] z-50 shadow-md px-6">
@@ -50,17 +29,14 @@ export default function Navbar({ activePage }) {
 
         <nav className="flex space-x-20">
           {buttons.map((btn) => (
-            <button
-              key={btn.id}
-              onClick={() => handleClick(btn)}
-              className="w-[209px] h-[75px] rounded-md text-white font-semibold"
-              style={{
-                backgroundColor: btn.baseColor,
-                cursor: "pointer",
-              }}
-            >
-              {btn.label}
-            </button>
+            <Link key={btn.id} href={btn.link}>
+              <button
+                className="w-[209px] h-[75px] rounded-md text-white font-semibold"
+                style={{ backgroundColor: btn.baseColor }}
+              >
+                {btn.label}
+              </button>
+            </Link>
           ))}
         </nav>
 
@@ -76,9 +52,7 @@ export default function Navbar({ activePage }) {
             </svg>
           </Link>
           <div>
-            <p className="text-[30px] text-[#000000]">
-              โต๊ะ : {tableNumber}
-            </p>
+            <p className="text-[30px] text-[#000000]">โต๊ะ : {tableNumber}</p>
           </div>
         </div>
       </div>
