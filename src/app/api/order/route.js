@@ -1,25 +1,28 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-const filePath = path.join(process.cwd(), "data", "order.json");
+const orderFilePath = path.join(process.cwd(), "data", "order.json");
+const ownerFilePath = path.join(process.cwd(), "data", "order_owner.json");
 
-async function readOrders() {
+
+async function readFile(filePath) {
   try {
     const data = await fs.readFile(filePath, "utf-8");
     return JSON.parse(data);
-  } catch (err) {
+  } catch {
     return [];
   }
 }
 
-async function writeOrders(orders) {
-  await fs.writeFile(filePath, JSON.stringify(orders, null, 2), "utf-8");
+
+async function writeFile(filePath, data) {
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
 
 export async function POST(req) {
   const newOrder = await req.json();
-  let orders = await readOrders();
+  let orders = await readFile(orderFilePath);
 
   const index = orders.findIndex(
     (o) =>
@@ -49,45 +52,57 @@ export async function POST(req) {
     });
   }
 
-  writeOrders(orders).catch((err) => console.error("เขียนไฟล์ order.json ไม่สำเร็จ:", err));
+  await writeFile(orderFilePath, orders);
 
   return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
 }
+
 
 export async function DELETE(req) {
-  const { code, type, sugarLevel, note, all } = await req.json();
-  let orders = await readOrders();
+  const { all, tableNumber } = await req.json();
+  let orders = await readFile(orderFilePath);
 
-  if (all) {
+  if (all && orders.length > 0) {
+    let ownerOrders = await readFile(ownerFilePath);
+
+    // หาเลข order ล่าสุด
+    let lastOrderNumber = ownerOrders.length
+      ? ownerOrders[ownerOrders.length - 1].ordernumber
+      : "O1000";
+
+    // สร้าง ordernumber ใหม่
+    let nextOrderNumber =
+      "O" + (parseInt(lastOrderNumber.substring(1)) + 1).toString().padStart(4, "0");
+
+    // รวมเมนูทั้งหมดใน object เดียว
+    const newOrderGroup = {
+      ordernumber: nextOrderNumber,
+      tableNumber: tableNumber || "ไม่ระบุ",
+      items: orders.map((item) => ({
+        name: item.name,
+        type: item.type,
+        sugarLevel: item.sugarLevel,
+        quantity: item.quantity,
+        totalPrice: item.totalPrice,
+        note: item.note,
+      })),
+    };
+
+    // เพิ่ม order group นี้ไป ownerOrders
+    ownerOrders.push(newOrderGroup);
+
+    // เขียนกลับไป owner file
+    await writeFile(ownerFilePath, ownerOrders);
+
+    // ล้าง order.json
     orders = [];
-  } else {
-    const index = orders.findIndex(
-      (o) =>
-        o.code === code &&
-        (type ? o.type === type : true) &&
-        (sugarLevel ? o.sugarLevel === sugarLevel : true) &&
-        (note ? o.note === note : true)
-    );
-
-    if (index > -1) {
-      if (orders[index].quantity > 1) {
-        orders[index].quantity -= 1;
-        orders[index].totalPrice =
-          (orders[index].basePrice + (orders[index].typePrice || 0)) *
-          orders[index].quantity;
-      } else {
-        orders.splice(index, 1);
-      }
-    }
   }
 
-  await writeOrders(orders);
+  await writeFile(orderFilePath, orders);
   return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
 }
 
-
-
 export async function GET() {
-  const orders = await readOrders();
+  const orders = await readFile(orderFilePath);
   return new Response(JSON.stringify(orders), { status: 200 });
 }

@@ -7,8 +7,12 @@ import Link from "next/link";
 export default function Order_Customer() {
   const [orders, setOrders] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [tableNumber, setTableNumber] = useState("");
 
   useEffect(() => {
+    const selectedTable = localStorage.getItem("selectedTable");
+    if (selectedTable) setTableNumber(selectedTable);
+
     import("/data/order.json").then((data) => {
       setOrders(data.default || data);
     });
@@ -24,7 +28,7 @@ export default function Order_Customer() {
       const res = await fetch("/api/order", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ all: true }),
+        body: JSON.stringify({ all: true, tableNumber }),
       });
       const data = await res.json();
       if (data.success) {
