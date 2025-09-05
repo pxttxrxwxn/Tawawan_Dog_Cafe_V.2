@@ -1,8 +1,25 @@
-import React from 'react'
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Navbar from '../../components/Navbar'
 import Link from "next/link"
 
-export default function oder_completed() {
+export default function OrderCompleted() {
+    const [orders, setOrders] = useState([]);
+    useEffect(() => {
+    
+        fetch("/data/Order_completed.json")
+          .then((res) => res.json())
+          .then((data) => setOrders(data))
+          .catch((err) => console.error(err));
+      }, []);
+    const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = String(date.getFullYear()).slice(-2);
+        return `${day}/${month}/${year}`;
+    };
     return (
         <div className="min-h-screen">
             <Navbar activePage="order" />
@@ -37,20 +54,40 @@ export default function oder_completed() {
                             ประวัติการสั่งซื้อที่เสร็จสิ้น
                         </h2>
                     </div>
-                    <div className="overflow-x-auto flex justify-center mb-10">
-                        <table className="border-collapse w-[95%] text-center text-black">
-                            <thead>
-                                <tr className="bg-[#F79C4B] text-white">
-                                <th className="border border-black px-1 py-2">หมายเลขออเดอร์</th>
-                                <th className="border border-black px-4 py-2">วันที่/เวลา</th>
-                                <th className="border border-black px-4 py-2">รายการ</th>
-                                <th className="border border-black px-4 py-2">โต๊ะ</th>
-                                <th className="border border-black px-4 py-2">ยอดรวม</th>
-                                <th className="border border-black px-4 py-2">สถานะ</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
+                    {orders.length > 0 ? (
+                        <div className="overflow-x-auto flex justify-center mb-10">
+                            <table className="border-collapse w-[80%] text-center text-black">
+                                <thead>
+                                    <tr className="bg-[#F79C4B] text-white">
+                                    <th className="border border-black px-1 py-2">หมายเลขออเดอร์</th>
+                                    <th className="border border-black px-4 py-2">วันที่ | เวลา</th>
+                                    <th className="border border-black px-4 py-2">รายการ</th>
+                                    <th className="border border-black px-4 py-2">โต๊ะ</th>
+                                    <th className="border border-black px-4 py-2">ยอดรวม</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {orders.map((order, index) => (
+                                        <tr key={index} className="bg-white">
+                                            <td className="border border-black px-4 py-2">{order.ordernumber}</td>
+                                            <td className="border border-black px-4 py-2">{formatDate(order.date)} | เวลา: {order.time}</td>
+                                            <td className="border border-black px-4 py-2">
+                                                {order.items.map((item, index) => (
+                                                    <div key={index} className="flex justify-start p-2">
+                                                        {item.quantity}x {item.name}{item.type ? `${item.type}` : ""}
+                                                    </div>
+                                                ))}
+                                            </td>
+                                            <td className="border border-black px-4 py-2">{order.tableNumber}</td>
+                                            <td className="border border-black px-4 py-2">{order.total}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <p className="text-center text-gray-500 mt-10">ไม่มีข้อมูลคำสั่งซื้อ</p>
+                    )}
                 </div>
             </div>
         </div>

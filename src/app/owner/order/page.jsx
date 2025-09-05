@@ -22,6 +22,22 @@ export default function Order() {
     const year = String(date.getFullYear()).slice(-2);
     return `${day}/${month}/${year}`;
   };
+  const completeOrder = async (ordernumber) => {
+    try {
+      const res = await fetch("/api/Order_completed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ordernumber }),
+      });
+      if (res.ok) {
+        setOrders((prev) => prev.filter((o) => o.ordernumber !== ordernumber));
+      } else {
+        console.error("Failed to complete order");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="">
@@ -103,11 +119,13 @@ export default function Order() {
                   <path d="M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-800q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80Zm0-360Zm112 168 56-56-128-128v-184h-80v216l152 152ZM224-866l56 56-170 170-56-56 170-170Zm512 0 170 170-56 56-170-170 56-56ZM480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720q-117 0-198.5 81.5T200-440q0 117 81.5 198.5T480-160Z"/>
                 </svg>
                 <p className="font-bold text-[20px] text-[#F4A261] ml-2">
-                  สถานะ: <span className="text-[#F4A261] font-bold">รอดำเนินการ</span>
+                  สถานะ: รอดำเนินการ
                 </p>
               </div>
               <div className='flex justify-end'>
-                <button className="w-[141px] h-[42px] bg-[#0FA958] text-white text-[15px] px-3 py-1 rounded cursor-pointer">
+                <button 
+                  onClick={() => completeOrder(order.ordernumber)}
+                  className="w-[141px] h-[42px] bg-[#0FA958] text-white text-[15px] px-3 py-1 rounded cursor-pointer">
                   ออเดอร์เสร็จสิ้น
                 </button>
               </div>
