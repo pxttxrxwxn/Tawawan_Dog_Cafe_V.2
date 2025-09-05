@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 
 const orderFilePath = path.join(process.cwd(), "data", "order.json");
-const ownerFilePath = path.join(process.cwd(), "data", "order_owner.json");
+const ownerFilePath = path.join(process.cwd(), "public", "data", "order_owner.json");
 
 
 async function readFile(filePath) {
@@ -65,19 +65,22 @@ export async function DELETE(req) {
   if (all && orders.length > 0) {
     let ownerOrders = await readFile(ownerFilePath);
 
-    // หาเลข order ล่าสุด
     let lastOrderNumber = ownerOrders.length
       ? ownerOrders[ownerOrders.length - 1].ordernumber
       : "O1000";
 
-    // สร้าง ordernumber ใหม่
     let nextOrderNumber =
       "O" + (parseInt(lastOrderNumber.substring(1)) + 1).toString().padStart(4, "0");
 
-    // รวมเมนูทั้งหมดใน object เดียว
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const time = now.toTimeString().split(" ")[0];
+
     const newOrderGroup = {
       ordernumber: nextOrderNumber,
       tableNumber: tableNumber || "ไม่ระบุ",
+      date,
+      time,
       items: orders.map((item) => ({
         name: item.name,
         type: item.type,
@@ -88,13 +91,10 @@ export async function DELETE(req) {
       })),
     };
 
-    // เพิ่ม order group นี้ไป ownerOrders
     ownerOrders.push(newOrderGroup);
 
-    // เขียนกลับไป owner file
     await writeFile(ownerFilePath, ownerOrders);
 
-    // ล้าง order.json
     orders = [];
   }
 
