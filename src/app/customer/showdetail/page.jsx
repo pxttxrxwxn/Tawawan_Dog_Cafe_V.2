@@ -72,7 +72,7 @@ export default function ShowDetail() {
         <div className="flex justify-center items-center mb-6">
           <div className="bg-white w-[1000px] h-[500px] rounded-2xl flex justify-between">
             <div className="flex fex-col mb-6 justify-between w-[1000px]">
-              <div className="w-1/2 ml-[5%]">
+              <div className="w-1/2 m-auto">
                 <div className="flex justify-center mb-4">
                   <Image
                     src={menu.image}
@@ -96,7 +96,7 @@ export default function ShowDetail() {
               <div className="w-1/2 m-auto space-y-4">
                 {menu.type && typeof menu.type === "object" && (
                   <div>
-                    <h1 className="text-2xl font-bold text-[#000000] mb-2">
+                    <h1 className="text-2xl font-bold text-[#000000] mb-2 font-chakra">
                       รูปแบบ
                     </h1>
                     <div className="flex gap-3">
