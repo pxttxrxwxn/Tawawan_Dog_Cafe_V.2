@@ -30,7 +30,7 @@ export default function Navbar({ activePage }) {
           <Image src="/logo.png" alt="Logo" width={166} height={143} />
         </div>
 
-        <nav className="flex">
+        <nav className="flex ">
             {buttons.map((btn, index) => {
                 const isActiveDefault =
                     (activePage === "2" && (btn.key === "1" || btn.key === "2")) ||
@@ -48,7 +48,7 @@ export default function Navbar({ activePage }) {
                 <div key={btn.id} className="flex items-center">
                     <div className=" flex-col items-center">
                         <button
-                            className="w-[76px] h-[76px] rounded-[50%] text-black font-semibold"
+                            className="w-[76px] h-[76px] rounded-[50%] text-[#544E4E] font-semibold"
                             style={{
                             backgroundColor: btnColor,
                             cursor: "pointer",

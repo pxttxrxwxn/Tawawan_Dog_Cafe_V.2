@@ -54,35 +54,48 @@ export async function POST(req) {
   return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
 }
 
+// route.js (DELETE)
 export async function DELETE(req) {
-  const { code, type, sugarLevel, note } = await req.json();
+  const { code, type, sugarLevel, note, all } = await req.json();
   let orders = await readOrders();
 
-  const index = orders.findIndex(
-    (o) =>
-      o.code === code &&
-      (type ? o.type === type : true) &&
-      (sugarLevel ? o.sugarLevel === sugarLevel : true) &&
-      (note ? o.note === note : true)
-  );
+  if (all) {
+    // ลบสินค้าทั้งหมดที่ตรงกับ code/type/sugarLevel/note
+    orders = orders.filter(
+      (o) =>
+        !(
+          o.code === code &&
+          (type ? o.type === type : true) &&
+          (sugarLevel ? o.sugarLevel === sugarLevel : true) &&
+          (note ? o.note === note : true)
+        )
+    );
+  } else {
+    // ลดทีละ 1 (ของเดิม)
+    const index = orders.findIndex(
+      (o) =>
+        o.code === code &&
+        (type ? o.type === type : true) &&
+        (sugarLevel ? o.sugarLevel === sugarLevel : true) &&
+        (note ? o.note === note : true)
+    );
 
-  if (index > -1) {
-    if (orders[index].quantity > 1) {
-      orders[index].quantity -= 1;
-      orders[index].totalPrice =
-        (orders[index].basePrice + (orders[index].typePrice || 0)) *
-        orders[index].quantity;
-    } else {
-      orders.splice(index, 1);
+    if (index > -1) {
+      if (orders[index].quantity > 1) {
+        orders[index].quantity -= 1;
+        orders[index].totalPrice =
+          (orders[index].basePrice + (orders[index].typePrice || 0)) *
+          orders[index].quantity;
+      } else {
+        orders.splice(index, 1);
+      }
     }
   }
 
   await writeOrders(orders);
-
-  return new Response(JSON.stringify({ success: true, orders }), {
-    status: 200,
-  });
+  return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
 }
+
 
 export async function GET() {
   const orders = await readOrders();
