@@ -19,6 +19,23 @@ export default function Order_Customer() {
     setTotalAmount(total);
   }, [orders]);
 
+  const handleRemoveAll = async () => {
+    try {
+      const res = await fetch("/api/order", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ all: true }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOrders([]);
+        setTotalAmount(0);
+      }
+    } catch (error) {
+      console.error("Failed to remove all items:", error);
+    }
+  };
+
   return (
     <div className="">
       <Nabarorder activePage="2" />
@@ -30,7 +47,7 @@ export default function Order_Customer() {
           รวม ({orders.length} รายการ):
         </h1>
         <span className="text-[#D64545] font-bold">{totalAmount} ฿</span>
-        <Link href="/customer/Order_Customer_pay">
+        <Link href="/customer/Completed_Order">
           <button
             className={`px-4 py-2 rounded-md text-3xl mr-6 text-white ${
               orders.length > 0
@@ -38,6 +55,7 @@ export default function Order_Customer() {
                 : "bg-[#DDDDDD] cursor-not-allowed"
             }`}
             disabled={orders.length === 0}
+            onClick={handleRemoveAll}
           >
             สั่งสินค้า
           </button>

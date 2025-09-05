@@ -54,24 +54,13 @@ export async function POST(req) {
   return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
 }
 
-// route.js (DELETE)
 export async function DELETE(req) {
   const { code, type, sugarLevel, note, all } = await req.json();
   let orders = await readOrders();
 
   if (all) {
-    // ลบสินค้าทั้งหมดที่ตรงกับ code/type/sugarLevel/note
-    orders = orders.filter(
-      (o) =>
-        !(
-          o.code === code &&
-          (type ? o.type === type : true) &&
-          (sugarLevel ? o.sugarLevel === sugarLevel : true) &&
-          (note ? o.note === note : true)
-        )
-    );
+    orders = [];
   } else {
-    // ลดทีละ 1 (ของเดิม)
     const index = orders.findIndex(
       (o) =>
         o.code === code &&
@@ -95,6 +84,7 @@ export async function DELETE(req) {
   await writeOrders(orders);
   return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
 }
+
 
 
 export async function GET() {
