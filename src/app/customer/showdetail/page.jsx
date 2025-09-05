@@ -90,7 +90,7 @@ export default function ShowDetail() {
                   </h1>
                 </div>
                 <h1 className="text-xl font-bold text-center mb-2 text-[#757575]">
-                  {menu.desc || "ไม่มีคำอธิบาย"}
+                  {menu.desc}
                 </h1>
               </div>
               <div className="w-1/2 m-auto space-y-4">

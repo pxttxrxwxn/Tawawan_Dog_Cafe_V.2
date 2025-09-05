@@ -182,5 +182,61 @@
         "note": null
       }
     ]
+  },
+  {
+    "ordernumber": "O1006",
+    "tableNumber": "2",
+    "date": "2025-09-05",
+    "time": "20:35:22",
+    "items": [
+      {
+        "name": "ไดฟุกุสตรอเบอรี่",
+        "type": null,
+        "sugarLevel": null,
+        "quantity": 1,
+        "totalPrice": 50,
+        "note": null
+      },
+      {
+        "name": "กาแฟน้ำส้ม",
+        "type": "เย็น",
+        "sugarLevel": "50%",
+        "quantity": 4,
+        "totalPrice": 180,
+        "note": ""
+      },
+      {
+        "name": "กาแฟน้ำส้ม",
+        "type": "เย็น",
+        "sugarLevel": "25%",
+        "quantity": 1,
+        "totalPrice": 45,
+        "note": ""
+      }
+    ]
+  },
+  {
+    "ordernumber": "O1007",
+    "tableNumber": "2",
+    "date": "2025-09-05",
+    "time": "20:35:59",
+    "items": [
+      {
+        "name": "ลาเต้",
+        "type": "เย็น",
+        "sugarLevel": "75%",
+        "quantity": 1,
+        "totalPrice": 40,
+        "note": ""
+      },
+      {
+        "name": "กาแฟน้ำส้ม",
+        "type": "เย็น",
+        "sugarLevel": "25%",
+        "quantity": 1,
+        "totalPrice": 45,
+        "note": ""
+      }
+    ]
   }
 ]
