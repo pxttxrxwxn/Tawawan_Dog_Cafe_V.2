@@ -1,13 +1,29 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Nabarorder from "../../components/Navbarorder";
-import Link from "next/link";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 export default function CompletedOrder() {
-    return (
-        <div>
-            <Nabarorder activePage="3" />
-        </div>
-    );
+  const router = useRouter();
+
+  useEffect(() => {
+    Swal.fire({
+      title: "การชำระเงินสำเร็จ",
+      text: "ขอบคุณที่สั่งซื้อ เรากำลังเตรียมสินค้าให้คุณ",
+      icon: "success",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    }).then(() => {
+      router.push("/customer/Notifications");
+    });
+  }, [router]);
+
+  return (
+    <div>
+      <Nabarorder activePage="3" />
+    </div>
+  );
 }
