@@ -19,18 +19,39 @@ export default function ListFood() {
     localStorage.setItem("selectedDrinkMenu", JSON.stringify(menu));
   };
 
-  const handleIncrease = (code) => {
-    setCounts((prev) => ({ ...prev, [code]: (prev[code] || 0) + 1 }));
+  // เพิ่มจำนวน → POST ไป API
+  const handleIncrease = async (menu) => {
+    setCounts((prev) => ({ ...prev, [menu.code]: (prev[menu.code] || 0) + 1 }));
+
+    await fetch("/api/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: menu.code,
+        name: menu.name,
+        image: menu.image,
+        basePrice: menu.price,
+        quantity: 1,
+        totalPrice: menu.price,
+      }),
+    });
   };
 
-  const handleDecrease = (code) => {
+  // ลดจำนวน → DELETE ไป API
+  const handleDecrease = async (menu) => {
     setCounts((prev) => {
-      const newCount = (prev[code] || 0) - 1;
+      const newCount = (prev[menu.code] || 0) - 1;
       if (newCount <= 0) {
-        const { [code]: _, ...rest } = prev;
+        const { [menu.code]: _, ...rest } = prev;
         return rest;
       }
-      return { ...prev, [code]: newCount };
+      return { ...prev, [menu.code]: newCount };
+    });
+
+    await fetch("/api/order", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: menu.code }),
     });
   };
 
@@ -63,7 +84,6 @@ export default function ListFood() {
               <div className="w-[80%] mx-auto">
                 <div className="grid grid-cols-3 gap-12">
                   {filteredMenus.map((menu) => {
-                    // ถ้าเป็นเครื่องดื่ม หรืออยู่ในเมนูแนะนำและประเภทเป็นเครื่องดื่ม → ไปหน้า showdetail
                     const isDrink =
                       menu.category === "เครื่องดื่ม" ||
                       (category === "เมนูแนะนำ" && menu.category === "เครื่องดื่ม");
@@ -110,21 +130,21 @@ export default function ListFood() {
                             <div className="flex items-center gap-2 bg-[#F4A261] text-[#544E4E] rounded-[5px]">
                               <button
                                 className="px-2 text-black rounded"
-                                onClick={() => handleDecrease(menu.code)}
+                                onClick={() => handleDecrease(menu)}
                               >
                                 -
                               </button>
                               <span>{count}</span>
                               <button
                                 className="px-2 text-black rounded"
-                                onClick={() => handleIncrease(menu.code)}
+                                onClick={() => handleIncrease(menu)}
                               >
                                 +
                               </button>
                             </div>
                           ) : (
                             <svg
-                              onClick={() => handleIncrease(menu.code)}
+                              onClick={() => handleIncrease(menu)}
                               xmlns="http://www.w3.org/2000/svg"
                               height="24px"
                               viewBox="0 -960 960 960"

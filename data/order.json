@@ -1,26 +1,29 @@
 [
   {
-    "code": "M002",
-    "name": "กาแฟน้ำส้ม",
-    "basePrice": 40,
-    "type": "เย็น",
-    "typePrice": 5,
-    "sugarLevel": "50%",
-    "quantity": 1,
-    "totalPrice": 45,
-    "note": "",
-    "image": "/uploads/dx.jpg"
+    "code": "S001",
+    "name": "เฟรนฟรายซ์",
+    "image": "/uploads/เฟรนฟรายซ์.webp",
+    "basePrice": 50,
+    "quantity": 3,
+    "totalPrice": 150,
+    "typePrice": 0
   },
   {
-    "code": "M001",
-    "name": "ลาเต้",
-    "basePrice": 35,
-    "type": "ปั่น",
-    "typePrice": 10,
-    "sugarLevel": "75%",
+    "code": "D001",
+    "name": "ไดฟุกุสตรอเบอรี่",
+    "image": "/uploads/ไดฟุกุสตรอเบอรี่.png",
+    "basePrice": 50,
     "quantity": 1,
-    "totalPrice": 45,
-    "note": "",
-    "image": "/uploads/ลาเต้เย็น 1.png"
+    "totalPrice": 50,
+    "typePrice": 0
+  },
+  {
+    "code": "D002",
+    "name": "เค้ก",
+    "image": "/uploads/bx.jpg",
+    "basePrice": 100,
+    "quantity": 1,
+    "totalPrice": 100,
+    "typePrice": 0
   }
 ]
