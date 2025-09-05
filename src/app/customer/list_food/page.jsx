@@ -4,18 +4,17 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbarfood";
 import Image from "next/image";
 import Link from "next/link";
+import { type } from "os";
 
 export default function ListFood() {
   const [menus, setMenus] = useState([]);
   const [counts, setCounts] = useState({});
 
   useEffect(() => {
-    // โหลดเมนู
     import("/data/menus.json").then((data) => {
       setMenus(data.default || data);
     });
 
-    // โหลด order.json
     fetch("/api/order")
       .then((res) => res.json())
       .then((data) => {
@@ -40,10 +39,14 @@ export default function ListFood() {
       body: JSON.stringify({
         code: menu.code,
         name: menu.name,
-        image: menu.image,
         basePrice: menu.price,
+        type: null,
+        typePrice: 0,
+        sugarLevel: null,
         quantity: 1,
         totalPrice: menu.price,
+        note: null,
+        image: menu.image,
       }),
     });
   };
