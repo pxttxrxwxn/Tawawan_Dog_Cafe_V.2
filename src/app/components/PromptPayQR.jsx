@@ -5,19 +5,39 @@ import { generatePromptPayQR } from "../../lib/generatePromptPayQR";
 
 const PromptPayQR = () => {
   const promptPayId = "0932495900";
-  const [amount, setAmount] = useState(50);
+  const [orders, setOrders] = useState([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [amount, setAmount] = useState(0);
   const [qrData, setQrData] = useState("");
 
   useEffect(() => {
+    import("/data/order.json").then((data) => {
+      setOrders(data.default || data);
+    });
+  }, []);
+
+  useEffect(() => {
+    const total = orders.reduce((sum, item) => sum + item.totalPrice, 0);
+    setTotalAmount(total);
+    setAmount(total);
+  }, [orders]);
+
+  useEffect(() => {
     const fetchQR = async () => {
-      const qr = await generatePromptPayQR(promptPayId, amount);
-      setQrData(qr);
+      if (amount > 0) {
+        const qr = await generatePromptPayQR(promptPayId, amount);
+        setQrData(qr);
+      }
     };
     fetchQR();
   }, [promptPayId, amount]);
 
   return (
     <div className="flex flex-col items-center p-5">
+      <div className="flex flex-col items-center">
+        <h1 className="text-[#D64545] text-2xl font-bold mb-2">สแกน QR-Code</h1>
+        <h1 className="text-[#D64545] text-2xl font-bold mb-2">นี้เพื่อยืนยันการสั่งซื้อของคุณ</h1>
+      </div>
       <div className="relative mt-4 w-[300px] h-[300px]">
         {qrData ? (
           <>

@@ -1,0 +1,14 @@
+[
+  {
+    "code": "M002",
+    "name": "กาแฟน้ำส้ม",
+    "basePrice": 40,
+    "type": "เย็น",
+    "typePrice": 5,
+    "sugarLevel": "50%",
+    "quantity": 2,
+    "totalPrice": 90,
+    "note": "",
+    "image": "/uploads/dx.jpg"
+  }
+]

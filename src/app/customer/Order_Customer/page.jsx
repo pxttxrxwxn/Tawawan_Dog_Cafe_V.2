@@ -170,14 +170,16 @@ export default function Order_Customer() {
             รวม ({orders.length} รายการ):
           </h1>
           <span className="text-[#D64545] font-bold">{totalAmount} ฿</span>
-          <button 
-            className={`px-4 py-2 rounded-md text-3xl mr-6 text-white ${
-              orders.length > 0 ? "bg-[#F79C4B] cursor-pointer" : "bg-[#DDDDDD] cursor-not-allowed"
-            }`}
-            disabled={orders.length === 0}
-          >
-            สั่งสินค้า
-          </button>
+          <Link href="/customer/Order_Customer_pay">
+            <button 
+                className={`px-4 py-2 rounded-md text-3xl mr-6 text-white ${
+                orders.length > 0 ? "bg-[#F79C4B] cursor-pointer" : "bg-[#DDDDDD] cursor-not-allowed"
+                }`}
+                disabled={orders.length === 0}
+            >
+                สั่งสินค้า
+            </button>
+          </Link>
         </div>
     </div>
   );
