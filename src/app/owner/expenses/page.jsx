@@ -192,28 +192,33 @@ export default function Expenses() {
                 </tr>
               </thead>
               <tbody>
-                {filteredExpenses.map((exp, index) => (
-                  <tr key={index}>
-                    <td className="border px-4 py-2">{formatDate(exp.date)}</td>
-                    <td className="border px-4 py-2">{exp.detail}</td>
-                    <td className="border px-4 py-2 text-[#000000]"><span className="text-[#D64545] font-bold text-xl">-</span>{exp.amount} บาท</td>
-                    <td className="border px-4 py-2">{exp.category}</td>
-                    <td className="border border-black px-1 py-2">
-                      <div className="flex justify-center items-center gap-5">
-                        <button onClick={() => openModal(index)} className="cursor-pointer">
-                          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#B5B3B3">
+                {filteredExpenses.map((exp, index) => {
+                  const originalIndex = expenses.indexOf(exp);
+                  return (
+                    <tr key={index}>
+                      <td className="border px-4 py-2">{formatDate(exp.date)}</td>
+                      <td className="border px-4 py-2">{exp.detail}</td>
+                      <td className="border px-4 py-2 text-[#000000]">
+                        <span className="text-[#D64545] font-bold text-xl">-</span>{exp.amount} บาท
+                      </td>
+                      <td className="border px-4 py-2">{exp.category}</td>
+                      <td className="border border-black px-1 py-2">
+                        <div className="flex justify-center items-center gap-5">
+                          <button onClick={() => openModal(originalIndex)} className="cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#B5B3B3">
                               <path d="M80 0v-160h800V0H80Zm160-320h56l312-311-29-29-28-28-311 312v56Zm-80 80v-170l448-447q11-11 25.5-17t30.5-6q16 0 31 6t27 18l55 56q12 11 17.5 26t5.5 31q0 15-5.5 29.5T777-687L330-240H160Zm560-504-56-56 56 56ZM608-631l-29-29-28-28 57 57Z"/>
                             </svg>
-                        </button>
-                        <button onClick={() => handleDelete(index)} className="cursor-pointer">
-                          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#D64545">
+                          </button>
+                          <button onClick={() => handleDelete(originalIndex)} className="cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#D64545">
                               <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
                             </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

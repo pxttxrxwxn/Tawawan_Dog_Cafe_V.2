@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const filePath = path.join(process.cwd(), "data", "register-data.json");
+const filePath = path.join(process.cwd(),"public", "data", "register-data.json");
 
 export async function POST(req) {
   try {

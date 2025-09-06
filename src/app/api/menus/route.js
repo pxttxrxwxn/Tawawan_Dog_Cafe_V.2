@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 
-const dataFile = path.join(process.cwd(), "data", "menus.json");
+const dataFile = path.join(process.cwd(),"public", "data", "menus.json");
 const uploadDir = path.join(process.cwd(), "public", "uploads");
 
 async function readData() {

@@ -10,16 +10,18 @@ export default function ListFood() {
   const [counts, setCounts] = useState({});
 
   useEffect(() => {
-    import("/data/menus.json").then((data) => {
-      setMenus(data.default || data);
-    });
+    fetch("/data/menus.json")
+      .then((res) => res.json())
+      .then((data) => setMenus(data))
+      .catch((err) => console.error("Error loading menus:", err));
 
     fetch("/api/order")
       .then((res) => res.json())
       .then((data) => {
         const initialCounts = {};
         data.forEach((item) => {
-          initialCounts[item.code] = (initialCounts[item.code] || 0) + item.quantity;
+          initialCounts[item.code] =
+            (initialCounts[item.code] || 0) + item.quantity;
         });
         setCounts(initialCounts);
       });
@@ -63,7 +65,13 @@ export default function ListFood() {
     await fetch("/api/order", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: menu.code }),
+      body: JSON.stringify({
+        code: menu.code,
+        type: menu.type || null,
+        sugarLevel: menu.sugarLevel || null,
+        note: menu.note || null,
+        removeAll: false,
+      }),
     });
   };
 

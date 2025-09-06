@@ -11,9 +11,13 @@ const PromptPayQR = () => {
   const [qrData, setQrData] = useState("");
 
   useEffect(() => {
-    import("/data/order.json").then((data) => {
-      setOrders(data.default || data);
-    });
+    fetch("/data/order.json")
+      .then((res) => {
+        if (!res.ok) throw new Error("Cannot fetch order.json");
+        return res.json();
+      })
+      .then((data) => setOrders(data))
+      .catch((err) => console.error("Error loading order.json:", err));
   }, []);
 
   useEffect(() => {

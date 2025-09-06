@@ -1,9 +1,8 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-const orderFilePath = path.join(process.cwd(), "data", "order.json");
+const orderFilePath = path.join(process.cwd(), "public", "data", "order.json");
 const ownerFilePath = path.join(process.cwd(), "public", "data", "order_owner.json");
-
 
 async function readFile(filePath) {
   try {
@@ -14,11 +13,9 @@ async function readFile(filePath) {
   }
 }
 
-
 async function writeFile(filePath, data) {
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
-
 
 export async function POST(req) {
   const newOrder = await req.json();
@@ -53,54 +50,88 @@ export async function POST(req) {
   }
 
   await writeFile(orderFilePath, orders);
-
   return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
 }
-
 
 export async function DELETE(req) {
-  const { all, tableNumber } = await req.json();
-  let orders = await readFile(orderFilePath);
+  try {
+    const { all, code, removeAll, type, sugarLevel, note, tableNumber } = await req.json();
+    let orders = await readFile(orderFilePath);
 
-  if (all && orders.length > 0) {
-    let ownerOrders = await readFile(ownerFilePath);
+    // สั่งสินค้า → ย้าย order.json ไป order_owner.json
+    if (all && orders.length > 0) {
+      let ownerOrders = await readFile(ownerFilePath);
+      let lastOrderNumber = ownerOrders.length
+        ? ownerOrders[ownerOrders.length - 1].ordernumber
+        : "O1000";
+      let nextOrderNumber =
+        "O" + (parseInt(lastOrderNumber.substring(1)) + 1).toString().padStart(4, "0");
 
-    let lastOrderNumber = ownerOrders.length
-      ? ownerOrders[ownerOrders.length - 1].ordernumber
-      : "O1000";
+      const now = new Date();
+      const date = now.toISOString().split("T")[0];
+      const time = now.toTimeString().split(" ")[0];
 
-    let nextOrderNumber =
-      "O" + (parseInt(lastOrderNumber.substring(1)) + 1).toString().padStart(4, "0");
+      const newOrderGroup = {
+        ordernumber: nextOrderNumber,
+        tableNumber: tableNumber || "ไม่ระบุ",
+        date,
+        time,
+        items: orders.map((item) => ({
+          name: item.name,
+          type: item.type,
+          sugarLevel: item.sugarLevel,
+          quantity: item.quantity,
+          totalPrice: item.totalPrice,
+          note: item.note,
+        })),
+      };
 
-    const now = new Date();
-    const date = now.toISOString().split("T")[0];
-    const time = now.toTimeString().split(" ")[0];
+      ownerOrders.push(newOrderGroup);
+      await writeFile(ownerFilePath, ownerOrders);
 
-    const newOrderGroup = {
-      ordernumber: nextOrderNumber,
-      tableNumber: tableNumber || "ไม่ระบุ",
-      date,
-      time,
-      items: orders.map((item) => ({
-        name: item.name,
-        type: item.type,
-        sugarLevel: item.sugarLevel,
-        quantity: item.quantity,
-        totalPrice: item.totalPrice,
-        note: item.note,
-      })),
-    };
+      // ล้าง order.json
+      orders = [];
+    }
 
-    ownerOrders.push(newOrderGroup);
+    // ลดทีละ 1 หรือ ลบรายการทั้งหมด
+    if (code) {
+      const index = orders.findIndex(
+        (o) =>
+          o.code === code &&
+          o.type === type &&
+          o.sugarLevel === sugarLevel &&
+          (note ? o.note === note : true)
+      );
 
-    await writeFile(ownerFilePath, ownerOrders);
+      if (index > -1) {
+        if (removeAll) {
+          orders.splice(index, 1); // ลบทั้งหมด
+        } else {
+          orders[index].quantity -= 1;
+          if (orders[index].quantity <= 0) orders.splice(index, 1);
+          else orders[index].totalPrice =
+            (orders[index].basePrice + (orders[index].typePrice || 0)) *
+            orders[index].quantity;
+        }
+      }
+    }
 
-    orders = [];
+    await writeFile(orderFilePath, orders);
+
+    return new Response(JSON.stringify({ success: true, orders }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    console.error("DELETE order error:", err);
+    return new Response(JSON.stringify({ success: false, orders: [] }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-
-  await writeFile(orderFilePath, orders);
-  return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
 }
+
+
 
 export async function GET() {
   const orders = await readFile(orderFilePath);

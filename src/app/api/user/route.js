@@ -13,7 +13,7 @@ export async function GET(request) {
       );
     }
 
-    const filePath = path.join(process.cwd(), "data", "register-data.json");
+    const filePath = path.join(process.cwd(),"public", "data", "register-data.json");
     const fileContents = await fs.readFile(filePath, "utf-8");
     const data = JSON.parse(fileContents);
 

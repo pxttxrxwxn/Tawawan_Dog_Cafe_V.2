@@ -61,30 +61,29 @@ export default function Order_Customer() {
     }
     };
 
-    const handleRemove = async (item) => {
+  const handleRemove = async (item) => {
     try {
-        const res = await fetch("/api/order", {
+      const res = await fetch("/api/order", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            code: item.code,
-            type: item.type,
-            sugarLevel: item.sugarLevel,
-            note: item.note || "",
-            all: true,
+          code: item.code,
+          type: item.type,
+          sugarLevel: item.sugarLevel,
+          note: item.note || "",
+          removeAll: true,
         }),
-        });
-        const data = await res.json();
-        if (data.success) {
+      });
+      const data = await res.json();
+      if (data.success) {
         setOrders(data.orders);
         const total = data.orders.reduce((sum, i) => sum + i.totalPrice, 0);
         setTotalAmount(total);
-        }
+      }
     } catch (error) {
-        console.error("Failed to remove item:", error);
+      console.error("Failed to remove item:", error);
     }
-    };
-
+  };
 
   return (
     <div className="min-h-screen flex flex-col">

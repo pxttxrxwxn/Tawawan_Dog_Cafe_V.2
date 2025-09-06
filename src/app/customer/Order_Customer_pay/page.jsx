@@ -4,7 +4,7 @@ import PromptPayQR from "../../components/PromptPayQR";
 import Nabarorder from "../../components/Navbarorder";
 import Link from "next/link";
 
-export default function Order_Customer() {
+export default function Order_Customer_pay() {
   const [orders, setOrders] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [tableNumber, setTableNumber] = useState("");
@@ -13,9 +13,10 @@ export default function Order_Customer() {
     const selectedTable = localStorage.getItem("selectedTable");
     if (selectedTable) setTableNumber(selectedTable);
 
-    import("/data/order.json").then((data) => {
-      setOrders(data.default || data);
-    });
+    fetch("/data/order.json")
+      .then((res) => res.json())
+      .then((data) => setOrders(data))
+      .catch((err) => console.error("Error loading order.json:", err));
   }, []);
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function Order_Customer() {
       console.error("Failed to remove all items:", error);
     }
   };
+
 
   return (
     <div className="">

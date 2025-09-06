@@ -1,22 +1,49 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbarincome_and_expenses";
 
 export default function IncomeAndExpenses() {
+  const [incomeTotal, setIncomeTotal] = useState(0);
+  const [expenseTotal, setExpenseTotal] = useState(0);
+
+  useEffect(() => {
+    // โหลด Income.json
+    fetch("/data/Income.json")
+      .then((res) => res.json())
+      .then((data) => {
+        const totalIncome = data.reduce((sum, order) => sum + (order.total || 0), 0);
+        setIncomeTotal(totalIncome);
+      })
+      .catch((err) => console.error("Error loading Income.json:", err));
+
+    // โหลด expenses.json
+    fetch("/data/expenses.json")
+      .then((res) => res.json())
+      .then((data) => {
+        const totalExpense = data.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+        setExpenseTotal(totalExpense);
+      })
+      .catch((err) => console.error("Error loading expenses.json:", err));
+  }, []);
+
+  const netTotal = incomeTotal - expenseTotal;
+
   return (
     <div className="min-h-screen">
-
       <Navbar activePage="income_and_expenses" />
-      
+
       <div className="pt-[200px] px-10">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
-            <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            height="48px" 
-            viewBox="0 -960 960 960" 
-            width="48px" fill="#000000">
-              <path d="M200-160v-240h100v240H200Zm250 0v-440h100v440H450Zm250 0v-640h100v640H700Z"/></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="48px"
+              viewBox="0 -960 960 960"
+              width="48px"
+              fill="#000000"
+            >
+              <path d="M200-160v-240h100v240H200Zm250 0v-440h100v440H450Zm250 0v-640h100v640H700Z" />
+            </svg>
             <h2 className="text-[#D64545] font-bold text-xl">
               สรุปรายรับ–รายจ่าย
             </h2>
@@ -26,7 +53,7 @@ export default function IncomeAndExpenses() {
             <div className="flex items-center gap-8">
               <span className="font-medium text-[#000000]">ดูสรุป :</span>
               <select className="border rounded-md px-3 py-1 shadow-sm bg-white text-[#000000]">
-                <option>เลือกระยะเวลา</option>
+                <option>ทั้งหมด</option>
                 <option>วันนี้</option>
                 <option>สัปดาห์นี้</option>
                 <option>เดือนนี้</option>
@@ -46,32 +73,36 @@ export default function IncomeAndExpenses() {
             <tbody>
               <tr>
                 <td className="border border-black px-4 py-2 flex items-center justify-center gap-2">
-                  <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  height="24px" 
-                  viewBox="0 -960 960 960" 
-                  width="24px" 
-                  fill="#000000">
-                    <path d="m136-240-56-56 296-298 160 160 208-206H640v-80h240v240h-80v-104L536-320 376-480 136-240Z"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#000000"
+                  >
+                    <path d="m136-240-56-56 296-298 160 160 208-206H640v-80h240v240h-80v-104L536-320 376-480 136-240Z" />
+                  </svg>
                   รายรับ
                 </td>
                 <td className="border border-black px-4 py-2 font-bold">
-                  <span className="text-[#0FA958]">+</span> 45 บาท
+                  <span className="text-[#0FA958]">+</span> {incomeTotal} บาท
                 </td>
               </tr>
               <tr>
                 <td className="border border-black px-4 py-2 flex items-center justify-center gap-2">
-                  <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  height="24px" 
-                  viewBox="0 -960 960 960" 
-                  width="24px" 
-                  fill="#000000">
-                    <path d="M640-240v-80h104L536-526 376-366 80-664l56-56 240 240 160-160 264 264v-104h80v240H640Z"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#000000"
+                  >
+                    <path d="M640-240v-80h104L536-526 376-366 80-664l56-56 240 240 160-160 264 264v-104h80v240H640Z" />
+                  </svg>
                   รายจ่าย
                 </td>
                 <td className="border border-black px-4 py-2 font-bold">
-                  <span className="text-[#D64545]">-</span> 0 บาท
+                  <span className="text-[#D64545]">-</span> {expenseTotal} บาท
                 </td>
               </tr>
               <tr>
@@ -88,7 +119,15 @@ export default function IncomeAndExpenses() {
                   ยอดสุทธิ
                 </td>
                 <td className="border border-black px-4 py-2 font-bold">
-                  <span className="text-[#0FA958]">+</span> 45 บาท
+                  {netTotal >= 0 ? (
+                    <>
+                      <span className="text-[#0FA958]">+</span> {netTotal} บาท
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-[#D64545]">-</span> {Math.abs(netTotal)} บาท
+                    </>
+                  )}
                 </td>
               </tr>
             </tbody>

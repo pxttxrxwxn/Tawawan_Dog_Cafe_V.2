@@ -5,7 +5,7 @@ export async function POST(request) {
   try {
     const { email, password } = await request.json();
 
-    const filePath = path.join(process.cwd(), "data", "register-data.json");
+    const filePath = path.join(process.cwd(), "public", "data", "register-data.json");
 
     const fileContent = await fs.readFile(filePath, "utf-8");
     const users = JSON.parse(fileContent);

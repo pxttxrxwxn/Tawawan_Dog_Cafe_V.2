@@ -1,9 +1,8 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-const filePath = path.join(process.cwd(), "data", "expenses.json");
+const filePath = path.join(process.cwd(), "public","data", "expenses.json");
 
-// อ่านข้อมูลจากไฟล์
 async function readData() {
   try {
     const data = await fs.readFile(filePath, "utf-8");
@@ -13,18 +12,15 @@ async function readData() {
   }
 }
 
-// เขียนข้อมูลลงไฟล์
 async function writeData(data) {
   await fs.writeFile(filePath, JSON.stringify(data, null, 2));
 }
 
-// ดึงข้อมูลรายจ่ายทั้งหมด
 export async function GET() {
   const expenses = await readData();
   return new Response(JSON.stringify(expenses), { status: 200 });
 }
 
-// เพิ่มข้อมูลรายจ่าย
 export async function POST(req) {
   try {
     const newExpense = await req.json();
@@ -42,7 +38,6 @@ export async function POST(req) {
   }
 }
 
-// แก้ไขข้อมูลรายจ่าย
 export async function PUT(req) {
   try {
     const { originalIndex, ...updatedExpense } = await req.json();
@@ -67,7 +62,6 @@ export async function PUT(req) {
   }
 }
 
-// ลบข้อมูลรายจ่าย
 export async function DELETE(req) {
   try {
     const { searchParams } = new URL(req.url);

@@ -1,8 +1,24 @@
 "use client";
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbarincome_and_expenses";
 
 export default function Income() {
+    const [orders, setOrders] = useState([]);
+    useEffect(() => {
+    
+        fetch("/data/Income.json")
+          .then((res) => res.json())
+          .then((data) => setOrders(data))
+          .catch((err) => console.error(err));
+      }, []);
+    const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = String(date.getFullYear()).slice(-2);
+        return `${day}/${month}/${year}`;
+    };
   return (
     <div className="min-h-screen">
 
@@ -27,7 +43,7 @@ export default function Income() {
             <div className="flex items-center gap-8">
               <span className="font-medium text-[#000000]">ดูสรุป :</span>
               <select className="border rounded-md px-3 py-1 shadow-sm bg-white text-[#000000]">
-                <option>เลือกระยะเวลา</option>
+                <option>ทั้งหมด</option>
                 <option>วันนี้</option>
                 <option>สัปดาห์นี้</option>
                 <option>เดือนนี้</option>
@@ -36,49 +52,46 @@ export default function Income() {
           </div>
         </div>
 
-        <div className="overflow-x-auto flex justify-center">
-          <table className="border-collapse w-[80%] text-center text-black">
-            <thead>
-              <tr className="bg-[#F79C4B] text-white">
-                <th className="border border-black px-4 py-2 ">หมายเลขออเดอร์</th>
-                <th className="border border-black px-4 py-2">วันที่ | เวลา</th>
-                <th className="border border-black px-4 py-2 ">โต๊ะ</th>
-                <th className="border border-black px-4 py-2">รายละเอียด</th>
-                <th className="border border-black px-4 py-2 ">จำนวนเงิน</th>
-                <th className="border border-black px-4 py-2">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border border-black px-4 py-2 text-center">
-                  001
-                </td>
-                <td className="border border-black px-4 py-2 text-center">
-                  20/07/2025 |เวลา: 12:34
-                </td>
-                <td className="border border-black px-4 py-2 text-center">
-                  โต๊ะ : 2
-                </td>
-                <td className="border border-black px-4 py-2 text-center">
-                  1x ลาเต้เย็น
-                </td>
-                <td className="border border-black px-4 py-2 text-center">
-                  45 บาท
-                </td>
-                <td className="border border-black px-4 py-2">
-                  <div className="flex justify-center items-center">
-                    <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    height="24px" viewBox="0 -960 960 960" 
-                    width="24px" 
-                    fill="#D64545">
-                      <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        {orders.length > 0 ? (
+          <div className="overflow-x-auto flex justify-center">
+            <table className="border-collapse w-[80%] text-center text-black">
+              <thead>
+                <tr className="bg-[#F79C4B] text-white">
+                  <th className="border border-black px-4 py-2 ">หมายเลขออเดอร์</th>
+                  <th className="border border-black px-4 py-2">วันที่ | เวลา</th>
+                  <th className="border border-black px-4 py-2 ">โต๊ะ</th>
+                  <th className="border border-black px-4 py-2">รายละเอียด</th>
+                  <th className="border border-black px-4 py-2 ">จำนวนเงิน</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order, index) => (
+                  <tr key={index} className="bg-[#FFE8A3]">
+                    <td className="border border-black px-4 py-2 text-center">
+                      {order.ordernumber}
+                    </td>
+                    <td className="border border-black px-4 py-2 text-center">
+                      {formatDate(order.date)} | เวลา: {order.time}
+                    </td>
+                    <td className="border border-black px-4 py-2">
+                      {order.tableNumber}
+                    </td>
+                    <td className="border border-black px-4 py-2 text-center">
+                      {order.items.map((item, index) => (
+                        <div key={index} className="flex justify-start p-2">
+                          {item.quantity}x {item.name}{item.type ? `${item.type}` : ""}
+                        </div>
+                      ))}
+                    </td>
+                    <td className="border border-black px-4 py-2">{order.total} บาท</td>
+                  </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+          ) : (
+            <p className="text-center text-gray-500 mt-10">ไม่มีข้อมูลรายรับ</p>
+        )}
       </div>
     </div>
   );

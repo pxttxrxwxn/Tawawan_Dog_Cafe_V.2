@@ -67,6 +67,15 @@ export default function Menu() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
+    const newCode = form.menuCode.value.trim();
+    
+    const isDuplicate = menus.some(
+      (menu) => menu.code === newCode && (!editingMenu || menu.code !== editingMenu.code)
+    );
+    if (isDuplicate) {
+      alert("รหัสเมนูนี้ถูกใช้งานแล้ว กรุณาใช้รหัสเมนูอื่น");
+      return;
+    }
 
     if (!form.menuCategory.value) {
       alert("กรุณาเลือกหมวดหมู่");
@@ -85,7 +94,6 @@ export default function Menu() {
       alert("กรุณาใส่รูปเมนู");
       return;
     }
-
     const originalCode = editingMenu ? editingMenu.code : null;
     const basePrice = Number(form.menuPrice.value) || 0;
 

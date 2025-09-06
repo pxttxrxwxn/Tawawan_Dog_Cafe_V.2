@@ -14,8 +14,8 @@ export default function Navbar() {
     if (selectedTable) setTableNumber(selectedTable);
   }, []);
 
-  const { data: orders } = useSWR("/api/order", fetcher, { refreshInterval: 1000 });
-   const orderCount = orders ? orders.length : 0;
+  const { data: orders } = useSWR("/data/order.json", fetcher, { refreshInterval: 1000 });
+  const orderCount = orders ? orders.length : 0;
 
   const buttons = [
     { id: 1, label: "เครื่องดื่ม", baseColor: "#8D6E63", link: "/customer/list_food#เครื่องดื่ม" },

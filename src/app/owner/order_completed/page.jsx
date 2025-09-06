@@ -7,12 +7,17 @@ import Link from "next/link"
 export default function OrderCompleted() {
     const [orders, setOrders] = useState([]);
     useEffect(() => {
-    
         fetch("/data/Order_completed.json")
-          .then((res) => res.json())
-          .then((data) => setOrders(data))
-          .catch((err) => console.error(err));
-      }, []);
+            .then((res) => {
+            if (!res.ok) throw new Error("Network response was not ok");
+            return res.text();
+            })
+            .then((text) => {
+            const data = text ? JSON.parse(text) : [];
+            setOrders(data);
+            })
+            .catch((err) => console.error("Failed to load orders:", err));
+        }, []);
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
         const day = String(date.getDate()).padStart(2, "0");
@@ -61,8 +66,8 @@ export default function OrderCompleted() {
                                     <tr className="bg-[#F79C4B] text-white">
                                     <th className="border border-black px-1 py-2">หมายเลขออเดอร์</th>
                                     <th className="border border-black px-4 py-2">วันที่ | เวลา</th>
-                                    <th className="border border-black px-4 py-2">รายการ</th>
                                     <th className="border border-black px-4 py-2">โต๊ะ</th>
+                                    <th className="border border-black px-4 py-2">รายการ</th>
                                     <th className="border border-black px-4 py-2">ยอดรวม</th>
                                     </tr>
                                 </thead>
@@ -71,6 +76,7 @@ export default function OrderCompleted() {
                                         <tr key={index} className="bg-white">
                                             <td className="border border-black px-4 py-2">{order.ordernumber}</td>
                                             <td className="border border-black px-4 py-2">{formatDate(order.date)} | เวลา: {order.time}</td>
+                                            <td className="border border-black px-4 py-2">{order.tableNumber}</td>
                                             <td className="border border-black px-4 py-2">
                                                 {order.items.map((item, index) => (
                                                     <div key={index} className="flex justify-start p-2">
@@ -78,8 +84,7 @@ export default function OrderCompleted() {
                                                     </div>
                                                 ))}
                                             </td>
-                                            <td className="border border-black px-4 py-2">{order.tableNumber}</td>
-                                            <td className="border border-black px-4 py-2">{order.total}</td>
+                                            <td className="border border-black px-4 py-2">{order.total} บาท</td>
                                         </tr>
                                     ))}
                                 </tbody>
