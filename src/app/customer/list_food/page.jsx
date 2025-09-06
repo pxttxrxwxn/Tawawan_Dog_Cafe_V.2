@@ -188,14 +188,14 @@ export default function ListFood() {
                           ) : count > 0 ? (
                             <div className="flex items-center gap-2 bg-[#F4A261] text-[#544E4E] rounded-[5px]">
                               <button
-                                className="px-2 text-black rounded"
+                                className="px-2 text-black rounded cursor-pointer"
                                 onClick={() => handleDecrease(menu)}
                               >
                                 -
                               </button>
                               <span>{count}</span>
                               <button
-                                className="px-2 text-black rounded"
+                                className="px-2 text-black rounded cursor-pointer"
                                 onClick={() => handleIncrease(menu)}
                               >
                                 +

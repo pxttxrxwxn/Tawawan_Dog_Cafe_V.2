@@ -8,10 +8,20 @@ export default function Order() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-
     fetch("/data/order_owner.json")
-      .then((res) => res.json())
-      .then((data) => setOrders(data))
+      .then((res) => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.text();
+      })
+      .then((data) => {
+        try {
+          const parsed = JSON.parse(data || "[]");
+          setOrders(parsed);
+        } catch (err) {
+          console.error("Invalid JSON:", err);
+          setOrders([]);
+        }
+      })
       .catch((err) => console.error(err));
   }, []);
 
@@ -31,6 +41,20 @@ export default function Order() {
       });
       if (res.ok) {
         setOrders((prev) => prev.filter((o) => o.ordernumber !== ordernumber));
+
+        const notification = {
+          id: Date.now(),
+          svgcheck: `<svg xmlns="http://www.w3.org/2000/svg" height="92px" viewBox="0 -960 960 960" width="92px" fill="#000000"><path d="M222.1-178.31q-45.95 0-78.33-32.4-32.38-32.39-32.38-78.68H53.85v-432.92q0-23.53 17.08-40.61T111.54-780h558.61v157.39h95l141 188.3v144.92h-65.61q0 46.29-32.39 78.68-32.39 32.4-78.66 32.4-46.11 0-78.42-32.4-32.3-32.39-32.3-78.68H333.15q0 46.31-32.55 78.7-32.55 32.38-78.5 32.38Zm.17-45.38q27.27 0 46.38-19.12 19.12-19.11 19.12-46.38 0-27.27-19.12-46.39-19.11-19.11-46.38-19.11-27.27 0-46.39 19.11-19.11 19.12-19.11 46.39t19.11 46.38q19.12 19.12 46.39 19.12ZM99.23-334.77h21.62q12.76-28.54 39.96-47.23 27.19-18.69 60.75-18.69 32.78 0 60.57 18.81 27.79 18.8 40.56 47.11h302.08v-399.84H111.54q-4.62 0-8.46 3.84-3.85 3.85-3.85 8.46v387.54Zm630.42 111.08q27.27 0 46.39-19.12 19.11-19.11 19.11-46.38 0-27.27-19.11-46.39-19.12-19.11-46.39-19.11t-46.38 19.11q-19.12 19.12-19.12 46.39t19.12 46.38q19.11 19.12 46.38 19.12Zm-59.5-195.54h191l-119.46-158h-71.54v158ZM362.31-527.08Z"/></svg>`,
+          title2: "จัดส่งสินค้าเสร็จสิ้น",
+          date: new Date().toLocaleString("th-TH", { hour12: false }),
+          svgbincheck: `<svg xmlns="http://www.w3.org/2000/svg" height="70px" viewBox="0 -960 960 960" width="70px" fill="#D64545"><path d="M278.31-140q-23.6 0-40.65-17.05-17.04-17.05-17.04-40.64v-544.23H180v-45.39h171.08v-28.07h257.84v28.07H780v45.39h-40.62v544.23q0 23.53-17.08 40.61T681.69-140H278.31ZM694-741.92H266v544.23q0 5.38 3.65 8.84 3.66 3.46 8.66 3.46h403.38q4.62 0 8.46-3.84 3.85-3.85 3.85-8.46v-544.23ZM381.23-269.85h45.39v-388.61h-45.39v388.61Zm152.15 0h45.39v-388.61h-45.39v388.61ZM266-741.92V-185.39v-556.53Z"/></svg>`,
+        };
+
+        await fetch("/api/notifications", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(notification),
+        });
       } else {
         console.error("Failed to complete order");
       }

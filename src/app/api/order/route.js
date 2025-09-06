@@ -58,7 +58,6 @@ export async function DELETE(req) {
     const { all, code, removeAll, type, sugarLevel, note, tableNumber } = await req.json();
     let orders = await readFile(orderFilePath);
 
-    // สั่งสินค้า → ย้าย order.json ไป order_owner.json
     if (all && orders.length > 0) {
       let ownerOrders = await readFile(ownerFilePath);
       let lastOrderNumber = ownerOrders.length
@@ -89,11 +88,9 @@ export async function DELETE(req) {
       ownerOrders.push(newOrderGroup);
       await writeFile(ownerFilePath, ownerOrders);
 
-      // ล้าง order.json
       orders = [];
     }
 
-    // ลดทีละ 1 หรือ ลบรายการทั้งหมด
     if (code) {
       const index = orders.findIndex(
         (o) =>
@@ -105,7 +102,7 @@ export async function DELETE(req) {
 
       if (index > -1) {
         if (removeAll) {
-          orders.splice(index, 1); // ลบทั้งหมด
+          orders.splice(index, 1);
         } else {
           orders[index].quantity -= 1;
           if (orders[index].quantity <= 0) orders.splice(index, 1);
@@ -130,8 +127,6 @@ export async function DELETE(req) {
     });
   }
 }
-
-
 
 export async function GET() {
   const orders = await readFile(orderFilePath);

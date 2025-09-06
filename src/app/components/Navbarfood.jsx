@@ -34,7 +34,7 @@ export default function Navbar() {
           {buttons.map((btn) => (
             <Link key={btn.id} href={btn.link}>
               <button
-                className="w-[209px] h-[75px] rounded-md text-white font-semibold"
+                className="w-[209px] h-[75px] rounded-md text-white font-semibold cursor-pointer"
                 style={{ backgroundColor: btn.baseColor }}
               >
                 {btn.label}
