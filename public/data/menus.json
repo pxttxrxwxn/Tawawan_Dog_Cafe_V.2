@@ -1,0 +1,73 @@
+[
+  {
+    "code": "M001",
+    "name": "ลาเต้",
+    "category": "เครื่องดื่ม",
+    "type": {
+      "ร้อน": {
+        "checked": true,
+        "price": 0
+      },
+      "เย็น": {
+        "checked": true,
+        "price": 5
+      },
+      "ปั่น": {
+        "checked": true,
+        "price": 10
+      }
+    },
+    "price": "35",
+    "desc": "กาแฟนมสด หอมละมุน ดื่มง่าย",
+    "image": "/uploads/ลาเต้เย็น 1.png"
+  },
+  {
+    "code": "S001",
+    "name": "เฟรนฟรายซ์",
+    "category": "อาหารทานเล่น",
+    "type": "",
+    "price": "50",
+    "desc": "มันฝรั่งทอดกรอบนอกนุ่มใน โรยเกลือ \r\nทานคู่ซอสสุดโปรด",
+    "image": "/uploads/เฟรนฟรายซ์.webp"
+  },
+  {
+    "code": "D001",
+    "name": "ไดฟุกุสตรอเบอรี่",
+    "category": "ขนมหวาน",
+    "type": "",
+    "price": "50",
+    "desc": "โมจิไส้ถั่วแดงเนื้อนุ่ม ห่อสตรอเบอรี่สด \r\nหวานฉ่ำลงตัว",
+    "image": "/uploads/ไดฟุกุสตรอเบอรี่.png"
+  },
+  {
+    "code": "D002",
+    "name": "เค้ก",
+    "category": "ขนมหวาน",
+    "type": "",
+    "price": "100",
+    "desc": "",
+    "image": "/uploads/bx.jpg"
+  },
+  {
+    "code": "M002",
+    "name": "กาแฟน้ำส้ม",
+    "category": "เครื่องดื่ม",
+    "type": {
+      "ร้อน": {
+        "checked": true,
+        "price": 0
+      },
+      "เย็น": {
+        "checked": true,
+        "price": 5
+      },
+      "ปั่น": {
+        "checked": true,
+        "price": 10
+      }
+    },
+    "price": "40",
+    "desc": "",
+    "image": "/uploads/dx.jpg"
+  }
+]

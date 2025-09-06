@@ -12,8 +12,31 @@ export default function Menu() {
     ปั่น: { checked: false, price: 0 }
   });
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [menuDesc, setMenuDesc] = useState("");
 
   const editingMenu = editingIndex !== null && menus[editingIndex] ? menus[editingIndex] : null;
+
+  useEffect(() => {
+    if (editingMenu) {
+      setMenuDesc(editingMenu.desc || "");
+      setSelectedCategory(editingMenu.category || "");
+      if (editingMenu.category === "เครื่องดื่ม") {
+        setDrinkTypes({
+          ร้อน: editingMenu.type?.ร้อน || { checked: false, price: 0 },
+          เย็น: editingMenu.type?.เย็น || { checked: false, price: 0 },
+          ปั่น: editingMenu.type?.ปั่น || { checked: false, price: 0 },
+        });
+      }
+    } else {
+      setMenuDesc("");
+      setSelectedCategory("");
+      setDrinkTypes({
+        ร้อน: { checked: false, price: 0 },
+        เย็น: { checked: false, price: 0 },
+        ปั่น: { checked: false, price: 0 },
+      });
+    }
+  }, [editingMenu]);
 
   const openModal = (index = null) => {
     setEditingIndex(index);
@@ -101,19 +124,18 @@ export default function Menu() {
       code: form.menuCode.value,
       name: form.menuName.value,
       category: form.menuCategory.value,
-      type: form.menuCategory.value === "เครื่องดื่ม" ? 
-        Object.fromEntries(
-          Object.entries(drinkTypes).map(([t, data]) => [
-            t,
-            {
-              checked: data.checked,
-              price: data.checked ? data.price : 0
-            }
-          ])
-        )
+      type: form.menuCategory.value === "เครื่องดื่ม"
+        ? Object.fromEntries(
+            Object.entries(drinkTypes).map(([t, data]) => [
+              t,
+              { checked: data.checked, price: data.checked ? data.price : 0 },
+            ])
+          )
         : form.menuType?.value || "",
-      price: form.menuCategory.value === "เครื่องดื่ม" ? basePrice : form.menuPrice.value || "",
-      desc: form.menuDesc.value,
+      price: form.menuCategory.value === "เครื่องดื่ม"
+        ? Number(form.menuPrice.value) || 0
+        : form.menuPrice.value || "",
+      desc: menuDesc,
     };
     const formData = new FormData();
     formData.append("originalCode", originalCode || "");
@@ -160,29 +182,29 @@ export default function Menu() {
     <div className="min-h-screen">
       <Navbar activePage="menu" />
 
-      <div className="pt-[220px] px-10">
+      <div className="pt-[180px] px-10">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
-              height="57px" 
+              height="32px" 
               viewBox="0 -960 960 960" 
-              width="57px" 
+              width="32px" 
               fill="#000000">
                 <path d="M300-80q-58 0-99-41t-41-99v-520q0-58 41-99t99-41h500v600q-25 0-42.5 17.5T740-220q0 25 17.5 42.5T800-160v80H300Zm-60-267q14-7 29-10t31-3h20v-440h-20q-25 0-42.5 17.5T240-740v393Zm160-13h320v-440H400v440Zm-160 13v-453 453Zm60 187h373q-6-14-9.5-28.5T660-220q0-16 3-31t10-29H300q-26 0-43 17.5T240-220q0 26 17 43t43 17Z"/>
             </svg>
-            <h2 className="text-[#D64545] font-bold text-[36px]">
+            <h2 className="text-[#D64545] font-bold text-[32px]">
               เมนูที่มีอยู่ในร้าน
             </h2>
           </div>
           <button 
             onClick={() => openModal()}
-            className="bg-[#C49A6C] h-[75px] w-[243px] flex justify-center items-center rounded-[10px] font-bold text-white gap-1 text-[32px] cursor-pointer">
+            className="bg-[#C49A6C] h-[60px] w-[180px] flex justify-center items-center rounded-[10px] font-bold text-white gap-[10px] text-[26px] cursor-pointer">
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
-              height="48px" 
+              height="32px" 
               viewBox="0 -960 960 960" 
-              width="48px" 
+              width="32px" 
               fill="#FFFFFF">
                 <path d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160Zm40 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
             </svg>
@@ -302,11 +324,12 @@ export default function Menu() {
 
               {selectedCategory === "เครื่องดื่ม" && (
                 <div className="flex flex-col gap-2">
-                  <label className="font-bold text-[#715045] text-lg mb-1">ประเภทและราคา</label>
+                  <label className="font-bold text-[#715045] text-lg mb-1">ราคาที่ลูกค้าต้องจ่ายเพิ่ม</label>
                   <div className="flex flex-row items-center gap-4">
                     {["ร้อน", "เย็น", "ปั่น"].map((type) => (
                       <div key={type} className="flex items-center gap-2">
                         <input
+                          className="w-4 h-4"
                           type="checkbox"
                           checked={drinkTypes[type].checked}
                           onChange={(e) => handleDrinkTypeChange(type, "checked", e.target.checked)}
@@ -325,18 +348,16 @@ export default function Menu() {
                           type="number"
                           value={drinkTypes[type].price}
                           onChange={(e) => handleDrinkTypeChange(type, "price", e.target.value)}
-                          className="border p-1 rounded w-20 text-black"
+                          className="border p-1 rounded w-15 text-black bg-white"
                         />
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-
-
               <div className="flex flex-col">
                 <label htmlFor="menuPrice" className="font-bold text-[#715045] text-lg mb-1">
-                  ราคา
+                  ราคาเริ่มต้น
                 </label>
                 <input
                   type="number"
@@ -361,14 +382,16 @@ export default function Menu() {
 
               <div className="flex flex-col">
                 <label htmlFor="menuDesc" className="font-bold text-[#715045] text-lg mb-1">
-                  คำอธิบายเพิ่มเติม
+                  คำอธิบายเพิ่มเติม({menuDesc.length} / 40 ตัวอักษร)
                 </label>
                 <textarea
                   id="menuDesc"
-                  defaultValue={editingMenu ? editingMenu.desc : ""}
+                  value={menuDesc}
+                  onChange={(e) => setMenuDesc(e.target.value)}
                   placeholder="บอกลักษณะของเมนู..."
                   className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   rows={4}
+                  maxLength={40}
                 ></textarea>
               </div>
 
@@ -376,15 +399,15 @@ export default function Menu() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-10 py-3 text-[20px] bg-[#D64545] text-[#ffffff] rounded transition"
+                  className="px-10 py-3 text-[22px] bg-[#D64545] text-[#ffffff] rounded transition"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
-                  className="px-15 py-3 text-[20px] bg-[#8D6E63] text-white rounded transition"
+                  className="px-11 py-3 text-[22px] bg-[#8D6E63] text-white rounded transition"
                 >
-                  {editingMenu ? "บันทึก" : "เพิ่ม"}
+                  {editingMenu ? "บันทึก" : "บันทึก"}
                 </button>
               </div>
             </form>

@@ -26,22 +26,22 @@ export default function Income() {
       
       <div className="pt-[200px] px-10">
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-[10%]">
             <svg 
             xmlns="http://www.w3.org/2000/svg" 
-            height="24px" 
+            height="32px" 
             viewBox="0 -960 960 960" 
-            width="24px" 
+            width="32px" 
             fill="#000000">
               <path d="m136-240-56-56 296-298 160 160 208-206H640v-80h240v240h-80v-104L536-320 376-480 136-240Z"/></svg>
-            <h2 className="text-[#D64545] font-bold text-xl">
+            <h2 className="text-[#D64545] font-bold text-2xl">
               รายรับ
             </h2>
           </div>
 
           <div className="flex justify-end mb-4">
-            <div className="flex items-center gap-8">
-              <span className="font-medium text-[#000000]">ดูสรุป :</span>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-[#000000] text-[18px]">ดูสรุป :</span>
               <select className="border rounded-md px-3 py-1 shadow-sm bg-white text-[#000000]">
                 <option>ทั้งหมด</option>
                 <option>วันนี้</option>

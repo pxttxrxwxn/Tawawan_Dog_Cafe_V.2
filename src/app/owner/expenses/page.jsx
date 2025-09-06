@@ -135,21 +135,21 @@ export default function Expenses() {
 
       <div className="pt-[200px] px-10">
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-[10%]">
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
-              height="24px" 
+              height="32px" 
               viewBox="0 -960 960 960" 
-              width="24px" 
+              width="32px" 
               fill="#000000">
                 <path d="M640-240v-80h104L536-526 376-366 80-664l56-56 240 240 160-160 264 264v-104h80v240H640Z"/></svg>
-            <h2 className="text-[#D64545] font-bold text-xl">
+            <h2 className="text-[#D64545] font-bold text-2xl">
               รายจ่าย
             </h2>
           </div>
           <div className="flex justify-end mb-4">
-            <div className="flex items-center gap-8">
-              <span className="font-medium text-[#000000]">ดูสรุป :</span>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-[#000000] text-[18px]">ดูสรุป :</span>
               <select
                 className="border rounded-md px-3 py-1 shadow-sm bg-white text-[#000000]"
                 value={filter}
@@ -166,13 +166,13 @@ export default function Expenses() {
         <div className="mb-4 flex justify-end">
           <button
             onClick={() => openModal()}
-            className="bg-[#C49A6C] h-[75px] w-[243px] flex justify-center items-center rounded-[10px] font-bold text-white gap-1 text-[20px] cursor-pointer"
+            className="bg-[#C49A6C] h-[60px] w-[200px] flex justify-center items-center rounded-[10px] font-bold text-white gap-[10px] text-[26px] cursor-pointer"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
-              height="30px" 
+              height="32px" 
               viewBox="0 -960 960 960" 
-              width="30px" 
+              width="32px" 
               fill="#FFFFFF">
                 <path d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160Zm40 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
             </svg>

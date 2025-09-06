@@ -7,7 +7,6 @@ export default function IncomeAndExpenses() {
   const [expenseTotal, setExpenseTotal] = useState(0);
 
   useEffect(() => {
-    // โหลด Income.json
     fetch("/data/Income.json")
       .then((res) => res.json())
       .then((data) => {
@@ -16,7 +15,6 @@ export default function IncomeAndExpenses() {
       })
       .catch((err) => console.error("Error loading Income.json:", err));
 
-    // โหลด expenses.json
     fetch("/data/expenses.json")
       .then((res) => res.json())
       .then((data) => {
@@ -34,24 +32,24 @@ export default function IncomeAndExpenses() {
 
       <div className="pt-[200px] px-10">
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-[10%]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              height="48px"
+              height="32px"
               viewBox="0 -960 960 960"
-              width="48px"
+              width="32px"
               fill="#000000"
             >
               <path d="M200-160v-240h100v240H200Zm250 0v-440h100v440H450Zm250 0v-640h100v640H700Z" />
             </svg>
-            <h2 className="text-[#D64545] font-bold text-xl">
+            <h2 className="text-[#D64545] font-bold text-2xl">
               สรุปรายรับ–รายจ่าย
             </h2>
           </div>
 
           <div className="flex justify-end mb-4">
-            <div className="flex items-center gap-8">
-              <span className="font-medium text-[#000000]">ดูสรุป :</span>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-[#000000] text-[18px]">ดูสรุป :</span>
               <select className="border rounded-md px-3 py-1 shadow-sm bg-white text-[#000000]">
                 <option>ทั้งหมด</option>
                 <option>วันนี้</option>
@@ -66,13 +64,13 @@ export default function IncomeAndExpenses() {
           <table className="border-collapse w-[50%] text-center text-black">
             <thead>
               <tr className="bg-[#F79C4B] text-white">
-                <th className="border border-black px-4 py-2 ">ประเภท</th>
+                <th className="border border-black px-2 py-2 ">ประเภท</th>
                 <th className="border border-black px-4 py-2">ยอดรวม [บาท]</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border border-black px-4 py-2 flex items-center justify-center gap-2">
+                <td className="border border-black px-2 py-2 flex items-center justify-center gap-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     height="24px"
@@ -89,7 +87,7 @@ export default function IncomeAndExpenses() {
                 </td>
               </tr>
               <tr>
-                <td className="border border-black px-4 py-2 flex items-center justify-center gap-2">
+                <td className="border border-black px-2 py-2 flex items-center justify-center gap-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     height="24px"
@@ -106,7 +104,7 @@ export default function IncomeAndExpenses() {
                 </td>
               </tr>
               <tr>
-                <td className="border border-black px-4 py-2 flex items-center justify-center gap-2">
+                <td className="border border-black px-2 py-2 flex items-center justify-center gap-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 32 32"

@@ -29,28 +29,21 @@ export default function Register() {
     special: /[!@#$%^&*]/.test(password),
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const validateUsername = () => {
+    if (!username.trim()) setUsernameError("กรุณากรอกชื่อผู้ใช้");
+    else setUsernameError("");
+  };
 
-    let hasError = false;
+  const validateEmail = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) setEmailError("กรุณากรอกอีเมล");
+    else if (!emailRegex.test(email)) setEmailError("รูปแบบอีเมลไม่ถูกต้อง");
+    else setEmailError("");
+  };
 
-    if (!username.trim()) {
-      setUsernameError("กรุณากรอกชื่อผู้ใช้");
-      hasError = true;
-    } else {
-      setUsernameError("");
-    }
-
-    if (!email.trim()) {
-      setEmailError("กรุณากรอกอีเมล");
-      hasError = true;
-    } else {
-      setEmailError("");
-    }
-
+  const validatePassword = () => {
     if (!password.trim()) {
       setPasswordError("กรุณากรอกรหัสผ่าน");
-      hasError = true;
       setShowPasswordCriteria(true);
     } else if (
       !passwordCriteria.length ||
@@ -60,43 +53,60 @@ export default function Register() {
       !passwordCriteria.special
     ) {
       setPasswordError("รหัสผ่านไม่ตรงตามเงื่อนไข");
-      hasError = true;
       setShowPasswordCriteria(true);
     } else {
       setPasswordError("");
       setShowPasswordCriteria(false);
     }
+  };
 
-    if (confirmPassword !== password) {
-      setConfirmPasswordError("รหัสผ่านไม่ตรงกัน");
-      hasError = true;
-    } else {
-      setConfirmPasswordError("");
-    }
-
-    if (!hasError) {
-      try {
-        const response = await fetch("/api/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, email, password }),
-        });
-
-        const resData = await response.json();
-
-        if (response.ok) {
-          alert("สมัครสำเร็จ! กำลังไปหน้าเข้าสู่ระบบ");
-          router.push("/owner/sign_in");
-        } else {
-          if (resData.message === "อีเมลนี้ถูกใช้งานแล้ว") {
-            setEmailError("อีเมลนี้ถูกใช้งานแล้ว");
-          } else {
-            alert("เกิดข้อผิดพลาด: " + (resData.error || "ไม่สามารถบันทึกข้อมูลได้"));
-          }
-        }
-      } catch (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
+  const validateConfirmPassword = () => {
+    if (confirmPassword !== password) 
+      {setConfirmPasswordError("รหัสผ่านไม่ตรงกัน");
+      setShowPasswordCriteria(true);
       }
+    else {
+      setConfirmPasswordError("");
+      setShowPasswordCriteria(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    validateUsername();
+    validateEmail();
+    validatePassword();
+    validateConfirmPassword();
+
+    if (
+      usernameError ||
+      emailError ||
+      passwordError ||
+      confirmPasswordError
+    ) return;
+
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const resData = await response.json();
+
+      if (response.ok) {
+        alert("สมัครสำเร็จ! กำลังไปหน้าเข้าสู่ระบบ");
+        router.push("/owner/sign_in");
+      } else {
+        if (resData.message === "อีเมลนี้ถูกใช้งานแล้ว") {
+          setEmailError("อีเมลนี้ถูกใช้งานแล้ว");
+        } else {
+          alert("เกิดข้อผิดพลาด: " + (resData.error || "ไม่สามารถบันทึกข้อมูลได้"));
+        }
+      }
+    } catch (error) {
+      alert("เกิดข้อผิดพลาด: " + error.message);
     }
   };
 
@@ -119,6 +129,8 @@ export default function Register() {
                 placeholder="ชื่อผู้ใช้งาน"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                onFocus={validateUsername}
+                onBlur={validateUsername}
                 className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black font-Inter 
                   ${usernameError ? "border-red-500" : "border-[#A1724E]"}`}
               />
@@ -135,6 +147,8 @@ export default function Register() {
                 placeholder="tawawandogcafe@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onFocus={validateEmail}
+                onBlur={validateEmail}
                 className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black font-Inter 
                   ${emailError ? "border-red-500" : "border-[#A1724E]"}`}
               />
@@ -152,6 +166,8 @@ export default function Register() {
                 placeholder="รหัสผ่าน"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={validatePassword}
+                onBlur={validatePassword}
                 className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black pr-10 font-Inter 
                   ${passwordError ? "border-red-500" : "border-[#A1724E]"}`}
               />
@@ -173,7 +189,7 @@ export default function Register() {
             {passwordError && <p className="text-xs text-red-500 mt-1">{passwordError}</p>}
 
             {showPasswordCriteria && (
-              <div className="text-xs mt-2 space-y-1 text-[#845C44]">
+              <div className="text-[16px] mt-2 space-y-1 text-[#845C44]">
                 <p className={passwordCriteria.length ? "text-green-600" : "text-red-500"}>
                   {passwordCriteria.length ? "✔️" : "❌"} รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร
                 </p>
@@ -204,6 +220,8 @@ export default function Register() {
                 placeholder="ยืนยันรหัสผ่าน"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                onFocus={validateConfirmPassword}
+                onBlur={validateConfirmPassword}
                 className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black pr-10 font-Inter 
                   ${confirmPasswordError ? "border-red-500" : "border-[#A1724E]"}`}
               />

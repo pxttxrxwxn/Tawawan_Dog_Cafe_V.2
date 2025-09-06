@@ -1,7 +1,7 @@
-import fs from "fs";
+import { promises as fs } from "fs";
 import path from "path";
 
-const filePath = path.join(process.cwd(),"public", "data", "register-data.json");
+const filePath = path.join(process.cwd(), "public", "data", "register-data.json");
 
 export async function POST(req) {
   try {
@@ -13,19 +13,23 @@ export async function POST(req) {
     }
 
     let users = [];
-    if (fs.existsSync(filePath)) {
-      users = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    try {
+      const fileData = await fs.readFile(filePath, "utf8");
+      users = JSON.parse(fileData);
+    } catch (err) {
+      users = [];
     }
 
-    if (users.some(u => u.email === email)) {
+    if (users.some((u) => u.email === email)) {
       return new Response(JSON.stringify({ message: "อีเมลนี้ถูกใช้งานแล้ว" }), { status: 400 });
     }
 
     users.push({ username, email, password });
-    fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
+    await fs.writeFile(filePath, JSON.stringify(users, null, 2), "utf8");
 
     return new Response(JSON.stringify({ message: "สมัครสมาชิกสำเร็จ" }), { status: 201 });
   } catch (error) {
+    console.error("Register error:", error);
     return new Response(JSON.stringify({ message: "เกิดข้อผิดพลาด" }), { status: 500 });
   }
 }
@@ -35,12 +39,15 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const email = searchParams.get("email") || "";
 
-    if (!fs.existsSync(filePath)) {
+    let users = [];
+    try {
+      const fileData = await fs.readFile(filePath, "utf8");
+      users = JSON.parse(fileData);
+    } catch (err) {
       return new Response(JSON.stringify({ username: "ไม่พบชื่อผู้ใช้" }), { status: 404 });
     }
 
-    const users = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    const user = users.find(u => u.email === email);
+    const user = users.find((u) => u.email === email);
 
     if (user) {
       return new Response(JSON.stringify({ username: user.username }), { status: 200 });
@@ -48,6 +55,7 @@ export async function GET(req) {
       return new Response(JSON.stringify({ username: "ไม่พบชื่อผู้ใช้" }), { status: 404 });
     }
   } catch (error) {
+    console.error("Get user error:", error);
     return new Response(JSON.stringify({ username: "เกิดข้อผิดพลาด" }), { status: 500 });
   }
 }
