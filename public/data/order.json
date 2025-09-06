@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "code": "M001",
+    "name": "ลาเต้",
+    "basePrice": 35,
+    "type": "เย็น",
+    "typePrice": 5,
+    "sugarLevel": "50%",
+    "quantity": 1,
+    "totalPrice": 40,
+    "note": "",
+    "image": "/uploads/ลาเต้เย็น 1.png"
+  }
+]

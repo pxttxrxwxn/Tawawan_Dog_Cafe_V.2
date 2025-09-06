@@ -8,24 +8,60 @@ import Link from "next/link";
 export default function ListFood() {
   const [menus, setMenus] = useState([]);
   const [counts, setCounts] = useState({});
+  const [recommendedMenus, setRecommendedMenus] = useState([]);
 
   useEffect(() => {
     fetch("/data/menus.json")
-      .then((res) => res.json())
-      .then((data) => setMenus(data))
-      .catch((err) => console.error("Error loading menus:", err));
+      .then(res => res.json())
+      .then(data => setMenus(data))
+      .catch(err => console.error("Error loading menus:", err));
+  }, []);
 
+  useEffect(() => {
+    if (menus.length === 0) return;
+
+    fetch("/data/Income.json")
+      .then(res => res.json())
+      .then(data => {
+        if (!data || data.length === 0) throw new Error("No income data");
+
+        const itemCount = {};
+        data.forEach(order =>
+          order.items.forEach(item => {
+            itemCount[item.name] = (itemCount[item.name] || 0) + item.quantity;
+          })
+        );
+
+        const sortedMenus = menus
+          .filter(menu => itemCount[menu.name])
+          .sort((a, b) => itemCount[b.name] - itemCount[a.name])
+          .slice(0, 3);
+
+        if (sortedMenus.length < 3) {
+          const remaining = menus.filter(m => !sortedMenus.find(sm => sm.code === m.code));
+          sortedMenus.push(...remaining.slice(0, 3 - sortedMenus.length));
+        }
+
+        setRecommendedMenus(sortedMenus);
+      })
+      .catch(() => {
+        console.log("No income data, using menus.json");
+        setRecommendedMenus(menus.slice(0, 3));
+      });
+  }, [menus]);
+
+  useEffect(() => {
     fetch("/api/order")
       .then((res) => res.json())
       .then((data) => {
         const initialCounts = {};
         data.forEach((item) => {
-          initialCounts[item.code] =
-            (initialCounts[item.code] || 0) + item.quantity;
+          initialCounts[item.code] = (initialCounts[item.code] || 0) + item.quantity;
         });
         setCounts(initialCounts);
       });
   }, []);
+
 
   const handleSelectDrinkMenu = (menu) => {
     localStorage.setItem("selectedDrinkMenu", JSON.stringify(menu));
@@ -82,10 +118,13 @@ export default function ListFood() {
       <Navbar activePage="list_food" />
       <div className="pt-[230px] px-10">
         {categories.map((category) => {
-          const filteredMenus = menus.filter((menu) => {
-            if (category === "เมนูแนะนำ") return menu.category === "เครื่องดื่ม";
-            return menu.category === category;
-          });
+          let filteredMenus = [];
+
+          if (category === "เมนูแนะนำ") {
+            filteredMenus = recommendedMenus;
+          } else {
+            filteredMenus = menus.filter((menu) => menu.category === category);
+          }
 
           if (filteredMenus.length === 0) return null;
 
