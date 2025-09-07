@@ -63,21 +63,23 @@ export default function Notifications() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="pt-[220px] px-30">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[#D64545] font-bold text-[36px] font-c">
-            การแจ้งเตือน
-          </h2>
-          <h5 onClick={handleDeleteAll} className="text-[#000000] underline text-[24px] cursor-pointer">
-            ลบการแจ้งเตือนทั้งหมด
-          </h5>
+      <div className="pt-[180px] px-30">
+        <div className="flex justify-center items-center mb-6">
+          <div className="flex justify-between items-center  w-[80%]">
+            <h2 className="text-[#D64545] font-bold text-[40px]">
+              การแจ้งเตือน
+            </h2>
+            <h5 onClick={handleDeleteAll} className="text-[#000000] underline text-[20px] cursor-pointer">
+              ลบการแจ้งเตือนทั้งหมด
+            </h5>
+          </div>
         </div>
 
         <div className="flex flex-col justify-center items-center gap-4">
           {notifications.map((item) => (
             <div
               key={item.id}
-              className="w-[50%] bg-[#FFFFFF] flex justify-between items-center rounded-3xl mb-4 p-4"
+              className="w-[40%] bg-[#FFFFFF] flex justify-between items-center rounded-3xl mb-4 p-4"
             >
               <div
                 dangerouslySetInnerHTML={{

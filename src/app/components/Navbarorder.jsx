@@ -24,10 +24,10 @@ export default function Navbar({ activePage }) {
   ];
 
   return (
-    <div className="fixed top-0 left-0 w-screen h-[187px] bg-[#FFE8A3] z-50 shadow-md px-6">
+    <div className="fixed top-0 left-0 w-screen h-[150px] bg-[#FFE8A3] z-50 shadow-md px-6">
       <div className="flex items-center justify-between h-full">
         <div className="flex items-center mr-10">
-          <Image src="/logo.png" alt="Logo" width={166} height={143} />
+          <Image src="/logo.png" alt="Logo" width={150} height={130} />
         </div>
 
         <nav className="flex ">
@@ -46,22 +46,21 @@ export default function Navbar({ activePage }) {
 
                 return (
                 <div key={btn.id} className="flex items-center">
-                    <div className=" flex-col items-center">
+                    <div className="flex flex-col items-center">
                         <button
-                            className="w-[76px] h-[76px] rounded-[50%] text-[#544E4E] font-semibold"
+                            className="w-[55px] h-[55px] rounded-[50%] text-[#544E4E] font-semibold text-[22px]"
                             style={{
                             backgroundColor: btnColor,
-                            cursor: "pointer",
                             }}
                         >
                             {btn.label}
                         </button>
-                        <p className="mt-2 text-black text-sm">{btn.text}</p>
+                        <p className="mt-2 text-black text-[16px]">{btn.text}</p>
                     </div>
 
                     {index < buttons.length - 1 && (
                     <div
-                        className="flex mb-5 w-[350px] h-[5px]"
+                        className="flex mb-5 w-[300px] h-[5px] rounded-3xl"
                         style={{ backgroundColor: lineColor }}
                     ></div>
                     )}
@@ -93,7 +92,7 @@ export default function Navbar({ activePage }) {
             </div>
             </Link>
             <div className="">
-                <p className="text-[30px] text-[#000000]">โต๊ะ : {tableNumber}</p>
+                <p className="text-[26px] text-[#000000]">โต๊ะ: {tableNumber}</p>
             </div>
         </div>
       </div>

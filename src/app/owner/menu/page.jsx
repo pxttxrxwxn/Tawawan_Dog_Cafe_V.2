@@ -214,7 +214,7 @@ export default function Menu() {
 
         {menus.length > 0 && (
           <div className="overflow-x-auto flex justify-center mb-10">
-            <table className="border-collapse w-[95%] text-center text-black">
+            <table className="border-collapse w-[95%] text-center text-black mb-2">
               <thead>
                 <tr className="bg-[#F79C4B] text-white">
                   <th className="border border-black px-4 py-2">รูป</th>

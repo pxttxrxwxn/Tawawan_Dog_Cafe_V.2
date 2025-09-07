@@ -14,7 +14,7 @@ export default function CompletedOrder() {
       text: "ขอบคุณที่สั่งซื้อ เรากำลังเตรียมสินค้าให้คุณ",
       icon: "success",
       showConfirmButton: false,
-      timer: 3000,
+      timer: 5000,
       timerProgressBar: true,
     }).then(() => {
       router.push("/customer/Notifications");

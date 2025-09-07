@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Index() {
   return (
-    <div className="min-h-screen  flex items-center justify-between">
+    <div className="min-h-screen  flex items-center justify-between font-[prompt]">
       <div className="flex flex-col items-left justify-center h-screen ml-[3%] mr-[3%]">
         <Image 
         src="/logo.png" alt="Logo" 

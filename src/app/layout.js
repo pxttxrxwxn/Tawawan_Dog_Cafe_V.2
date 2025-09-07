@@ -1,19 +1,28 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter ,Chakra_Petch, Prompt } from "next/font/google";
 import "./globals.css";
 
 if (typeof window === "undefined") {
   import("../lib/clearOrdersScheduler.js");
 }
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-Inter",
   subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const chakra_Petch = Chakra_Petch({
+  variable: "--font-Chakra-Petch",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
+
+const prompt = Prompt({
+  variable: "--font-prompt",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
 
 export const metadata = {
   title: "Tawawan Dog Cafe",
@@ -29,7 +38,7 @@ export default function RootLayout({ children }) {
       <link rel="icon" href="/logo.png" type="image/x-icon" />
     </>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable}${chakra_Petch.variable}${prompt.variable} antialiased`}
       >
         {children}
       </body>

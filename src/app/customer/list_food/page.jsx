@@ -116,7 +116,7 @@ export default function ListFood() {
   return (
     <div className="min-h-screen">
       <Navbar activePage="list_food" />
-      <div className="pt-[230px] px-10">
+      <div className="pt-[180px] px-10">
         {categories.map((category) => {
           let filteredMenus = [];
 

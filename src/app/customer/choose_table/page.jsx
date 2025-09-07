@@ -18,7 +18,7 @@ export default function ChooseTable() {
                 <div className='mx-auto mt-[30px]'>
                     <div className='flex justify-center w-[925px] bg-[#FFE8A3] rounded-2xl'>
                         <div className='mt-[50px] mb-[50px]'>
-                            <p className='text-[40px] text-[#D64545]'>
+                            <p className='text-[40px] text-[#D64545] font-[Prompt]'>
                                 โปรดเลือกหมายเลขโต๊ะที่ต้องการก่อนดำเนินการต่อ
                             </p>
 

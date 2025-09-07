@@ -29,7 +29,7 @@ export default function OrderCompleted() {
         <div className="min-h-screen">
             <Navbar activePage="order" />
             <div className="pt-6 pl-6 pr-6">
-                <div className="mb-4 mt-[200px] pl-[80px] pr-[80px] flex">
+                <div className="mb-4 mt-[180px] pl-[80px] pr-[80px] flex">
                     <Link href="/owner/order" className="w-[400px] h-[80px] p-5 rounded-sm bg-[#FFE7A1] flex items-center text-[#000000] cursor-pointer">
                         <svg 
                         xmlns="http://www.w3.org/2000/svg" 
@@ -55,7 +55,7 @@ export default function OrderCompleted() {
             <div className="bg-[#FFFFFF] m-8">
                 <div className="p-5 flex flex-col">
                     <div className="flex justify-start items-center mb-6">
-                        <h2 className="text-[#D64545] font-bold text-[25px]">
+                        <h2 className="text-[#D64545] font-bold text-[28px] ml-2">
                             ประวัติการสั่งซื้อที่เสร็จสิ้น
                         </h2>
                     </div>

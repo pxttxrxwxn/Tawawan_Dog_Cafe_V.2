@@ -21,8 +21,7 @@ export default function Order_Customer() {
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 2000);
-    return () => clearInterval(interval);
+
   }, []);
 
     const updateTotal = (ordersData) => {
@@ -88,14 +87,14 @@ export default function Order_Customer() {
   return (
     <div className="min-h-screen flex flex-col">
       <Nabarorder activePage="1" />
-      <div className="pt-[220px] px-30">
+      <div className="pt-[180px] px-30">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-[#D64545] font-bold text-[36px] font-c">
             ตะกร้าของฉัน
           </h2>
           <Link
             href={"/customer/list_food"}
-            className="text-[#000000] underline text-[24px]"
+            className="text-[#000000] underline text-[20px] mt-8"
           >
             เพิ่มรายการ
           </Link>
@@ -165,13 +164,13 @@ export default function Order_Customer() {
       </div>
 
         <div className="bg-white flex justify-end items-center fixed bottom-0 left-0 w-full p-4 h-[100px] shadow-md gap-4">
-          <h1 className="flex justify-between items-center text-black">
+          <h1 className="flex justify-between items-center text-black text-[20px]">
             รวม ({orders.length} รายการ):
+            <span className="text-[#D64545] font-bold">{totalAmount} ฿</span>
           </h1>
-          <span className="text-[#D64545] font-bold">{totalAmount} ฿</span>
           <Link href="/customer/Order_Customer_pay">
             <button 
-                className={`px-4 py-2 rounded-md text-3xl mr-6 text-white ${
+                className={`px-8 py-2 rounded-md text-[24px] mr-6 text-white ${
                 orders.length > 0 ? "bg-[#F79C4B] cursor-pointer" : "bg-[#DDDDDD] cursor-not-allowed"
                 }`}
                 disabled={orders.length === 0}

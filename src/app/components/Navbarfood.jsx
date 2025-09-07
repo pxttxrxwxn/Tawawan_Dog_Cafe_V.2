@@ -24,17 +24,17 @@ export default function Navbar() {
   ];
 
   return (
-    <div className="fixed top-0 left-0 w-screen h-[187px] bg-[#FFE8A3] z-50 shadow-md px-6">
+    <div className="fixed top-0 left-0 w-screen h-[150px] bg-[#FFE8A3] z-50 shadow-md px-6">
       <div className="flex items-center justify-between h-full">
         <div className="flex items-center mr-10">
-          <Image src="/logo.png" alt="Logo" width={166} height={143} />
+          <Image src="/logo.png" alt="Logo" width={150} height={130} />
         </div>
 
         <nav className="flex space-x-20">
           {buttons.map((btn) => (
             <Link key={btn.id} href={btn.link}>
               <button
-                className="w-[209px] h-[75px] rounded-md text-white font-semibold cursor-pointer"
+                className="w-[209px] h-[75px] rounded-md text-white font-semibold cursor-pointer text-2xl"
                 style={{ backgroundColor: btn.baseColor }}
               >
                 {btn.label}
@@ -64,7 +64,7 @@ export default function Navbar() {
           </Link>
 
           <div>
-            <p className="text-[30px] text-[#000000]">โต๊ะ : {tableNumber}</p>
+            <p className="text-[26px] text-[#000000]">โต๊ะ: {tableNumber}</p>
           </div>
         </div>
       </div>
