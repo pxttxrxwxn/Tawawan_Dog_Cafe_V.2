@@ -51,7 +51,7 @@ export default function ListFood() {
   }, [menus]);
 
   useEffect(() => {
-    fetch("/api/order")
+    fetch("/api/orders")
       .then((res) => res.json())
       .then((data) => {
         const initialCounts = {};
@@ -70,7 +70,7 @@ export default function ListFood() {
   const handleIncrease = async (menu) => {
     setCounts((prev) => ({ ...prev, [menu.code]: (prev[menu.code] || 0) + 1 }));
 
-    await fetch("/api/order", {
+    await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

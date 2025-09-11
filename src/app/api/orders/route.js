@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-const orderFilePath = path.join(process.cwd(), "public", "data", "order.json");
+const orderFilePath = path.join(process.cwd(), "public", "data", "orders.json");
 const ownerFilePath = path.join(process.cwd(), "public", "data", "order_owner.json");
 
 async function readFile(filePath) {

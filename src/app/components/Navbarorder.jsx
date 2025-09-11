@@ -14,7 +14,7 @@ export default function Navbar({ activePage }) {
     if (selectedTable) setTableNumber(selectedTable);
     }, []);
 
-    const { data: orders } = useSWR("/api/order", fetcher, { refreshInterval: 1000 });
+    const { data: orders } = useSWR("/api/orders", fetcher, { refreshInterval: 1000 });
     const orderCount = orders ? orders.length : 0;
 
     const { data: Notifications } = useSWR("/data/Notifications.json", fetcher, { refreshInterval: 1000 });
