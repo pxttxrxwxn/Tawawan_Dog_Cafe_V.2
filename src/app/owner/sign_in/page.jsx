@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { act, useState } from 'react'
 import Image from 'next/image'
 import Link from "next/link"
 import { useRouter } from "next/navigation";
@@ -57,10 +57,10 @@ function SignIn() {
   if (hasError) return;
 
   try {
-    const res = await fetch("/api/login", {
+    const res = await fetch("/api/owner", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({action: "login", email, password }),
     });
 
     const data = await res.json();

@@ -8,7 +8,7 @@ export default function Order() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    fetch("/data/order_owner.json")
+    fetch("/data/orders.json")
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not ok");
         return res.text();

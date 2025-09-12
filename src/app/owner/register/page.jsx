@@ -87,10 +87,10 @@ export default function Register() {
     ) return;
 
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("/api/owner", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ action: "register", username, email, password }),
       });
 
       const resData = await response.json();

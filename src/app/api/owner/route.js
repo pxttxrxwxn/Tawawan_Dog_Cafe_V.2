@@ -1,0 +1,83 @@
+import { promises as fs } from "fs";
+import path from "path";
+
+const filePath = path.join(process.cwd(), "public", "data", "owner.json");
+
+async function readUsers() {
+  try {
+    const data = await fs.readFile(filePath, "utf-8");
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+async function writeUsers(users) {
+  await fs.writeFile(filePath, JSON.stringify(users, null, 2), "utf-8");
+}
+
+export async function POST(req) {
+  try {
+    const body = await req.json();
+    const { action, username, email, password } = body;
+
+    if (!action) {
+      return new Response(JSON.stringify({ error: "ต้องระบุ action (register หรือ login)" }), { status: 400 });
+    }
+
+    let users = await readUsers();
+
+    if (action === "register") {
+      if (!username || !email || !password) {
+        return new Response(JSON.stringify({ message: "ข้อมูลไม่ครบ" }), { status: 400 });
+      }
+
+      if (users.some((u) => u.email === email)) {
+        return new Response(JSON.stringify({ message: "อีเมลนี้ถูกใช้งานแล้ว" }), { status: 400 });
+      }
+
+      users.push({ username, email, password });
+      await writeUsers(users);
+
+      return new Response(JSON.stringify({ message: "สมัครสมาชิกสำเร็จ" }), { status: 201 });
+    }
+
+    if (action === "login") {
+      const user = users.find((u) => u.email === email);
+
+      if (!user) {
+        return new Response(JSON.stringify({ error: "ไม่พบอีเมลนี้ในระบบ" }), { status: 401 });
+      }
+
+      if (user.password !== password) {
+        return new Response(JSON.stringify({ error: "รหัสผ่านไม่ถูกต้อง" }), { status: 401 });
+      }
+
+      return new Response(JSON.stringify({ message: "ล็อกอินสำเร็จ" }), { status: 200 });
+    }
+
+    return new Response(JSON.stringify({ error: "action ไม่ถูกต้อง" }), { status: 400 });
+
+  } catch (error) {
+    console.error("API Error:", error);
+    return new Response(JSON.stringify({ error: "เกิดข้อผิดพลาด" }), { status: 500 });
+  }
+}
+
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get("email") || "";
+
+    const users = await readUsers();
+    const user = users.find((u) => u.email === email);
+
+    if (user) {
+      return new Response(JSON.stringify({ username: user.username }), { status: 200 });
+    } else {
+      return new Response(JSON.stringify({ username: "ไม่พบชื่อผู้ใช้" }), { status: 404 });
+    }
+  } catch (error) {
+    return new Response(JSON.stringify({ username: "เกิดข้อผิดพลาด" }), { status: 500 });
+  }
+}

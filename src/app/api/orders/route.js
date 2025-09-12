@@ -1,8 +1,8 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-const orderFilePath = path.join(process.cwd(), "public", "data", "orders.json");
-const ownerFilePath = path.join(process.cwd(), "public", "data", "order_owner.json");
+const cartFilePath = path.join(process.cwd(), "public", "data", "cart.json");
+const ordersFilePath = path.join(process.cwd(), "public", "data", "orders.json");
 
 async function readFile(filePath) {
   try {
@@ -19,9 +19,9 @@ async function writeFile(filePath, data) {
 
 export async function POST(req) {
   const newOrder = await req.json();
-  let orders = await readFile(orderFilePath);
+  let cart = await readFile(cartFilePath);
 
-  const index = orders.findIndex(
+  const index = cart.findIndex(
     (o) =>
       o.code === newOrder.code &&
       o.type === newOrder.type &&
@@ -30,17 +30,17 @@ export async function POST(req) {
   );
 
   if (index > -1) {
-    orders[index].quantity += newOrder.quantity || 1;
-    orders[index].totalPrice =
-      (orders[index].basePrice + (orders[index].typePrice || 0)) *
-      orders[index].quantity;
+    cart[index].quantity += newOrder.quantity || 1;
+    cart[index].totalPrice =
+      (cart[index].basePrice + (cart[index].typePrice || 0)) *
+      cart[index].quantity;
   } else {
     const basePrice = Number(newOrder.basePrice || newOrder.price || 0);
     const typePrice = Number(newOrder.typePrice || 0);
     const quantity = Number(newOrder.quantity || 1);
     const totalPrice = (basePrice + typePrice) * quantity;
 
-    orders.push({
+    cart.push({
       ...newOrder,
       basePrice,
       typePrice,
@@ -49,22 +49,27 @@ export async function POST(req) {
     });
   }
 
-  await writeFile(orderFilePath, orders);
-  return new Response(JSON.stringify({ success: true, orders }), { status: 200 });
+  await writeFile(cartFilePath, cart);
+  return new Response(JSON.stringify({ success: true, cart }), { status: 200 });
 }
 
 export async function DELETE(req) {
   try {
-    const { all, code, removeAll, type, sugarLevel, note, tableNumber } = await req.json();
-    let orders = await readFile(orderFilePath);
+    const { all, code, removeAll, type, sugarLevel, note, tableNumber } =
+      await req.json();
 
-    if (all && orders.length > 0) {
-      let ownerOrders = await readFile(ownerFilePath);
-      let lastOrderNumber = ownerOrders.length
-        ? ownerOrders[ownerOrders.length - 1].ordernumber
+    let cart = await readFile(cartFilePath);
+    let orders = await readFile(ordersFilePath);
+
+    if (all && cart.length > 0) {
+      let lastOrderNumber = orders.length
+        ? orders[orders.length - 1].ordernumber
         : "O1000";
       let nextOrderNumber =
-        "O" + (parseInt(lastOrderNumber.substring(1)) + 1).toString().padStart(4, "0");
+        "O" +
+        (parseInt(lastOrderNumber.substring(1)) + 1)
+          .toString()
+          .padStart(4, "0");
 
       const now = new Date();
       const date = now.toISOString().split("T")[0];
@@ -75,7 +80,7 @@ export async function DELETE(req) {
         tableNumber: tableNumber || "ไม่ระบุ",
         date,
         time,
-        items: orders.map((item) => ({
+        items: cart.map((item) => ({
           name: item.name,
           type: item.type,
           sugarLevel: item.sugarLevel,
@@ -83,16 +88,17 @@ export async function DELETE(req) {
           totalPrice: item.totalPrice,
           note: item.note,
         })),
+        status: "Pending",
       };
 
-      ownerOrders.push(newOrderGroup);
-      await writeFile(ownerFilePath, ownerOrders);
+      orders.push(newOrderGroup);
+      await writeFile(ordersFilePath, orders);
 
-      orders = [];
+      cart = [];
     }
 
     if (code) {
-      const index = orders.findIndex(
+      const index = cart.findIndex(
         (o) =>
           o.code === code &&
           o.type === type &&
@@ -102,26 +108,29 @@ export async function DELETE(req) {
 
       if (index > -1) {
         if (removeAll) {
-          orders.splice(index, 1);
+          cart.splice(index, 1);
         } else {
-          orders[index].quantity -= 1;
-          if (orders[index].quantity <= 0) orders.splice(index, 1);
-          else orders[index].totalPrice =
-            (orders[index].basePrice + (orders[index].typePrice || 0)) *
-            orders[index].quantity;
+          cart[index].quantity -= 1;
+          if (cart[index].quantity <= 0) {
+            cart.splice(index, 1);
+          } else {
+            cart[index].totalPrice =
+              (cart[index].basePrice + (cart[index].typePrice || 0)) *
+              cart[index].quantity;
+          }
         }
       }
     }
 
-    await writeFile(orderFilePath, orders);
+    await writeFile(cartFilePath, cart);
 
-    return new Response(JSON.stringify({ success: true, orders }), {
+    return new Response(JSON.stringify({ success: true, cart }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
     console.error("DELETE order error:", err);
-    return new Response(JSON.stringify({ success: false, orders: [] }), {
+    return new Response(JSON.stringify({ success: false, cart: [] }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
@@ -129,6 +138,6 @@ export async function DELETE(req) {
 }
 
 export async function GET() {
-  const orders = await readFile(orderFilePath);
-  return new Response(JSON.stringify(orders), { status: 200 });
+  const cart = await readFile(cartFilePath);
+  return new Response(JSON.stringify(cart), { status: 200 });
 }

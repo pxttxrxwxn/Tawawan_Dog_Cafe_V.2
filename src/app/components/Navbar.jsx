@@ -12,7 +12,7 @@ export default function Navbar({ activePage }) {
         const email = localStorage.getItem("loggedInEmail");
         console.log("email from localStorage:", email);
 
-        const res = await fetch("/data/register-data.json");
+        const res = await fetch("/data/owner.json");
         const data = await res.json();
 
         const user = data.find((u) => u.email === email);

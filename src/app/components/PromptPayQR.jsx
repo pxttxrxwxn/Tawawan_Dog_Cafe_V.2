@@ -11,7 +11,7 @@ const PromptPayQR = () => {
   const [qrData, setQrData] = useState("");
 
   useEffect(() => {
-    fetch("/data/order.json")
+    fetch("/data/cart.json")
       .then((res) => {
         if (!res.ok) throw new Error("Cannot fetch order.json");
         return res.json();

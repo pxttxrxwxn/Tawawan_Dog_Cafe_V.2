@@ -13,7 +13,7 @@ export default function Order_Customer_pay() {
     const selectedTable = localStorage.getItem("selectedTable");
     if (selectedTable) setTableNumber(selectedTable);
 
-    fetch("/data/order.json")
+    fetch("/data/cart.json")
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .catch((err) => console.error("Error loading order.json:", err));
@@ -28,7 +28,7 @@ export default function Order_Customer_pay() {
     if (orders.length === 0) return;
 
     try {
-      const res = await fetch("/api/order", {
+      const res = await fetch("/api/orders", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ all: true, tableNumber }),

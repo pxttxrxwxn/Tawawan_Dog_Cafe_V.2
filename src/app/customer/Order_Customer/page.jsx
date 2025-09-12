@@ -9,7 +9,7 @@ export default function Order_Customer() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("/api/order");
+      const res = await fetch("/api/orders");
       const data = await res.json();
       setOrders(data);
       const total = data.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -34,7 +34,7 @@ export default function Order_Customer() {
     try {
         let data;
         if (delta < 0) {
-        const res = await fetch("/api/order", {
+        const res = await fetch("/api/orders", {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -42,11 +42,12 @@ export default function Order_Customer() {
             type: item.type,
             sugarLevel: item.sugarLevel,
             note: item.note || "",
+            status : "Pending",
             }),
         });
         data = await res.json();
         } else {
-        const res = await fetch("/api/order", {
+        const res = await fetch("/api/orders", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ...item, quantity: 1 }),
@@ -62,7 +63,7 @@ export default function Order_Customer() {
 
   const handleRemove = async (item) => {
     try {
-      const res = await fetch("/api/order", {
+      const res = await fetch("/api/orders", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -70,6 +71,7 @@ export default function Order_Customer() {
           type: item.type,
           sugarLevel: item.sugarLevel,
           note: item.note || "",
+          status : "Pending",
           removeAll: true,
         }),
       });
