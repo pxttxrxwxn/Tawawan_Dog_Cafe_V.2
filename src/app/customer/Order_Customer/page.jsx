@@ -9,7 +9,7 @@ export default function Order_Customer() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("/api/orders");
+      const res = await fetch("/data/cart.json");
       const data = await res.json();
       setOrders(data);
       const total = data.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -24,46 +24,74 @@ export default function Order_Customer() {
 
   }, []);
 
-    const updateTotal = (ordersData) => {
-    setOrders(ordersData);
-    const total = ordersData.reduce((sum, i) => sum + i.totalPrice, 0);
-    setTotalAmount(total);
-    };
+  const updateTotal = (ordersData) => {
+  setOrders(ordersData);
+  const total = ordersData.reduce((sum, i) => sum + i.totalPrice, 0);
+  setTotalAmount(total);
+  };
 
-    const handleQuantityChange = async (item, delta) => {
-    try {
-        let data;
-        if (delta < 0) {
-        const res = await fetch("/api/orders", {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-            code: item.code,
-            type: item.type,
-            sugarLevel: item.sugarLevel,
-            note: item.note || "",
-            status : "Pending",
-            }),
-        });
-        data = await res.json();
-        } else {
-        const res = await fetch("/api/orders", {
+  const handleQuantityChange = async (item, delta) => {
+    const updatedOrders = [...orders];
+    const index = updatedOrders.findIndex(
+      (i) =>
+        i.code === item.code &&
+        i.type === item.type &&
+        i.sugarLevel === item.sugarLevel &&
+        (i.note || "") === (item.note || "")
+    );
+
+    if (index !== -1) {
+      const newQuantity = updatedOrders[index].quantity + delta;
+
+      if (newQuantity <= 0) {
+        updatedOrders.splice(index, 1);
+      } else {
+        updatedOrders[index].quantity = newQuantity;
+        updatedOrders[index].totalPrice = updatedOrders[index].basePrice * newQuantity;
+      }
+
+      updateTotal(updatedOrders);
+
+      try {
+        if (delta > 0) {
+          await fetch("/api/orders", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ...item, quantity: 1 }),
-        });
-        data = await res.json();
+          });
+        } else {
+          await fetch("/api/orders", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              code: item.code,
+              type: item.type,
+              sugarLevel: item.sugarLevel,
+              note: item.note || "",
+              status: "Pending",
+            }),
+          });
         }
-
-        if (data.success) updateTotal(data.orders);
-    } catch (error) {
-        console.error("Failed to update quantity:", error);
+      } catch (error) {
+        console.error("Failed to sync with backend:", error);
+      }
     }
-    };
+  };
 
   const handleRemove = async (item) => {
+    const updatedOrders = orders.filter(
+      (i) =>
+        !(
+          i.code === item.code &&
+          i.type === item.type &&
+          i.sugarLevel === item.sugarLevel &&
+          (i.note || "") === (item.note || "")
+        )
+    );
+    updateTotal(updatedOrders);
+
     try {
-      const res = await fetch("/api/orders", {
+      await fetch("/api/orders", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -71,18 +99,12 @@ export default function Order_Customer() {
           type: item.type,
           sugarLevel: item.sugarLevel,
           note: item.note || "",
-          status : "Pending",
+          status: "Pending",
           removeAll: true,
         }),
       });
-      const data = await res.json();
-      if (data.success) {
-        setOrders(data.orders);
-        const total = data.orders.reduce((sum, i) => sum + i.totalPrice, 0);
-        setTotalAmount(total);
-      }
     } catch (error) {
-      console.error("Failed to remove item:", error);
+      console.error("Failed to sync with backend:", error);
     }
   };
 

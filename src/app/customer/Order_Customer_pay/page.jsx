@@ -25,16 +25,36 @@ export default function Order_Customer_pay() {
   }, [orders]);
 
   const handleOrder = async () => {
-    if (orders.length === 0) return;
+    const customerid = localStorage.getItem("customerid");
+    if (!customerid) {
+      console.error("customerid not found in localStorage");
+      return;
+    }
+
+    if (orders.length === 0) {
+      console.error("No orders to process");
+      return;
+    }
 
     try {
       const res = await fetch("/api/orders", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ all: true, tableNumber }),
+        body: JSON.stringify({ all: true, tableNumber, customerid }),
       });
+
+      if (!res.ok) {
+        console.error("DELETE request failed with status:", res.status);
+        return;
+      }
+      
       const data = await res.json();
-      if (!data.success) throw new Error("Failed to process order");
+      console.log("DELETE response:", data);
+
+      if (!data.success) {
+        console.error("DELETE failed:", data);
+        return;
+      }
 
       const notification2 = {
         id: Date.now() + Math.random(),

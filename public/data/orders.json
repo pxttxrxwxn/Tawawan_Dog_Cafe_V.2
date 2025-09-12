@@ -2,11 +2,12 @@
   {
     "ordernumber": "O1001",
     "tableNumber": "1",
+    "customerid": "C1001",
     "date": "2025-09-12",
-    "time": "22:45:24",
+    "time": "00:15:19",
     "items": [
       {
-        "name": "ไดฟุกุสตรอเบอรี่",
+        "name": "เฟรนฟรายซ์",
         "type": null,
         "sugarLevel": null,
         "quantity": 1,
@@ -14,16 +15,17 @@
         "note": null
       }
     ],
-    "status": "complete"
+    "status": "Pending"
   },
   {
     "ordernumber": "O1002",
-    "tableNumber": "1",
+    "tableNumber": "4",
+    "customerid": "C1004",
     "date": "2025-09-12",
-    "time": "22:45:24",
+    "time": "00:16:48",
     "items": [
       {
-        "name": "ไดฟุกุสตรอเบอรี่",
+        "name": "เฟรนฟรายซ์",
         "type": null,
         "sugarLevel": null,
         "quantity": 1,
@@ -31,6 +33,6 @@
         "note": null
       }
     ],
-    "status": "complete"
+    "status": "Pending"
   }
 ]

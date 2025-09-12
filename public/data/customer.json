@@ -2,5 +2,17 @@
   {
     "customerid": "C1001",
     "tableNumber": "1"
+  },
+  {
+    "customerid": "C1002",
+    "tableNumber": "5"
+  },
+  {
+    "customerid": "C1003",
+    "tableNumber": "5"
+  },
+  {
+    "customerid": "C1004",
+    "tableNumber": "4"
   }
 ]
