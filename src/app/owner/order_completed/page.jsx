@@ -7,14 +7,15 @@ import Link from "next/link"
 export default function OrderCompleted() {
     const [orders, setOrders] = useState([]);
     useEffect(() => {
-        fetch("/data/Order_completed.json")
+        fetch("/data/orders.json")
             .then((res) => {
             if (!res.ok) throw new Error("Network response was not ok");
             return res.text();
             })
             .then((text) => {
             const data = text ? JSON.parse(text) : [];
-            setOrders(data);
+            const completedOrders = data.filter(order => order.status.toLowerCase() === "complete");
+            setOrders(completedOrders);
             })
             .catch((err) => console.error("Failed to load orders:", err));
         }, []);

@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 const dataDir = path.join(process.cwd(), "public", "data");
-const ownerFile = path.join(dataDir, "order_owner.json");
+const ownerFile = path.join(dataDir, "order.json");
 const completedFile = path.join(dataDir, "order_completed.json");
 const incomeFile = path.join(dataDir, "income.json");
 

@@ -1,8 +1,10 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { NextResponse } from "next/server";
 
-const cartFilePath = path.join(process.cwd(), "public", "data", "cart.json");
-const ordersFilePath = path.join(process.cwd(), "public", "data", "orders.json");
+const cartFilePath = path.join(process.cwd(), "public/data/cart.json");
+const ordersFilePath = path.join(process.cwd(), "public/data/orders.json");
+const incomeFilePath = path.join(process.cwd(), "public/data/income.json");
 
 async function readFile(filePath) {
   try {
@@ -18,11 +20,37 @@ async function writeFile(filePath, data) {
 }
 
 export async function POST(req) {
-  const newOrder = await req.json();
+  const body = await req.json();
+
+  if (body.ordernumber) {
+    try {
+      const orders = await readFile(ordersFilePath);
+      const income = await readFile(incomeFilePath);
+
+      const index = orders.findIndex(o => o.ordernumber === body.ordernumber);
+      if (index === -1) {
+        return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      }
+
+      orders[index].status = "complete";
+
+      income.push(orders[index]);
+      await writeFile(incomeFilePath, income);
+
+      await writeFile(ordersFilePath, orders);
+
+      return NextResponse.json({ success: true, order: orders[index] });
+    } catch (err) {
+      console.error("❌ Complete order error:", err);
+      return NextResponse.json({ error: "Server error" }, { status: 500 });
+    }
+  }
+
+  const newOrder = body;
   let cart = await readFile(cartFilePath);
 
   const index = cart.findIndex(
-    (o) =>
+    o =>
       o.code === newOrder.code &&
       o.type === newOrder.type &&
       o.sugarLevel === newOrder.sugarLevel &&
@@ -55,8 +83,7 @@ export async function POST(req) {
 
 export async function DELETE(req) {
   try {
-    const { all, code, removeAll, type, sugarLevel, note, tableNumber } =
-      await req.json();
+    const { all, code, removeAll, type, sugarLevel, note, tableNumber } = await req.json();
 
     let cart = await readFile(cartFilePath);
     let orders = await readFile(ordersFilePath);
@@ -80,7 +107,7 @@ export async function DELETE(req) {
         tableNumber: tableNumber || "ไม่ระบุ",
         date,
         time,
-        items: cart.map((item) => ({
+        items: cart.map(item => ({
           name: item.name,
           type: item.type,
           sugarLevel: item.sugarLevel,
@@ -99,7 +126,7 @@ export async function DELETE(req) {
 
     if (code) {
       const index = cart.findIndex(
-        (o) =>
+        o =>
           o.code === code &&
           o.type === type &&
           o.sugarLevel === sugarLevel &&
@@ -138,6 +165,6 @@ export async function DELETE(req) {
 }
 
 export async function GET() {
-  const cart = await readFile(cartFilePath);
-  return new Response(JSON.stringify(cart), { status: 200 });
+  const orders = await readFile(ordersFilePath);
+  return new Response(JSON.stringify(orders), { status: 200 });
 }
