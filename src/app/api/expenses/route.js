@@ -23,8 +23,22 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const newExpense = await req.json();
+    const { OwnerID, date, detail, amount, category } = await req.json();
     const expenses = await readData();
+
+    const lastExpense = expenses[expenses.length - 1];
+    const lastIDNumber = lastExpense ? parseInt(lastExpense.ExpenseID.slice(1)) : 0;
+    const newExpenseID = `E${(lastIDNumber + 1).toString().padStart(4, "0")}`;
+
+    const newExpense = {
+      ExpenseID: newExpenseID,
+      OwnerID,
+      date,
+      detail,
+      amount,
+      category,
+    };
+
     expenses.push(newExpense);
     await writeData(expenses);
 
@@ -32,6 +46,7 @@ export async function POST(req) {
       status: 201,
     });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify({ error: "ไม่สามารถเพิ่มข้อมูลได้" }), {
       status: 500,
     });
@@ -40,7 +55,7 @@ export async function POST(req) {
 
 export async function PUT(req) {
   try {
-    const { originalIndex, ...updatedExpense } = await req.json();
+    const { originalIndex, date, detail, amount, category } = await req.json();
     const expenses = await readData();
 
     if (originalIndex < 0 || originalIndex >= expenses.length) {
@@ -48,14 +63,21 @@ export async function PUT(req) {
         status: 404,
       });
     }
+    expenses[originalIndex] = {
+      ...expenses[originalIndex],
+      date,
+      detail,
+      amount,
+      category,
+    };
 
-    expenses[originalIndex] = updatedExpense;
     await writeData(expenses);
 
-    return new Response(JSON.stringify({ message: "แก้ไขสำเร็จ", updatedExpense }), {
+    return new Response(JSON.stringify({ message: "แก้ไขสำเร็จ", updatedExpense: expenses[originalIndex] }), {
       status: 200,
     });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify({ error: "ไม่สามารถแก้ไขได้" }), {
       status: 500,
     });

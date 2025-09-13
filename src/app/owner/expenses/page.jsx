@@ -52,7 +52,10 @@ export default function Expenses() {
       return;
     }
 
+    const ownerID = localStorage.getItem("OwnerID") || ""; 
+
     const newExpense = {
+      OwnerID: ownerID,
       date: form.date.value,
       detail: form.detail.value,
       amount: Number(form.amount.value),
@@ -67,15 +70,18 @@ export default function Expenses() {
           body: JSON.stringify({ ...newExpense, originalIndex: editingIndex }),
         });
         setExpenses((prev) =>
-          prev.map((exp, idx) => (idx === editingIndex ? newExpense : exp))
+          prev.map((exp, idx) =>
+            idx === editingIndex ? { ...prev[idx], ...newExpense } : exp
+          )
         );
       } else {
-        await fetch("/api/expenses", {
+        const res = await fetch("/api/expenses", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newExpense),
         });
-        setExpenses((prev) => [...prev, newExpense]);
+        const data = await res.json();
+        setExpenses((prev) => [...prev, data.newExpense]);
       }
     } catch (err) {
       console.error(err);
