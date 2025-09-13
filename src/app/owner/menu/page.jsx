@@ -90,6 +90,7 @@ export default function Menu() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
+    const ownerID = localStorage.getItem("OwnerID") || "";
     const newCode = form.menuCode.value.trim();
     
     const isDuplicate = menus.some(
@@ -119,8 +120,10 @@ export default function Menu() {
     }
     const originalCode = editingMenu ? editingMenu.code : null;
     const basePrice = Number(form.menuPrice.value) || 0;
+    
 
     const newMenu = {
+      OwnerID: ownerID,
       code: form.menuCode.value,
       name: form.menuName.value,
       category: form.menuCategory.value,
@@ -138,6 +141,7 @@ export default function Menu() {
       desc: menuDesc,
     };
     const formData = new FormData();
+    formData.append("OwnerID", ownerID);
     formData.append("originalCode", originalCode || "");
     formData.append("code", newMenu.code);
     formData.append("name", newMenu.name);

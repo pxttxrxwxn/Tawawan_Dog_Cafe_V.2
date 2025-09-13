@@ -1,5 +1,6 @@
 [
   {
+    "OwnerID": "OW1001",
     "code": "M001",
     "name": "ลาเต้",
     "category": "เครื่องดื่ม",
@@ -13,8 +14,8 @@
         "price": 5
       },
       "ปั่น": {
-        "checked": true,
-        "price": 10
+        "checked": false,
+        "price": 0
       }
     },
     "price": "35",
@@ -22,33 +23,27 @@
     "image": "/uploads/ลาเต้เย็น 1.png"
   },
   {
+    "OwnerID": "OW1001",
     "code": "S001",
     "name": "เฟรนฟรายซ์",
     "category": "อาหารทานเล่น",
     "type": "",
     "price": "50",
-    "desc": "มันฝรั่งทอดกรอบนอกนุ่มใน โรยเกลือ \r\nทานคู่ซอสสุดโปรด",
+    "desc": "มันฝรั่งทอดกรอบนอกนุ่มใน โรยเกลือ",
     "image": "/uploads/เฟรนฟรายซ์.webp"
   },
   {
+    "OwnerID": "OW1001",
     "code": "D001",
     "name": "ไดฟุกุสตรอเบอรี่",
     "category": "ขนมหวาน",
     "type": "",
     "price": "50",
-    "desc": "โมจิไส้ถั่วแดงเนื้อนุ่ม ห่อสตรอเบอรี่สด \r\nหวานฉ่ำลงตัว",
+    "desc": "โมจิไส้ถั่วแดงเนื้อนุ่ม ห่อสตรอเบอรี่สด",
     "image": "/uploads/ไดฟุกุสตรอเบอรี่.png"
   },
   {
-    "code": "D002",
-    "name": "เค้ก",
-    "category": "ขนมหวาน",
-    "type": "",
-    "price": "100",
-    "desc": "",
-    "image": "/uploads/bx.jpg"
-  },
-  {
+    "OwnerID": "OW1001",
     "code": "M002",
     "name": "กาแฟน้ำส้ม",
     "category": "เครื่องดื่ม",
@@ -58,16 +53,26 @@
         "price": 0
       },
       "เย็น": {
-        "checked": true,
-        "price": 5
+        "checked": false,
+        "price": 0
       },
       "ปั่น": {
-        "checked": true,
-        "price": 10
+        "checked": false,
+        "price": 0
       }
     },
     "price": "40",
     "desc": "",
     "image": "/uploads/dx.jpg"
+  },
+  {
+    "OwnerID": "OW1001",
+    "code": "D002",
+    "name": "เค้กช็อก",
+    "category": "ขนมหวาน",
+    "type": "",
+    "price": "50",
+    "desc": "",
+    "image": "/uploads/bxxx.jpg"
   }
 ]

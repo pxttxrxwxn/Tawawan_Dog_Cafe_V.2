@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function ListFood() {
   const [menus, setMenus] = useState([]);
-  const [counts, setCounts] = useState({});
+  const [orders, setOrders] = useState([]);
   const [recommendedMenus, setRecommendedMenus] = useState([]);
 
   useEffect(() => {
@@ -18,13 +18,18 @@ export default function ListFood() {
   }, []);
 
   useEffect(() => {
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      setOrders(JSON.parse(storedCart));
+    }
+  }, []);
+
+  useEffect(() => {
     if (menus.length === 0) return;
 
     fetch("/data/Income.json")
       .then(res => res.json())
       .then(data => {
-        if (!data || data.length === 0) throw new Error("No income data");
-
         const itemCount = {};
         data.forEach(order =>
           order.items.forEach(item => {
@@ -45,70 +50,59 @@ export default function ListFood() {
         setRecommendedMenus(sortedMenus);
       })
       .catch(() => {
-        console.log("No income data, using menus.json");
         setRecommendedMenus(menus.slice(0, 3));
       });
   }, [menus]);
 
-  useEffect(() => {
-    fetch("/data/cart.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const initialCounts = {};
-        data.forEach((item) => {
-          initialCounts[item.code] = (initialCounts[item.code] || 0) + item.quantity;
-        });
-        setCounts(initialCounts);
-      });
-  }, []);
+  const handleIncrease = (menu) => {
+    const cart = [...orders];
+    const index = cart.findIndex(
+      (item) =>
+        item.code === menu.code &&
+        item.type === menu.type &&
+        item.sugarLevel === menu.sugarLevel
+    );
 
+    if (index > -1) {
+      cart[index].quantity += 1;
+      cart[index].totalPrice = Number(cart[index].basePrice) * cart[index].quantity;
+    } else {
+      cart.push({
+        ...menu,
+        basePrice: Number(menu.price),
+        quantity: 1,
+        totalPrice: Number(menu.price),
+      });
+    }
+
+    setOrders(cart);
+    localStorage.setItem("cart", JSON.stringify(cart));
+  };
+
+  const handleDecrease = (menu) => {
+    const cart = [...orders];
+    const index = cart.findIndex(
+      (item) =>
+        item.code === menu.code &&
+        item.type === menu.type &&
+        item.sugarLevel === menu.sugarLevel
+    );
+
+    if (index > -1) {
+      cart[index].quantity -= 1;
+      if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+      } else {
+        cart[index].totalPrice = Number(cart[index].basePrice) * cart[index].quantity;
+      }
+    }
+
+    setOrders(cart);
+    localStorage.setItem("cart", JSON.stringify(cart));
+  };
 
   const handleSelectDrinkMenu = (menu) => {
     localStorage.setItem("selectedDrinkMenu", JSON.stringify(menu));
-  };
-
-  const handleIncrease = async (menu) => {
-    setCounts((prev) => ({ ...prev, [menu.code]: (prev[menu.code] || 0) + 1 }));
-
-    await fetch("/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code: menu.code,
-        name: menu.name,
-        basePrice: menu.price,
-        type: null,
-        typePrice: 0,
-        sugarLevel: null,
-        quantity: 1,
-        totalPrice: menu.price,
-        note: null,
-        image: menu.image,
-      }),
-    });
-  };
-
-  const handleDecrease = async (menu) => {
-    setCounts((prev) => {
-      const newCount = (prev[menu.code] || 0) - 1;
-      if (newCount <= 0) {
-        const { [menu.code]: _, ...rest } = prev;
-        return rest;
-      }
-      return { ...prev, [menu.code]: newCount };
-    });
-
-    await fetch("/api/orders", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code: menu.code,
-        type: menu.type || null,
-        sugarLevel: menu.sugarLevel || null,
-        note: menu.note || null,
-        removeAll: false,
-      }),
-    });
   };
 
   const categories = ["เมนูแนะนำ", "เครื่องดื่ม", "ขนมหวาน", "อาหารทานเล่น"];
@@ -143,11 +137,8 @@ export default function ListFood() {
               <div className="w-[80%] mx-auto">
                 <div className="grid grid-cols-3 gap-12">
                   {filteredMenus.map((menu) => {
-                    const isDrink =
-                      menu.category === "เครื่องดื่ม" ||
-                      (category === "เมนูแนะนำ" && menu.category === "เครื่องดื่ม");
-
-                    const count = counts[menu.code] || 0;
+                    const isDrink = menu.category === "เครื่องดื่ม" || (category === "เมนูแนะนำ" && menu.category === "เครื่องดื่ม");
+                    const count = orders.find(o => o.code === menu.code)?.quantity || 0;
 
                     return (
                       <div key={menu.code} className="bg-white rounded-lg shadow-md h-[350px] p-4 mx-10">
@@ -162,12 +153,8 @@ export default function ListFood() {
                           </div>
                         </div>
                         <div className="flex items-center justify-between p-2 ">
-                          <h1 className="text-xl font-semibold mb-2 text-[#000000]">
-                            {menu.name}
-                          </h1>
-                          <h1 className="text-xl font-semibold mb-2 text-[#000000]">
-                            {menu.price}
-                          </h1>
+                          <h1 className="text-xl font-semibold mb-2 text-[#000000]">{menu.name}</h1>
+                          <h1 className="text-xl font-semibold mb-2 text-[#000000]">{menu.price} ฿</h1>
                         </div>
                         <p className="text-gray-600 pl-2">{menu.desc}</p>
 

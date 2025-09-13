@@ -13,10 +13,18 @@ export default function Order_Customer_pay() {
     const selectedTable = localStorage.getItem("selectedTable");
     if (selectedTable) setTableNumber(selectedTable);
 
-    fetch("/data/cart.json")
-      .then((res) => res.json())
-      .then((data) => setOrders(data))
-      .catch((err) => console.error("Error loading order.json:", err));
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      try {
+        const cartData = JSON.parse(storedCart);
+        setOrders(cartData);
+      } catch (err) {
+        console.error("Error parsing cart from localStorage:", err);
+        setOrders([]);
+      }
+    } else {
+      setOrders([]);
+    }
   }, []);
 
   useEffect(() => {
@@ -26,12 +34,14 @@ export default function Order_Customer_pay() {
 
   const handleOrder = async () => {
     const customerid = localStorage.getItem("customerid");
+    const storedCart = localStorage.getItem("cart");
+    const cart = storedCart ? JSON.parse(storedCart) : [];
     if (!customerid) {
       console.error("customerid not found in localStorage");
       return;
     }
 
-    if (orders.length === 0) {
+    if (cart.length === 0) {
       console.error("No orders to process");
       return;
     }
@@ -40,7 +50,7 @@ export default function Order_Customer_pay() {
       const res = await fetch("/api/orders", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ all: true, tableNumber, customerid }),
+        body: JSON.stringify({ all: true, tableNumber, customerid, cart, }),
       });
 
       if (!res.ok) {
@@ -85,6 +95,7 @@ export default function Order_Customer_pay() {
         body: JSON.stringify(notification2),
       });
 
+      localStorage.removeItem("cart");
       setOrders([]);
       setTotalAmount(0);
 

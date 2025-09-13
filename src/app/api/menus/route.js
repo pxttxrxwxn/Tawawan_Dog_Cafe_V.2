@@ -27,6 +27,7 @@ export async function POST(req) {
   const formData = await req.formData();
   const menus = await readData();
 
+  const ownerID = formData.get("OwnerID") || "";
   const code = formData.get("code");
   const name = formData.get("name");
   const category = formData.get("category");
@@ -44,7 +45,7 @@ export async function POST(req) {
     imageUrl = `/uploads/${file.name}`;
   }
 
-  const newMenu = { code, name, category, type, price, desc, image: imageUrl };
+  const newMenu = { OwnerID: ownerID, code, name, category, type, price, desc, image: imageUrl };
   menus.push(newMenu);
   await writeData(menus);
 
@@ -56,6 +57,7 @@ export async function PUT(req) {
   const menus = await readData();
 
   const originalCode = formData.get("originalCode");
+  const ownerID = formData.get("OwnerID") || "";
   const code = formData.get("code");
   const name = formData.get("name");
   const category = formData.get("category");
@@ -78,7 +80,7 @@ export async function PUT(req) {
     imageUrl = `/uploads/${file.name}`;
   }
 
-  menus[idx] = { code, name, category, type, price, desc, image: imageUrl };
+  menus[idx] = { OwnerID: ownerID, code, name, category, type, price, desc, image: imageUrl };
   await writeData(menus);
 
   return NextResponse.json(menus[idx]);

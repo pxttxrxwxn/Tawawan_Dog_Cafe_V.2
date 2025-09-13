@@ -2,23 +2,48 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import useSWR from "swr";
-
-const fetcher = (url) => fetch(url).then(res => res.json());
 
 export default function Navbar() {
   const [tableNumber, setTableNumber] = useState("");
+  const [orderCount, setOrderCount] = useState(0);
+  const [notificationsCount, setNotificationsCount] = useState(0);
 
   useEffect(() => {
     const selectedTable = localStorage.getItem("selectedTable");
     if (selectedTable) setTableNumber(selectedTable);
-  }, []);
 
-  const { data: cart } = useSWR("/data/cart.json", fetcher, { refreshInterval: 1000 });
-  const orderCount = cart ? cart.length : 0;
-  
-  const { data: Notifications } = useSWR("/data/Notifications.json", fetcher, { refreshInterval: 1000 });
-  const NotificationsCount = Notifications ? Notifications.length : 0;
+    const loadCart = () => {
+      const cart = localStorage.getItem("cart");
+      if (cart) {
+        try {
+          const data = JSON.parse(cart);
+          setOrderCount(data.length);
+        } catch {
+          setOrderCount(0);
+        }
+      } else {
+        setOrderCount(0);
+      }
+    };
+
+    const loadNotifications = async () => {
+      try {
+        const res = await fetch("/data/Notifications.json");
+        const data = await res.json();
+        setNotificationsCount(data.length);
+      } catch {
+        setNotificationsCount(0);
+      }
+    };
+
+    loadCart();
+    loadNotifications();
+
+    const interval = setInterval(loadCart, 1000);
+    const interval2 = setInterval(loadNotifications, 1000);
+
+    return () => {clearInterval(interval); clearInterval(interval2);};
+  }, []);
 
   const buttons = [
     { id: 1, label: "เครื่องดื่ม", baseColor: "#8D6E63", link: "/customer/list_food#เครื่องดื่ม" },
@@ -52,11 +77,11 @@ export default function Navbar() {
               <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#000000">
                 <path d="M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z" />
               </svg>
-              {NotificationsCount > 0 && (
-                  <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">
-                    {NotificationsCount}
-                  </div>
-                )}
+              {notificationsCount > 0 && (
+                <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">
+                  {notificationsCount}
+                </div>
+              )}
             </div>
           </Link>
 

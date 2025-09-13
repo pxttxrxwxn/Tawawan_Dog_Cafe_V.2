@@ -7,27 +7,41 @@ export default function Order_Customer() {
   const [orders, setOrders] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
 
-  const fetchOrders = async () => {
+  const fetchOrders = () => {
     try {
-      const res = await fetch("/data/cart.json");
-      const data = await res.json();
-      setOrders(data);
-      const total = data.reduce((sum, item) => sum + item.totalPrice, 0);
-      setTotalAmount(total);
+      const storedCart = localStorage.getItem("cart");
+      if (storedCart) {
+        const data = JSON.parse(storedCart).map(item => ({
+          ...item,
+          basePrice: Number(item.basePrice),
+          quantity: Number(item.quantity),
+          totalPrice: Number(item.totalPrice || item.basePrice * item.quantity),
+        }));
+        setOrders(data);
+        const total = data.reduce((sum, item) => sum + item.totalPrice, 0);
+        setTotalAmount(total);
+      } else {
+        setOrders([]);
+        setTotalAmount(0);
+      }
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      console.error("Error fetching orders from localStorage:", error);
     }
   };
 
   useEffect(() => {
     fetchOrders();
-
   }, []);
 
   const updateTotal = (ordersData) => {
-  setOrders(ordersData);
-  const total = ordersData.reduce((sum, i) => sum + i.totalPrice, 0);
-  setTotalAmount(total);
+    const updated = ordersData.map(item => ({
+      ...item,
+      totalPrice: Number(item.basePrice) * Number(item.quantity),
+    }));
+    setOrders(updated);
+    localStorage.setItem("cart", JSON.stringify(updated));
+    const total = updated.reduce((sum, i) => sum + i.totalPrice, 0);
+    setTotalAmount(total);
   };
 
   const handleQuantityChange = async (item, delta) => {
@@ -47,38 +61,14 @@ export default function Order_Customer() {
         updatedOrders.splice(index, 1);
       } else {
         updatedOrders[index].quantity = newQuantity;
-        updatedOrders[index].totalPrice = updatedOrders[index].basePrice * newQuantity;
+        updatedOrders[index].totalPrice = Number(updatedOrders[index].basePrice) * newQuantity;
       }
 
       updateTotal(updatedOrders);
-
-      try {
-        if (delta > 0) {
-          await fetch("/api/orders", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...item, quantity: 1 }),
-          });
-        } else {
-          await fetch("/api/orders", {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              code: item.code,
-              type: item.type,
-              sugarLevel: item.sugarLevel,
-              note: item.note || "",
-              status: "Pending",
-            }),
-          });
-        }
-      } catch (error) {
-        console.error("Failed to sync with backend:", error);
-      }
     }
   };
 
-  const handleRemove = async (item) => {
+  const handleRemove = (item) => {
     const updatedOrders = orders.filter(
       (i) =>
         !(
@@ -89,23 +79,6 @@ export default function Order_Customer() {
         )
     );
     updateTotal(updatedOrders);
-
-    try {
-      await fetch("/api/orders", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code: item.code,
-          type: item.type,
-          sugarLevel: item.sugarLevel,
-          note: item.note || "",
-          status: "Pending",
-          removeAll: true,
-        }),
-      });
-    } catch (error) {
-      console.error("Failed to sync with backend:", error);
-    }
   };
 
   return (
@@ -152,30 +125,32 @@ export default function Order_Customer() {
                   <td className="border border-black px-4 py-2">{item.basePrice} ฿</td>
                   <td className="border border-black px-4 py-2">
                     <button
-                        className="text-black px-2 cursor-pointer"
-                        onClick={() => handleQuantityChange(item, -1)}
+                      className="text-black px-2 cursor-pointer"
+                      onClick={() => handleQuantityChange(item, -1)}
                     >
-                        -
+                      -
                     </button>
                     <span className="px-2">{item.quantity}</span>
                     <button
-                        className=" text-black px-2 cursor-pointer"
-                        onClick={() => handleQuantityChange(item, 1)}
+                      className=" text-black px-2 cursor-pointer"
+                      onClick={() => handleQuantityChange(item, 1)}
                     >
-                        +
+                      +
                     </button>
-                </td>
+                  </td>
                   <td className="border border-black px-4 py-2">{item.totalPrice} ฿</td>
                   <td className="border border-black px-4 py-2">
                     <div className="flex justify-center cursor-pointer">
-                        <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            height="24px" 
-                            viewBox="0 -960 960 960" 
-                            width="24px" 
-                            fill="#D64545"
-                            onClick={() =>handleRemove(item)}>
-                            <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        height="24px" 
+                        viewBox="0 -960 960 960" 
+                        width="24px" 
+                        fill="#D64545"
+                        onClick={() => handleRemove(item)}
+                      >
+                        <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                      </svg>
                     </div>
                   </td>
                 </tr>
@@ -187,22 +162,22 @@ export default function Order_Customer() {
         )}
       </div>
 
-        <div className="bg-white flex justify-end items-center fixed bottom-0 left-0 w-full p-4 h-[100px] shadow-md gap-4">
-          <h1 className="flex justify-between items-center text-black text-[20px]">
-            รวม ({orders.length} รายการ):
-            <span className="text-[#D64545] font-bold">{totalAmount} ฿</span>
-          </h1>
-          <Link href="/customer/Order_Customer_pay">
-            <button 
-                className={`px-8 py-2 rounded-md text-[24px] mr-6 text-white ${
-                orders.length > 0 ? "bg-[#F79C4B] cursor-pointer" : "bg-[#DDDDDD] cursor-not-allowed"
-                }`}
-                disabled={orders.length === 0}
-            >
-                สั่งสินค้า
-            </button>
-          </Link>
-        </div>
+      <div className="bg-white flex justify-end items-center fixed bottom-0 left-0 w-full p-4 h-[100px] shadow-md gap-4">
+        <h1 className="flex justify-between items-center text-black text-[20px]">
+          รวม ({orders.length} รายการ):
+          <span className="text-[#D64545] font-bold">{totalAmount} ฿</span>
+        </h1>
+        <Link href="/customer/Order_Customer_pay">
+          <button 
+            className={`px-8 py-2 rounded-md text-[24px] mr-6 text-white ${
+              orders.length > 0 ? "bg-[#F79C4B] cursor-pointer" : "bg-[#DDDDDD] cursor-not-allowed"
+            }`}
+            disabled={orders.length === 0}
+          >
+            สั่งสินค้า
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }

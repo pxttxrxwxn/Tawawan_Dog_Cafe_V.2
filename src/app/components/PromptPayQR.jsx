@@ -11,13 +11,18 @@ const PromptPayQR = () => {
   const [qrData, setQrData] = useState("");
 
   useEffect(() => {
-    fetch("/data/cart.json")
-      .then((res) => {
-        if (!res.ok) throw new Error("Cannot fetch order.json");
-        return res.json();
-      })
-      .then((data) => setOrders(data))
-      .catch((err) => console.error("Error loading order.json:", err));
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      try {
+        const cartData = JSON.parse(storedCart);
+        setOrders(cartData);
+      } catch (err) {
+        console.error("Error parsing cart from localStorage:", err);
+        setOrders([]);
+      }
+    } else {
+      setOrders([]);
+    }
   }, []);
 
   useEffect(() => {

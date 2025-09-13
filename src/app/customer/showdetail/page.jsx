@@ -33,7 +33,7 @@ export default function ShowDetail() {
   const typePrice = selectedType ? (menu.type?.[selectedType]?.price || 0) : 0;
   const totalPrice = (basePrice + typePrice) * quantity;
   
-  const handleAddToCart = async () => {
+  const handleAddToCart = () => {
     if (menu.type && !selectedType) {
       setError("กรุณาเลือกรูปแบบ");
       return;
@@ -44,6 +44,7 @@ export default function ShowDetail() {
     }
 
     setError("");
+
     const order = {
       code: menu.code,
       name: menu.name,
@@ -57,13 +58,28 @@ export default function ShowDetail() {
       image: menu.image,
     };
 
-  router.push("/customer/list_food");
+    const storedCart = localStorage.getItem("cart");
+    let cart = storedCart ? JSON.parse(storedCart) : [];
 
-    fetch("/api/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(order),
-    }).catch((err) => console.error("เพิ่มออเดอร์ไม่สำเร็จ:", err));
+    const index = cart.findIndex(
+      (item) =>
+        item.code === order.code &&
+        item.type === order.type &&
+        item.sugarLevel === order.sugarLevel &&
+        (order.note ? item.note === order.note : true)
+    );
+
+    if (index > -1) {
+      cart[index].quantity += order.quantity;
+      cart[index].totalPrice =
+        (cart[index].basePrice + (cart[index].typePrice || 0)) * cart[index].quantity;
+    } else {
+      cart.push(order);
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    router.push("/customer/list_food");
   };
   return (
     <div className="min-h-screen">

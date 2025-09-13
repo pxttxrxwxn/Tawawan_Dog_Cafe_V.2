@@ -2,7 +2,6 @@ import { promises as fs } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 
-const cartFilePath = path.join(process.cwd(), "public/data/cart.json");
 const ordersFilePath = path.join(process.cwd(), "public/data/orders.json");
 const incomeFilePath = path.join(process.cwd(), "public/data/income.json");
 const orderIncomeFilePath = path.join(process.cwd(), "public/data/Order_Income.json");
@@ -135,79 +134,51 @@ export async function POST(req) {
 
 export async function DELETE(req) {
   try {
-    const { all, code, removeAll, type, sugarLevel, note, tableNumber, customerid } = await req.json();
+    const { tableNumber, customerid, cart } = await req.json();
 
-    let cart = await readFile(cartFilePath);
-    let orders = await readFile(ordersFilePath);
-
-    if (all && cart.length > 0) {
-      const lastOrderNumber = orders.length
-        ? orders[orders.length - 1].ordernumber
-        : "O1000";
-      const nextOrderNumber =
-        "O" + (parseInt(lastOrderNumber.substring(1)) + 1).toString().padStart(4, "0");
-
-      const now = new Date();
-      const date = now.toISOString().split("T")[0];
-      const time = now.toTimeString().split(" ")[0];
-
-      const newOrderGroup = {
-        ordernumber: nextOrderNumber,
-        tableNumber: tableNumber || "ไม่ระบุ",
-        customerid: customerid || "ไม่ระบุ",
-        date,
-        time,
-        items: cart.map(item => ({
-          MenuID: item.code,
-          name: item.name,
-          type: item.type,
-          sugarLevel: item.sugarLevel,
-          quantity: item.quantity,
-          totalPrice: item.totalPrice,
-          note: item.note,
-        })),
-        total: cart.reduce((sum, item) => sum + item.totalPrice, 0),
-        status: "Pending",
-      };
-
-      console.log("Creating new order group:", newOrderGroup);
-      orders.push(newOrderGroup);
-      await writeFile(ordersFilePath, orders);
-
-      cart = [];
+    if (!Array.isArray(cart) || cart.length === 0) {
+      return NextResponse.json({ success: false, error: "No orders to process" });
     }
 
-    if (code) {
-      const index = cart.findIndex(
-        o =>
-          o.code === code &&
-          o.type === type &&
-          o.sugarLevel === sugarLevel &&
-          (note ? o.note === note : true)
-      );
+    const orders = await readFile(ordersFilePath);
 
-      if (index > -1) {
-        if (removeAll) {
-          cart.splice(index, 1);
-        } else {
-          cart[index].quantity -= 1;
-          if (cart[index].quantity <= 0) {
-            cart.splice(index, 1);
-          } else {
-            cart[index].totalPrice =
-              (cart[index].basePrice + (cart[index].typePrice || 0)) *
-              cart[index].quantity;
-          }
-        }
-      }
-    }
+    // สร้าง orderNumber ใหม่
+    const lastOrderNumber = orders.length
+      ? orders[orders.length - 1].ordernumber
+      : "O1000";
+    const nextOrderNumber =
+      "O" + (parseInt(lastOrderNumber.substring(1)) + 1).toString().padStart(4, "0");
 
-    await writeFile(cartFilePath, cart);
+    const now = new Date();
+    const date = now.toISOString().split("T")[0];
+    const time = now.toTimeString().split(" ")[0];
 
-    return NextResponse.json({ success: true, cart });
+    const newOrderGroup = {
+      ordernumber: nextOrderNumber,
+      tableNumber: tableNumber || "ไม่ระบุ",
+      customerid: customerid || "ไม่ระบุ",
+      date,
+      time,
+      items: cart.map(item => ({
+        MenuID: item.code,
+        name: item.name,
+        type: item.type,
+        sugarLevel: item.sugarLevel,
+        quantity: item.quantity,
+        totalPrice: item.totalPrice,
+        note: item.note,
+      })),
+      total: cart.reduce((sum, item) => sum + item.totalPrice, 0),
+      status: "Pending",
+    };
+
+    orders.push(newOrderGroup);
+    await writeFile(ordersFilePath, orders);
+
+    return NextResponse.json({ success: true, order: newOrderGroup });
   } catch (err) {
     console.error("DELETE error:", err);
-    return NextResponse.json({ success: false, cart: [], error: "Server error" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
   }
 }
 
