@@ -6,25 +6,28 @@ import Navbar from "../../components/Navbarfood";
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
 
-  useEffect(() => {
-    fetch("/data/Notifications.json")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch Notifications.json");
-        return res.json();
-      })
+    useEffect(() => {
+      fetch("/data/Notifications.json")
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch Notifications.json");
+          return res.json();
+        })
         .then((data) => {
-        if (Array.isArray(data)) {
-            const sortedData = data.sort(
-                (a, b) => new Date(b.date) - new Date(a.date)
-            );
-            setNotifications(sortedData);
-        } else {
+          if (Array.isArray(data)) {
+            const sortedNotifications = data.sort((a, b) => {
+              const numA = parseInt(a.NotificationID.replace("N", ""), 10);
+              const numB = parseInt(b.NotificationID.replace("N", ""), 10);
+              return numB - numA;
+            });
+            setNotifications(sortedNotifications);
+          } else {
             console.error("Notifications.json is not an array", data);
             setNotifications([]);
-        }
+          }
         })
-      .catch((err) => console.error(err));
-  }, []);
+        .catch((err) => console.error(err));
+    }, []);
+
 
     const handleDelete = async (id) => {
         try {
@@ -78,7 +81,7 @@ export default function Notifications() {
         <div className="flex flex-col justify-center items-center gap-4">
           {notifications.map((item) => (
             <div
-              key={item.id}
+              key={item.NotificationID}
               className="w-[40%] bg-[#FFFFFF] flex justify-between items-center rounded-3xl mb-4 p-4"
             >
               <div

@@ -15,20 +15,18 @@ export async function POST(req) {
       notifications = [];
     }
 
-    // หาเลขล่าสุดจาก id ที่มีอยู่ เช่น N1002 -> 1002
     let lastNumber = 1000;
     if (notifications.length > 0) {
-      const ids = notifications
-        .map((item) => parseInt(item.id.replace("N", ""), 10))
+      const NotificationIDs = notifications
+        .map((item) => parseInt(item.NotificationID.replace("N", ""), 10))
         .filter((num) => !isNaN(num));
-      if (ids.length > 0) lastNumber = Math.max(...ids);
+      if (NotificationIDs.length > 0) lastNumber = Math.max(...NotificationIDs);
     }
 
-    // ถ้า body.id เป็น "AUTO1" หรือ "AUTO2" → ให้กำหนดใหม่
-    if (body.id === "AUTO1") {
-      body.id = `N${lastNumber + 1}`;
-    } else if (body.id === "AUTO2") {
-      body.id = `N${lastNumber + 1}`;
+    if (body.NotificationID === "AUTO1") {
+      body.NotificationID = `N${lastNumber + 1}`;
+    } else if (body.NotificationID === "AUTO2") {
+      body.NotificationID = `N${lastNumber + 1}`;
     }
 
     notifications.push(body);
