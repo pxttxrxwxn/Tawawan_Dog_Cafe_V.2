@@ -15,11 +15,25 @@ export async function POST(req) {
       notifications = [];
     }
 
+    let lastNumber = 1000;
+    if (notifications.length > 0) {
+      const ids = notifications
+        .map((item) => parseInt(item.id.replace("N", ""), 10))
+        .filter((num) => !isNaN(num));
+      if (ids.length > 0) lastNumber = Math.max(...ids);
+    }
+
+    if (body.id === "AUTO1") {
+      body.id = `N${lastNumber + 1}`;
+    } else if (body.id === "AUTO2") {
+      body.id = `N${lastNumber + 2}`;
+    }
+
     notifications.push(body);
 
     await fs.writeFile(notificationsFile, JSON.stringify(notifications, null, 2));
 
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    return new Response(JSON.stringify({ success: true, id: body.id }), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ success: false, error: error.message }), { status: 500 });
   }

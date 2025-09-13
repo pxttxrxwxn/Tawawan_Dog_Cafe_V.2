@@ -48,8 +48,8 @@ export default function Order() {
             o.ordernumber === ordernumber ? { ...o, status: "complete" } : o
           )
         );
-        const notification = {
-          id: Date.now() + Math.random(),
+        const notification1 = {
+          id: "AUTO1",
           svgcheck: `<svg xmlns="http://www.w3.org/2000/svg" height="92px" viewBox="0 -960 960 960" width="92px" fill="#000000"><path d="..."/></svg>`,
           title2: "จัดส่งสินค้าเสร็จสิ้น",
           date: new Date().toLocaleString("th-TH", { hour12: false }),
@@ -59,7 +59,7 @@ export default function Order() {
         await fetch("/api/notifications", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(notification),
+          body: JSON.stringify(notification1),
         });
       } else {
         console.error("Failed to complete order:", data.error || "Unknown error");
