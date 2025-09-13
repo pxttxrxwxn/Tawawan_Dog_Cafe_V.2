@@ -16,6 +16,13 @@ async function writeUsers(users) {
   await fs.writeFile(filePath, JSON.stringify(users, null, 2), "utf-8");
 }
 
+async function generateOwnerID(users) {
+  if (users.length === 0) return "OW1001";
+  const lastID = users[users.length - 1].OwnerID;
+  const num = parseInt(lastID.replace("OW", "")) + 1;
+  return "OW" + num.toString().padStart(4, "0");
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -36,10 +43,12 @@ export async function POST(req) {
         return new Response(JSON.stringify({ message: "อีเมลนี้ถูกใช้งานแล้ว" }), { status: 400 });
       }
 
-      users.push({ username, email, password });
+      const OwnerID = await generateOwnerID(users);
+
+      users.push({ OwnerID, username, email, password });
       await writeUsers(users);
 
-      return new Response(JSON.stringify({ message: "สมัครสมาชิกสำเร็จ" }), { status: 201 });
+      return new Response(JSON.stringify({ message: "สมัครสมาชิกสำเร็จ", OwnerID }), { status: 201 });
     }
 
     if (action === "login") {
@@ -53,7 +62,7 @@ export async function POST(req) {
         return new Response(JSON.stringify({ error: "รหัสผ่านไม่ถูกต้อง" }), { status: 401 });
       }
 
-      return new Response(JSON.stringify({ message: "ล็อกอินสำเร็จ" }), { status: 200 });
+      return new Response(JSON.stringify({ message: "ล็อกอินสำเร็จ",OwnerID: user.OwnerID  }), { status: 200 });
     }
 
     return new Response(JSON.stringify({ error: "action ไม่ถูกต้อง" }), { status: 400 });
