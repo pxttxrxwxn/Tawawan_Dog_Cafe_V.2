@@ -6,6 +6,7 @@ const cartFilePath = path.join(process.cwd(), "public/data/cart.json");
 const ordersFilePath = path.join(process.cwd(), "public/data/orders.json");
 const incomeFilePath = path.join(process.cwd(), "public/data/income.json");
 const orderIncomeFilePath = path.join(process.cwd(), "public/data/Order_Income.json");
+const orderMenuFilePath = path.join(process.cwd(), "public/data/Order_menu.json");
 
 async function readFile(filePath) {
   try {
@@ -71,12 +72,26 @@ export async function POST(req) {
 
       orderIncome.push(newOrderIncome);
 
-      await writeFile(orderIncomeFilePath, orderIncome);
+      const orderMenu = await readFile(orderMenuFilePath); 
+      const newOrderMenuEntries = orders[index].items.map(items => ({
+        OrderID: orders[index].ordernumber,
+        MenuID:items.MenuID,
+        Quantity: items.quantity,
+      }));
 
+      orderMenu.push(...newOrderMenuEntries);
+
+      await writeFile(orderIncomeFilePath, orderIncome);
       await writeFile(incomeFilePath, income);
       await writeFile(ordersFilePath, orders);
+      await writeFile(orderMenuFilePath, orderMenu);
 
-      return NextResponse.json({ success: true, income: newIncome, orderIncome: newOrderIncome });
+      return NextResponse.json({ 
+        success: true, 
+        income: newIncome, 
+        orderIncome: newOrderIncome ,
+        orderMenu: newOrderMenuEntries
+      });
     }
 
     const newOrder = body;
@@ -143,6 +158,7 @@ export async function DELETE(req) {
         date,
         time,
         items: cart.map(item => ({
+          MenuID: item.code,
           name: item.name,
           type: item.type,
           sugarLevel: item.sugarLevel,
@@ -150,6 +166,7 @@ export async function DELETE(req) {
           totalPrice: item.totalPrice,
           note: item.note,
         })),
+        total: cart.reduce((sum, item) => sum + item.totalPrice, 0),
         status: "Pending",
       };
 

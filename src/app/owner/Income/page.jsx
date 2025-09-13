@@ -5,7 +5,8 @@ import Navbar from "../../components/Navbarincome_and_expenses";
 
 export default function Income() {
     const [orders, setOrders] = useState([]);
-
+    const [filter, setFilter] = useState("all");
+    
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -41,6 +42,40 @@ export default function Income() {
         const year = String(date.getFullYear()).slice(-2);
         return `${day}/${month}/${year}`;
     };
+    const filterOrders = () => {
+      const today = new Date();
+      return orders.filter((order) => {
+        if (!order.date) return false;
+        const orderDate = new Date(order.date);
+
+        if (filter === "today") {
+          return (
+            orderDate.getDate() === today.getDate() &&
+            orderDate.getMonth() === today.getMonth() &&
+            orderDate.getFullYear() === today.getFullYear()
+          );
+        }
+
+        if (filter === "week") {
+          const startOfWeek = new Date(today);
+          startOfWeek.setDate(today.getDate() - today.getDay());
+          const endOfWeek = new Date(today);
+          endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
+          return orderDate >= startOfWeek && orderDate <= endOfWeek;
+        }
+
+        if (filter === "month") {
+          return (
+            orderDate.getMonth() === today.getMonth() &&
+            orderDate.getFullYear() === today.getFullYear()
+          );
+        }
+
+        return true;
+      });
+    };
+
+    const filteredOrders = filterOrders().sort((a, b) => new Date(a.date) - new Date(b.date));
   return (
     <div className="min-h-screen">
 
@@ -64,11 +99,11 @@ export default function Income() {
           <div className="flex justify-end mb-4">
             <div className="flex items-center gap-2">
               <span className="font-medium text-[#000000] text-[18px]">ดูสรุป :</span>
-              <select className="border rounded-md px-3 py-1 shadow-sm bg-white text-[#000000]">
-                <option>ทั้งหมด</option>
-                <option>วันนี้</option>
-                <option>สัปดาห์นี้</option>
-                <option>เดือนนี้</option>
+              <select className="border rounded-md px-3 py-1 shadow-sm bg-white text-[#000000]" value={filter} onChange={(e) => setFilter(e.target.value)}>
+                <option value="all">ทั้งหมด</option>
+                <option value="today">วันนี้</option>
+                <option value="week">สัปดาห์นี้</option>
+                <option value="month">เดือนนี้</option>
               </select>
             </div>
           </div>
@@ -76,7 +111,7 @@ export default function Income() {
 
         {orders.length > 0 ? (
           <div className="overflow-x-auto flex justify-center">
-            <table className="border-collapse w-[80%] text-center text-black">
+            <table className="border-collapse w-[80%] text-center text-black mb-3">
               <thead>
                 <tr className="bg-[#F79C4B] text-white">
                   <th className="border border-black px-4 py-2 ">หมายเลขออเดอร์</th>
@@ -87,7 +122,7 @@ export default function Income() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order, index) => (
+                {filteredOrders.map((order, index) => (
                   <tr key={index} className="bg-[#FFE8A3]">
                     <td className="border border-black px-4 py-2 text-center">
                       {order.ordernumber}

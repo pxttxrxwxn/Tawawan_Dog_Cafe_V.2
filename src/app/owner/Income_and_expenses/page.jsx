@@ -5,12 +5,38 @@ import Navbar from "../../components/Navbarincome_and_expenses";
 export default function IncomeAndExpenses() {
   const [incomeTotal, setIncomeTotal] = useState(0);
   const [expenseTotal, setExpenseTotal] = useState(0);
+  const [filter, setFilter] = useState("all");
+
+  const filterDataByDate = (data, filterKey, field = "date") => {
+    const today = new Date();
+    return data.filter((item) => {
+      if (!item[field]) return false;
+      const itemDate = new Date(item[field]);
+
+      if (filterKey === "today") {
+        return itemDate.toDateString() === today.toDateString();
+      } else if (filterKey === "week") {
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        return itemDate >= weekStart && itemDate <= weekEnd;
+      } else if (filterKey === "month") {
+        return (
+          itemDate.getMonth() === today.getMonth() &&
+          itemDate.getFullYear() === today.getFullYear()
+        );
+      }
+      return true;
+    });
+  };
 
   useEffect(() => {
     fetch("/data/Income.json")
       .then((res) => res.json())
       .then((data) => {
-        const totalIncome = data.reduce((sum, order) => sum + (order.total || 0), 0);
+        const filtered = filterDataByDate(data, filter, "date");
+        const totalIncome = filtered.reduce((sum, order) => sum + (order.total || 0), 0);
         setIncomeTotal(totalIncome);
       })
       .catch((err) => console.error("Error loading Income.json:", err));
@@ -18,11 +44,12 @@ export default function IncomeAndExpenses() {
     fetch("/data/expenses.json")
       .then((res) => res.json())
       .then((data) => {
-        const totalExpense = data.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+        const filtered = filterDataByDate(data, filter, "date");
+        const totalExpense = filtered.reduce((sum, exp) => sum + (exp.amount || 0), 0);
         setExpenseTotal(totalExpense);
       })
       .catch((err) => console.error("Error loading expenses.json:", err));
-  }, []);
+  }, [filter]);
 
   const netTotal = incomeTotal - expenseTotal;
 
@@ -50,11 +77,11 @@ export default function IncomeAndExpenses() {
           <div className="flex justify-end mb-4">
             <div className="flex items-center gap-2">
               <span className="font-medium text-[#000000] text-[18px]">ดูสรุป :</span>
-              <select className="border rounded-md px-3 py-1 shadow-sm bg-white text-[#000000]">
-                <option>ทั้งหมด</option>
-                <option>วันนี้</option>
-                <option>สัปดาห์นี้</option>
-                <option>เดือนนี้</option>
+              <select className="border rounded-md px-3 py-1 shadow-sm bg-white text-[#000000]" value={filter} onChange={(e) => setFilter(e.target.value)}  >
+                <option value="all">ทั้งหมด</option>
+                <option value="today">วันนี้</option>
+                <option value="week">สัปดาห์นี้</option>
+                <option value="month">เดือนนี้</option>
               </select>
             </div>
           </div>
