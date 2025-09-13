@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 const cartFilePath = path.join(process.cwd(), "public/data/cart.json");
 const ordersFilePath = path.join(process.cwd(), "public/data/orders.json");
 const incomeFilePath = path.join(process.cwd(), "public/data/income.json");
+const orderIncomeFilePath = path.join(process.cwd(), "public/data/Order_Income.json");
 
 async function readFile(filePath) {
   try {
@@ -32,6 +33,7 @@ export async function POST(req) {
     if (body.ordernumber) {
       const orders = await readFile(ordersFilePath);
       const income = await readFile(incomeFilePath);
+      const orderIncome = await readFile(orderIncomeFilePath);
 
       const index = orders.findIndex(o => o.ordernumber === body.ordernumber);
       if (index === -1) {
@@ -39,12 +41,42 @@ export async function POST(req) {
       }
 
       orders[index].status = "complete";
-      income.push(orders[index]);
+
+      const lastIncomeId = income.length
+        ? income[income.length - 1].incomeid
+        : "R1000";
+      const nextIncomeId =
+        "R" + (parseInt(lastIncomeId.substring(1)) + 1).toString().padStart(4, "0");
+
+      const total= orders[index].items.reduce(
+        (sum, item) => sum + (item.totalPrice || 0),
+        0
+      );
+
+      const newIncome = {
+        incomeid: nextIncomeId,
+        items: orders[index].items,
+        date: orders[index].date,
+        time: orders[index].time,
+        tableNumber: orders[index].tableNumber,
+        total,
+      };
+
+      income.push(newIncome);
+
+      const newOrderIncome = {
+        ordernumber: orders[index].ordernumber,
+        incomeid: nextIncomeId,
+      };
+
+      orderIncome.push(newOrderIncome);
+
+      await writeFile(orderIncomeFilePath, orderIncome);
 
       await writeFile(incomeFilePath, income);
       await writeFile(ordersFilePath, orders);
 
-      return NextResponse.json({ success: true, order: orders[index] });
+      return NextResponse.json({ success: true, income: newIncome, orderIncome: newOrderIncome });
     }
 
     const newOrder = body;

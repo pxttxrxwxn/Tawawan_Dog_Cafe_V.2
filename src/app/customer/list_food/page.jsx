@@ -51,7 +51,7 @@ export default function ListFood() {
   }, [menus]);
 
   useEffect(() => {
-    fetch("/api/orders")
+    fetch("/data/cart.json")
       .then((res) => res.json())
       .then((data) => {
         const initialCounts = {};
@@ -98,7 +98,7 @@ export default function ListFood() {
       return { ...prev, [menu.code]: newCount };
     });
 
-    await fetch("/api/order", {
+    await fetch("/api/orders", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

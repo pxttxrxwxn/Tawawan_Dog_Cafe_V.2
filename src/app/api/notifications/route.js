@@ -15,6 +15,7 @@ export async function POST(req) {
       notifications = [];
     }
 
+    // หาเลขล่าสุดจาก id ที่มีอยู่ เช่น N1002 -> 1002
     let lastNumber = 1000;
     if (notifications.length > 0) {
       const ids = notifications
@@ -23,10 +24,11 @@ export async function POST(req) {
       if (ids.length > 0) lastNumber = Math.max(...ids);
     }
 
+    // ถ้า body.id เป็น "AUTO1" หรือ "AUTO2" → ให้กำหนดใหม่
     if (body.id === "AUTO1") {
       body.id = `N${lastNumber + 1}`;
     } else if (body.id === "AUTO2") {
-      body.id = `N${lastNumber + 2}`;
+      body.id = `N${lastNumber + 1}`;
     }
 
     notifications.push(body);

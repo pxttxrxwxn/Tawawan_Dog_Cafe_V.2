@@ -5,13 +5,35 @@ import Navbar from "../../components/Navbarincome_and_expenses";
 
 export default function Income() {
     const [orders, setOrders] = useState([]);
+
     useEffect(() => {
-    
-        fetch("/data/Income.json")
-          .then((res) => res.json())
-          .then((data) => setOrders(data))
-          .catch((err) => console.error(err));
-      }, []);
+      const fetchData = async () => {
+        try {
+          const incomeRes = await fetch("/data/Income.json");
+          const incomeData = await incomeRes.json();
+
+          const orderRes = await fetch("/data/Order_Income.json");
+          const orderData = await orderRes.json();
+          
+          const mergedData = incomeData.map((income) => {
+            const matchingOrder = orderData.find(
+              (order) => order.incomeid === income.incomeid
+            );
+            return {
+              ...income,
+              ordernumber: matchingOrder ? matchingOrder.ordernumber : "",
+            };
+          });
+
+          setOrders(mergedData);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      fetchData();
+    }, []);
+
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
         const day = String(date.getDate()).padStart(2, "0");
