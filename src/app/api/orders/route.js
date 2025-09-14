@@ -71,19 +71,9 @@ export async function POST(req) {
 
       orderIncome.push(newOrderIncome);
 
-      const orderMenu = await readFile(orderMenuFilePath); 
-      const newOrderMenuEntries = orders[index].items.map(items => ({
-        OrderID: orders[index].ordernumber,
-        MenuID:items.MenuID,
-        Quantity: items.quantity,
-      }));
-
-      orderMenu.push(...newOrderMenuEntries);
-
       await writeFile(orderIncomeFilePath, orderIncome);
       await writeFile(incomeFilePath, income);
       await writeFile(ordersFilePath, orders);
-      await writeFile(orderMenuFilePath, orderMenu);
 
       return NextResponse.json({ 
         success: true, 
@@ -142,7 +132,6 @@ export async function DELETE(req) {
 
     const orders = await readFile(ordersFilePath);
 
-    // สร้าง orderNumber ใหม่
     const lastOrderNumber = orders.length
       ? orders[orders.length - 1].ordernumber
       : "O1000";
@@ -174,6 +163,15 @@ export async function DELETE(req) {
 
     orders.push(newOrderGroup);
     await writeFile(ordersFilePath, orders);
+
+    const orderMenu = await readFile(orderMenuFilePath);
+    const newOrderMenuEntries = cart.map(item => ({
+      OrderID: nextOrderNumber,
+      MenuID: item.code,
+      Quantity: item.quantity,
+    }));
+    orderMenu.push(...newOrderMenuEntries);
+    await writeFile(orderMenuFilePath, orderMenu);
 
     return NextResponse.json({ success: true, order: newOrderGroup });
   } catch (err) {

@@ -1,10 +1,6 @@
 import { Inter ,Chakra_Petch, Prompt } from "next/font/google";
 import "./globals.css";
 
-if (typeof window === "undefined") {
-  import("../lib/clearOrdersScheduler.js");
-}
-
 const inter = Inter({
   variable: "--font-Inter",
   subsets: ["latin"],
