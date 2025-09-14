@@ -17,7 +17,7 @@ export default function ChooseTable() {
       console.log("Saved:", data);
 
       localStorage.setItem("selectedTable", tableNumber);
-      localStorage.setItem("customerid", data.customerid);
+      localStorage.setItem("CustomerID", data.CustomerID);
     } catch (err) {
       console.error("Error saving customer:", err);
     }

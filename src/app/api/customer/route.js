@@ -23,12 +23,12 @@ export async function POST(req) {
     let lastId = 1000;
     if (customers.length > 0) {
       const lastCustomer = customers[customers.length - 1];
-      lastId = parseInt(lastCustomer.customerid.replace("C", ""));
+      lastId = parseInt(lastCustomer.CustomerID.replace("C", ""));
     }
 
     const newCustomer = {
-      customerid: `C${lastId + 1}`,
-      tableNumber: tableNumber.toString(),
+      CustomerID: `C${lastId + 1}`,
+      TableNumber: tableNumber.toString(),
     };
 
     customers.push(newCustomer);

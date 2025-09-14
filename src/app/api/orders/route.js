@@ -30,43 +30,43 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    if (body.ordernumber) {
+    if (body.OrderID) {
       const orders = await readFile(ordersFilePath);
       const income = await readFile(incomeFilePath);
       const orderIncome = await readFile(orderIncomeFilePath);
 
-      const index = orders.findIndex(o => o.ordernumber === body.ordernumber);
+      const index = orders.findIndex(o => o.OrderID === body.OrderID);
       if (index === -1) {
         return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
 
-      orders[index].status = "complete";
+      orders[index].OrderStatus = "complete";
 
+      const lastIncome = income.length ? income[income.length - 1] : null;
       const lastIncomeId = income.length
         ? income[income.length - 1].incomeid
         : "R1000";
       const nextIncomeId =
         "R" + (parseInt(lastIncomeId.substring(1)) + 1).toString().padStart(4, "0");
 
-      const total= orders[index].items.reduce(
-        (sum, item) => sum + (item.totalPrice || 0),
+      const Total= orders[index].OrderDescription.reduce(
+        (sum, item) => sum + (item.TotalPrice || 0),
         0
       );
 
       const newIncome = {
-        incomeid: nextIncomeId,
-        items: orders[index].items,
-        date: orders[index].date,
-        time: orders[index].time,
-        tableNumber: orders[index].tableNumber,
-        total,
+        IncomeId: nextIncomeId,
+        OrderDescription: orders[index].OrderDescription,
+        OrderDateTime: orders[index].OrderDateTime,
+        TableNumber: orders[index].tableNumber,
+        Total,
       };
 
       income.push(newIncome);
 
       const newOrderIncome = {
-        ordernumber: orders[index].ordernumber,
-        incomeid: nextIncomeId,
+        OrderID: orders[index].OrderID,
+        IncomeId: nextIncomeId,
       };
 
       orderIncome.push(newOrderIncome);
@@ -81,10 +81,6 @@ export async function POST(req) {
         orderIncome: newOrderIncome
       });
     }
-
-    const newOrder = body;
-    let cart = await readFile(cartFilePath);
-
     const index = cart.findIndex(
       o =>
         o.code === newOrder.code &&
@@ -131,33 +127,32 @@ export async function DELETE(req) {
 
     const orders = await readFile(ordersFilePath);
 
-    const lastOrderNumber = orders.length
-      ? orders[orders.length - 1].ordernumber
+    const lastOrderID = orders.length
+      ? orders[orders.length - 1].OrderID
       : "O1000";
-    const nextOrderNumber =
-      "O" + (parseInt(lastOrderNumber.substring(1)) + 1).toString().padStart(4, "0");
+    const nextOrderID =
+      "O" + (parseInt(lastOrderID.substring(1)) + 1).toString().padStart(4, "0");
 
     const now = new Date();
     const date = now.toISOString().split("T")[0];
     const time = now.toTimeString().split(" ")[0];
 
     const newOrderGroup = {
-      ordernumber: nextOrderNumber,
-      tableNumber: tableNumber || "ไม่ระบุ",
-      customerid: customerid || "ไม่ระบุ",
-      date,
-      time,
-      items: cart.map(item => ({
+      OrderID: nextOrderID,
+      OrderDescription: cart.map(item => ({
         MenuID: item.code,
-        name: item.name,
-        type: item.type,
-        sugarLevel: item.sugarLevel,
-        quantity: item.quantity,
-        totalPrice: item.totalPrice,
-        note: item.note,
+        MenuName: item.name,
+        Type: item.type,
+        SugarLevel: item.sugarLevel,
+        Quantity: item.quantity,
+        TotalPrice: item.totalPrice,
+        Note: item.note,
       })),
-      total: cart.reduce((sum, item) => sum + item.totalPrice, 0),
-      status: "Pending",
+      OrderDateTime: `${date} ${time}`,
+      TableNumber: tableNumber || "ไม่ระบุ",
+      Total: cart.reduce((sum, item) => sum + item.totalPrice, 0),
+      OrderStatus: "Pending",
+      CustomerID: customerid || "ไม่ระบุ",
     };
 
     orders.push(newOrderGroup);
@@ -165,7 +160,7 @@ export async function DELETE(req) {
 
     const orderMenu = await readFile(orderMenuFilePath);
     const newOrderMenuEntries = cart.map(item => ({
-      OrderID: nextOrderNumber,
+      OrderID: nextOrderID,
       MenuID: item.code,
       Quantity: item.quantity,
     }));

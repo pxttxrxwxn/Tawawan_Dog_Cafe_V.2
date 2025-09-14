@@ -34,14 +34,16 @@ export default function Order() {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = String(date.getFullYear()).slice(-2);
-    return `${day}/${month}/${year}`;
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${day}/${month}/${year}  |  เวลา: ${hours}:${minutes}`;
   };
-  const completeOrder = async (ordernumber) => {
+  const completeOrder = async (OrderID) => {
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ordernumber }),
+        body: JSON.stringify({ OrderID }),
       });
 
       const data = await res.json();
@@ -49,7 +51,7 @@ export default function Order() {
       if (res.ok && data.success) {
         setOrders(prev =>
           prev.map(o =>
-            o.ordernumber === ordernumber ? { ...o, status: "complete" } : o
+            o.OrderID === OrderID ? { ...o, status: "complete" } : o
           )
         );
         const notification1 = {
@@ -106,9 +108,9 @@ export default function Order() {
 
         <div className="grid grid-cols-4 md:grid-cols-3 gap-6 ml-[60px] mt-[50px]">
           {orders
-            .filter(order => order.status === "Pending")
+            .filter(order => order.OrderStatus === "Pending")
               .map((order) => (
-                <div key={order.ordernumber} className="bg-white w-[388px] rounded-lg shadow flex flex-col p-4">
+                <div key={order.OrderID} className="bg-white w-[388px] rounded-lg shadow flex flex-col p-4">
                   <div className="flex justify-between mb-2">
                     <div className="flex flex-wrap">
                       <div className="flex items-center text-[32px]">
@@ -121,12 +123,12 @@ export default function Order() {
                           className="mr-2">
                           <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560h-80v120H280v-120h-80v560Zm280-560q17 0 28.5-11.5T520-800q0-17-11.5-28.5T480-840q-17 0-28.5 11.5T440-800q0 17 11.5 28.5T480-760Z"/>
                         </svg>
-                        <span className='text-[#000000] text-2xl'>ออเดอร์ #{order.ordernumber}</span>
-                        <p className="text-[30px] ml-[30px] mt-2 text-[#000000]">โต๊ะ: {order.tableNumber}</p>
+                        <span className='text-[#000000] text-2xl'>ออเดอร์ #{order.OrderID}</span>
+                        <p className="text-[30px] ml-[30px] mt-2 text-[#000000]">โต๊ะ: {order.TableNumber}</p>
                       </div>
 
                       <p className="text-sm text-black w-full ml-9">
-                        {formatDate(order.date)} | เวลา: {order.time}
+                        {formatDate(order.OrderDateTime)}
                       </p>
                     </div>
                   </div>
@@ -135,13 +137,13 @@ export default function Order() {
 
                   <div className="flex-1">
                       <p className="font-semibold text-[30px] text-[#000000]">รายการ</p>
-                      {order.items.map((item, index) => (
+                      {order.OrderDescription.map((item, index) => (
                         <div key={index} className='ml-5 text-[#000000] flex flex-col'>
                           <span>
-                            {item.quantity}x {item.name}{item.type ? `${item.type}` : ""} {item.sugarLevel ? ` ความหวาน ${item.sugarLevel}` : ""}
+                            {item.Quantity}x {item.MenuName}{item.Type ? `${item.Type}` : ""} {item.SugarLevel ? ` ความหวาน ${item.SugarLevel}` : ""}
                           </span>
-                          {item.note && item.note.trim() !== "" && (
-                            <span className="text-sm text-gray-600 ml-2">หมายเหตุ: {item.note}</span>
+                          {item.Note && item.Note.trim() !== "" && (
+                            <span className="text-sm text-gray-600 ml-2">หมายเหตุ: {item.Note}</span>
                           )}
                           <hr className="my-2 ml-0 text-gray-300 w-[320px]"/>
                         </div>
@@ -162,7 +164,7 @@ export default function Order() {
                   </div>
                   <div className='flex justify-end mt-2'>
                     <button 
-                      onClick={() => completeOrder(order.ordernumber)}
+                      onClick={() => completeOrder(order.OrderID)}
                       className="w-[150px] h-[42px] bg-[#0FA958] text-white font-bold text-[16px] px-3 py-1 rounded cursor-pointer">
                       ออเดอร์เสร็จสิ้น
                     </button>
