@@ -9,12 +9,13 @@ export default function Menu() {
   const [drinkTypes, setDrinkTypes] = useState({
     ร้อน: { checked: false, price: 0 },
     เย็น: { checked: false, price: 0 },
-    ปั่น: { checked: false, price: 0 }
+    ปั่น: { checked: false, price: 0 },
   });
   const [selectedCategory, setSelectedCategory] = useState("");
   const [menuDesc, setMenuDesc] = useState("");
 
-  const editingMenu = editingIndex !== null && menus[editingIndex] ? menus[editingIndex] : null;
+  const editingMenu =
+    editingIndex !== null && menus[editingIndex] ? menus[editingIndex] : null;
 
   useEffect(() => {
     if (editingMenu) {
@@ -44,12 +45,12 @@ export default function Menu() {
     if (index !== null) {
       setSelectedCategory(menus[index].category);
       if (menus[index].category === "เครื่องดื่ม") {
-      setDrinkTypes({
-        ร้อน: menus[index].type?.ร้อน || { checked: false, price: 0 },
-        เย็น: menus[index].type?.เย็น || { checked: false, price: 0 },
-        ปั่น: menus[index].type?.ปั่น || { checked: false, price: 0 }
-      });
-    }
+        setDrinkTypes({
+          ร้อน: menus[index].type?.ร้อน || { checked: false, price: 0 },
+          เย็น: menus[index].type?.เย็น || { checked: false, price: 0 },
+          ปั่น: menus[index].type?.ปั่น || { checked: false, price: 0 },
+        });
+      }
     }
   };
 
@@ -59,11 +60,12 @@ export default function Menu() {
     setDrinkTypes({
       ร้อน: { checked: false, price: 0 },
       เย็น: { checked: false, price: 0 },
-      ปั่น: { checked: false, price: 0 }
+      ปั่น: { checked: false, price: 0 },
     });
     setSelectedCategory("");
+    setMenuDesc("");
   };
-  
+
   useEffect(() => {
     const fetchMenus = async () => {
       try {
@@ -82,8 +84,8 @@ export default function Menu() {
       ...prev,
       [type]: {
         ...prev[type],
-        [field]: field === "checked" ? value : Number(value)
-      }
+        [field]: field === "checked" ? value : Number(value),
+      },
     }));
   };
 
@@ -92,9 +94,10 @@ export default function Menu() {
     const form = e.target;
     const ownerID = localStorage.getItem("OwnerID") || "";
     const newCode = form.menuCode.value.trim();
-    
+
     const isDuplicate = menus.some(
-      (menu) => menu.code === newCode && (!editingMenu || menu.code !== editingMenu.code)
+      (menu) =>
+        menu.code === newCode && (!editingMenu || menu.code !== editingMenu.code)
     );
     if (isDuplicate) {
       alert("รหัสเมนูนี้ถูกใช้งานแล้ว กรุณาใช้รหัสเมนูอื่น");
@@ -118,28 +121,31 @@ export default function Menu() {
       alert("กรุณาใส่รูปเมนู");
       return;
     }
+
     const originalCode = editingMenu ? editingMenu.code : null;
     const basePrice = Number(form.menuPrice.value) || 0;
-    
 
     const newMenu = {
       OwnerID: ownerID,
       code: form.menuCode.value,
       name: form.menuName.value,
       category: form.menuCategory.value,
-      type: form.menuCategory.value === "เครื่องดื่ม"
-        ? Object.fromEntries(
-            Object.entries(drinkTypes).map(([t, data]) => [
-              t,
-              { checked: data.checked, price: data.checked ? data.price : 0 },
-            ])
-          )
-        : form.menuType?.value || "",
-      price: form.menuCategory.value === "เครื่องดื่ม"
-        ? Number(form.menuPrice.value) || 0
-        : form.menuPrice.value || "",
+      type:
+        form.menuCategory.value === "เครื่องดื่ม"
+          ? Object.fromEntries(
+              Object.entries(drinkTypes).map(([t, data]) => [
+                t,
+                { checked: data.checked, price: data.checked ? data.price : 0 },
+              ])
+            )
+          : form.menuType?.value || "",
+      price:
+        form.menuCategory.value === "เครื่องดื่ม"
+          ? basePrice
+          : Number(form.menuPrice.value) || 0,
       desc: menuDesc,
     };
+
     const formData = new FormData();
     formData.append("OwnerID", ownerID);
     formData.append("originalCode", originalCode || "");
@@ -152,25 +158,43 @@ export default function Menu() {
     if (form.menuImage.files[0]) {
       formData.append("image", form.menuImage.files[0]);
     }
+
     try {
       if (editingMenu) {
-        await fetch("/api/menus", 
-          { method: "PUT", 
-            body: formData 
-          });
+        await fetch("/api/menus", { method: "PUT", body: formData });
+        const file = form.menuImage.files[0];
         setMenus((prev) =>
-          prev.map((m) => m.code === originalCode ? { ...newMenu, image: form.menuImage.files[0] ? `/uploads/${form.menuImage.files[0].name}` : editingMenu.image } : m)
+          prev.map((m) => 
+            m.code === originalCode
+              ? { 
+                  ...newMenu, 
+                  image: file ? URL.createObjectURL(file) : m.image, 
+                } 
+              : m
+        )
         );
       } else {
         await fetch("/api/menus", { method: "POST", body: formData });
-        setMenus((prev) => [...prev, { ...newMenu, image: `/uploads/${form.menuImage.files[0].name}` }]);
+        const file = form.menuImage.files[0];
+        setMenus((prev) => [
+          ...prev, 
+          { ...newMenu, image: file ? URL.createObjectURL(file) : "" },
+        ]);
       }
     } catch (err) {
       console.error(err);
     }
 
     form.reset();
-    closeModal();
+    setMenuDesc("");
+    setSelectedCategory("");
+    setDrinkTypes({
+      ร้อน: { checked: false, price: 0 },
+      เย็น: { checked: false, price: 0 },
+      ปั่น: { checked: false, price: 0 },
+    });
+    setEditingIndex(null);
+    setIsModalOpen(false);
   };
 
   const handleDelete = async (code) => {
@@ -241,10 +265,10 @@ export default function Menu() {
                     <td className="border border-black px-4 py-2">{menu.name}</td>
                     <td className="border border-black px-4 py-2">{menu.category}</td>
                     <td className="border border-black px-4 py-2">
-                      {typeof menu.type === "object"
+                      {menu.category === "เครื่องดื่ม" && typeof menu.type === "object"
                         ? Object.entries(menu.type)
-                            .filter(([type, data]) => data.checked)
-                            .map(([type, data]) => `${type}+${data.price}`)
+                            .filter(([_, data]) => data.checked)
+                            .map(([type, data]) => `${type} + ${data.price} `)
                             .join(", ")
                         : menu.type || "-"}
                     </td>
