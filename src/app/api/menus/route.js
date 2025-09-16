@@ -28,12 +28,12 @@ export async function POST(req) {
   const menus = await readData();
 
   const ownerID = formData.get("OwnerID") || "";
-  const code = formData.get("code");
-  const name = formData.get("name");
-  const category = formData.get("category");
-  const type = formData.get("type") ? JSON.parse(formData.get("type")) : "";
-  const price = formData.get("price");
-  const desc = formData.get("desc");
+  const MenuID = formData.get("code");
+  const MenuName = formData.get("name");
+  const CategoryMenu = formData.get("category");
+  const Type = formData.get("type") ? JSON.parse(formData.get("type")) : "";
+  const Price = formData.get("price");
+  const MenuDetail = formData.get("desc");
   const file = formData.get("image");
 
   let imageUrl = null;
@@ -45,7 +45,7 @@ export async function POST(req) {
     imageUrl = `/uploads/${file.name}`;
   }
 
-  const newMenu = { OwnerID: ownerID, code, name, category, type, price, desc, image: imageUrl };
+  const newMenu = { OwnerID: ownerID, MenuID, MenuName, CategoryMenu, Type, Price, MenuDetail, ImagePath: imageUrl };
   menus.push(newMenu);
   await writeData(menus);
 
@@ -58,20 +58,20 @@ export async function PUT(req) {
 
   const originalCode = formData.get("originalCode");
   const ownerID = formData.get("OwnerID") || "";
-  const code = formData.get("code");
-  const name = formData.get("name");
-  const category = formData.get("category");
-  const type = formData.get("type") ? JSON.parse(formData.get("type")) : "";
-  const price = formData.get("price");
-  const desc = formData.get("desc");
+  const MenuID = formData.get("code");
+  const MenuName = formData.get("name");
+  const CategoryMenu = formData.get("category");
+  const Type = formData.get("type") ? JSON.parse(formData.get("type")) : "";
+  const Price = formData.get("price");
+  const MenuDetail = formData.get("desc");
   const file = formData.get("image");
 
-  const idx = menus.findIndex((m) => m.code === originalCode);
+  const idx = menus.findIndex((m) => m.MenuID === originalCode);
   if (idx === -1) {
     return NextResponse.json({ error: "Menu not found" }, { status: 404 });
   }
 
-  let imageUrl = menus[idx].image;
+  let imageUrl = menus[idx].ImagePath;
   if (file && file.name) {
     await fs.mkdir(uploadDir, { recursive: true });
     const filePath = path.join(uploadDir, file.name);
@@ -80,19 +80,18 @@ export async function PUT(req) {
     imageUrl = `/uploads/${file.name}`;
   }
 
-  menus[idx] = { OwnerID: ownerID, code, name, category, type, price, desc, image: imageUrl };
+  menus[idx] = { OwnerID: ownerID, MenuID, MenuName, CategoryMenu, Type, Price, MenuDetail, ImagePath: imageUrl };
   await writeData(menus);
 
   return NextResponse.json(menus[idx]);
 }
-
 
 export async function DELETE(req) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
 
   let menus = await readData();
-  menus = menus.filter((m) => m.code !== code);
+  menus = menus.filter((m) => m.MenuID !== code);
   await writeData(menus);
 
   return NextResponse.json({ success: true });

@@ -7,9 +7,9 @@ export default function Menu() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [drinkTypes, setDrinkTypes] = useState({
-    ร้อน: { checked: false, price: 0 },
-    เย็น: { checked: false, price: 0 },
-    ปั่น: { checked: false, price: 0 },
+    ร้อน: { checked: false, price: "" },
+    เย็น: { checked: false, price: "" },
+    ปั่น: { checked: false, price: "" },
   });
   const [selectedCategory, setSelectedCategory] = useState("");
   const [menuDesc, setMenuDesc] = useState("");
@@ -19,22 +19,22 @@ export default function Menu() {
 
   useEffect(() => {
     if (editingMenu) {
-      setMenuDesc(editingMenu.desc || "");
-      setSelectedCategory(editingMenu.category || "");
-      if (editingMenu.category === "เครื่องดื่ม") {
+      setMenuDesc(editingMenu.MenuDetail || "");
+      setSelectedCategory(editingMenu.CategoryMenu || "");
+      if (editingMenu.CategoryMenu === "เครื่องดื่ม") {
         setDrinkTypes({
-          ร้อน: editingMenu.type?.ร้อน || { checked: false, price: 0 },
-          เย็น: editingMenu.type?.เย็น || { checked: false, price: 0 },
-          ปั่น: editingMenu.type?.ปั่น || { checked: false, price: 0 },
+          ร้อน: editingMenu.Type?.ร้อน || { checked: false, price: "" },
+          เย็น: editingMenu.Type?.เย็น || { checked: false, price: "" },
+          ปั่น: editingMenu.Type?.ปั่น || { checked: false, price: "" },
         });
       }
     } else {
       setMenuDesc("");
       setSelectedCategory("");
       setDrinkTypes({
-        ร้อน: { checked: false, price: 0 },
-        เย็น: { checked: false, price: 0 },
-        ปั่น: { checked: false, price: 0 },
+        ร้อน: { checked: false, price: "" },
+        เย็น: { checked: false, price: "" },
+        ปั่น: { checked: false, price: "" },
       });
     }
   }, [editingMenu]);
@@ -43,12 +43,12 @@ export default function Menu() {
     setEditingIndex(index);
     setIsModalOpen(true);
     if (index !== null) {
-      setSelectedCategory(menus[index].category);
-      if (menus[index].category === "เครื่องดื่ม") {
+      setSelectedCategory(menus[index].CategoryMenu);
+      if (menus[index].CategoryMenu === "เครื่องดื่ม") {
         setDrinkTypes({
-          ร้อน: menus[index].type?.ร้อน || { checked: false, price: 0 },
-          เย็น: menus[index].type?.เย็น || { checked: false, price: 0 },
-          ปั่น: menus[index].type?.ปั่น || { checked: false, price: 0 },
+          ร้อน: menus[index].Type?.ร้อน || { checked: false, price: "" },
+          เย็น: menus[index].Type?.เย็น || { checked: false, price: "" },
+          ปั่น: menus[index].Type?.ปั่น || { checked: false, price: "" },
         });
       }
     }
@@ -58,9 +58,9 @@ export default function Menu() {
     setEditingIndex(null);
     setIsModalOpen(false);
     setDrinkTypes({
-      ร้อน: { checked: false, price: 0 },
-      เย็น: { checked: false, price: 0 },
-      ปั่น: { checked: false, price: 0 },
+      ร้อน: { checked: false, price: "" },
+      เย็น: { checked: false, price: "" },
+      ปั่น: { checked: false, price: "" },
     });
     setSelectedCategory("");
     setMenuDesc("");
@@ -84,7 +84,7 @@ export default function Menu() {
       ...prev,
       [type]: {
         ...prev[type],
-        [field]: field === "checked" ? value : Number(value),
+        [field]: field === "checked" ? value : value,
       },
     }));
   };
@@ -97,7 +97,7 @@ export default function Menu() {
 
     const isDuplicate = menus.some(
       (menu) =>
-        menu.code === newCode && (!editingMenu || menu.code !== editingMenu.code)
+        menu.MenuID === newCode && (!editingMenu || menu.MenuID !== editingMenu.MenuID)
     );
     if (isDuplicate) {
       alert("รหัสเมนูนี้ถูกใช้งานแล้ว กรุณาใช้รหัสเมนูอื่น");
@@ -122,65 +122,72 @@ export default function Menu() {
       return;
     }
 
-    const originalCode = editingMenu ? editingMenu.code : null;
+    const originalCode = editingMenu ? editingMenu.MenuID : null;
     const basePrice = Number(form.menuPrice.value) || 0;
 
     const newMenu = {
       OwnerID: ownerID,
-      code: form.menuCode.value,
-      name: form.menuName.value,
-      category: form.menuCategory.value,
-      type:
+      MenuID: form.menuCode.value,
+      MenuName: form.menuName.value,
+      CategoryMenu: form.menuCategory.value,
+      Type:
         form.menuCategory.value === "เครื่องดื่ม"
           ? Object.fromEntries(
               Object.entries(drinkTypes).map(([t, data]) => [
                 t,
-                { checked: data.checked, price: data.checked ? data.price : 0 },
+                { checked: data.checked, price: data.checked ? Number(data.price) || 0 : 0 },
               ])
             )
           : form.menuType?.value || "",
-      price:
+      Price:
         form.menuCategory.value === "เครื่องดื่ม"
           ? basePrice
           : Number(form.menuPrice.value) || 0,
-      desc: menuDesc,
+      MenuDetail: menuDesc,
     };
 
     const formData = new FormData();
     formData.append("OwnerID", ownerID);
     formData.append("originalCode", originalCode || "");
-    formData.append("code", newMenu.code);
-    formData.append("name", newMenu.name);
-    formData.append("category", newMenu.category);
-    formData.append("type", JSON.stringify(newMenu.type));
-    formData.append("price", newMenu.price);
-    formData.append("desc", newMenu.desc);
+    formData.append("code", newMenu.MenuID);
+    formData.append("name", newMenu.MenuName);
+    formData.append("category", newMenu.CategoryMenu);
+    formData.append("type", JSON.stringify(newMenu.Type));
+    formData.append("price", newMenu.Price);
+    formData.append("desc", newMenu.MenuDetail);
     if (form.menuImage.files[0]) {
       formData.append("image", form.menuImage.files[0]);
     }
 
+    const fetchMenus = async () => {
+      try {
+        const res = await fetch("/api/menus");
+        const data = await res.json();
+        setMenus(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     try {
+      const file = form.menuImage.files[0];
       if (editingMenu) {
         await fetch("/api/menus", { method: "PUT", body: formData });
-        const file = form.menuImage.files[0];
         setMenus((prev) =>
-          prev.map((m) => 
-            m.code === originalCode
-              ? { 
-                  ...newMenu, 
-                  image: file ? URL.createObjectURL(file) : m.image, 
-                } 
+          prev.map((m) =>
+            m.MenuID === originalCode
+              ? { ...newMenu, ImagePath: file ? URL.createObjectURL(file) : m.ImagePath }
               : m
-        )
+          )
         );
       } else {
         await fetch("/api/menus", { method: "POST", body: formData });
-        const file = form.menuImage.files[0];
         setMenus((prev) => [
-          ...prev, 
-          { ...newMenu, image: file ? URL.createObjectURL(file) : "" },
+          ...prev,
+          { ...newMenu, ImagePath: file ? URL.createObjectURL(file) : "" },
         ]);
       }
+      await fetchMenus();
     } catch (err) {
       console.error(err);
     }
@@ -189,23 +196,22 @@ export default function Menu() {
     setMenuDesc("");
     setSelectedCategory("");
     setDrinkTypes({
-      ร้อน: { checked: false, price: 0 },
-      เย็น: { checked: false, price: 0 },
-      ปั่น: { checked: false, price: 0 },
+      ร้อน: { checked: false, price: "" },
+      เย็น: { checked: false, price: "" },
+      ปั่น: { checked: false, price: "" },
     });
     setEditingIndex(null);
     setIsModalOpen(false);
   };
 
-  const handleDelete = async (code) => {
+  const handleDelete = async (menuID) => {
     try {
-      await fetch(`/api/menus?code=${code}`, { method: "DELETE" });
-      setMenus((prev) => prev.filter((m) => m.code !== code));
+      await fetch(`/api/menus?code=${menuID}`, { method: "DELETE" });
+      setMenus((prev) => prev.filter((m) => m.MenuID !== menuID));
     } catch (err) {
       console.error(err);
     }
   };
-
   return (
     <div className="min-h-screen">
       <Navbar activePage="menu" />
@@ -259,23 +265,23 @@ export default function Menu() {
                 {menus.map((menu, index) => (
                   <tr key={index} className="bg-white">
                     <td className="border border-black px-4 py-2 text-center ">
-                      {menu.image ? <img src={menu.image} alt={menu.name} className="w-[80px] h-[80px] object-cover mx-auto" /> : "-"}
+                      {menu.ImagePath ? <img src={menu.ImagePath} alt={menu.MenuName} className="w-[80px] h-[80px] object-cover mx-auto" /> : "-"}
                     </td>
-                    <td className="border border-black px-4 py-2">{menu.code}</td>
-                    <td className="border border-black px-4 py-2">{menu.name}</td>
-                    <td className="border border-black px-4 py-2">{menu.category}</td>
+                    <td className="border border-black px-4 py-2">{menu.MenuID}</td>
+                    <td className="border border-black px-4 py-2">{menu.MenuName}</td>
+                    <td className="border border-black px-4 py-2">{menu.CategoryMenu}</td>
                     <td className="border border-black px-4 py-2">
-                      {menu.category === "เครื่องดื่ม" && typeof menu.type === "object"
-                        ? Object.entries(menu.type)
+                      {menu.CategoryMenu === "เครื่องดื่ม" && typeof menu.Type  === "object"
+                        ? Object.entries(menu.Type )
                             .filter(([_, data]) => data.checked)
                             .map(([type, data]) => `${type} + ${data.price} `)
                             .join(", ")
-                        : menu.type || "-"}
+                        : menu.Type  || "-"}
                     </td>
                     <td className="border border-black px-4 py-2">
-                      {menu.price ? `${menu.price} ฿` : "-"}
+                      {menu.Price ? `${menu.Price} ฿` : "-"}
                     </td>
-                    <td className="border border-black px-4 py-2">{menu.desc}</td>
+                    <td className="border border-black px-4 py-2">{menu.MenuDetail}</td>
                     <td className="border border-black px-1 py-2">
                       <div className="flex justify-center items-center gap-5">
                         <button onClick={() => openModal(index)} className="cursor-pointer">
@@ -283,7 +289,7 @@ export default function Menu() {
                             <path d="M80 0v-160h800V0H80Zm160-320h56l312-311-29-29-28-28-311 312v56Zm-80 80v-170l448-447q11-11 25.5-17t30.5-6q16 0 31 6t27 18l55 56q12 11 17.5 26t5.5 31q0 15-5.5 29.5T777-687L330-240H160Zm560-504-56-56 56 56ZM608-631l-29-29-28-28 57 57Z"/>
                           </svg>
                         </button>
-                        <button onClick={() => handleDelete(menu.code)} className="cursor-pointer">
+                        <button onClick={() => handleDelete(menu.MenuID)} className="cursor-pointer">
                           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#de3c3c">
                             <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
                           </svg>
@@ -314,7 +320,7 @@ export default function Menu() {
                   type="text"
                   id="menuCode"
                   name="menuCode"
-                  defaultValue={editingMenu ? editingMenu.code : ""}
+                  defaultValue={editingMenu ? editingMenu.MenuID : ""}
                   placeholder="เช่น M002"
                   className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   required
@@ -328,7 +334,7 @@ export default function Menu() {
                 <input
                   type="text"
                   id="menuName"
-                  defaultValue={editingMenu ? editingMenu.name : ""}
+                  defaultValue={editingMenu ? editingMenu.MenuName : ""}
                   placeholder="เช่น ลาเต้เย็น"
                   className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   required
@@ -357,7 +363,7 @@ export default function Menu() {
                     {["ร้อน", "เย็น", "ปั่น"].map((type) => (
                       <div key={type} className="flex items-center gap-2">
                         <input
-                          className="w-4 h-4"
+                          className="w-4 h-4 accent-[#0FA958]"
                           type="checkbox"
                           checked={drinkTypes[type].checked}
                           onChange={(e) => handleDrinkTypeChange(type, "checked", e.target.checked)}
@@ -390,7 +396,7 @@ export default function Menu() {
                 <input
                   type="number"
                   id="menuPrice"
-                  defaultValue={editingMenu ? editingMenu.price : ""}
+                  defaultValue={editingMenu ? editingMenu.Price : ""}
                   placeholder="เช่น 45"
                   className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                 />

@@ -4,21 +4,21 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Navbar({ activePage }) {
-  const [userName, setUserName] = useState("");
+  const [Username, setUserName] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const email = localStorage.getItem("loggedInEmail");
-        console.log("email from localStorage:", email);
+        const Email = localStorage.getItem("loggedInEmail");
+        console.log("email from localStorage:", Email);
 
         const res = await fetch("/data/owner.json");
         const data = await res.json();
 
-        const user = data.find((u) => u.email === email);
+        const user = data.find((u) => u.Email === Email);
 
-        if (user && user.username) {
-          setUserName(user.username);
+        if (user && user.Username) {
+          setUserName(user.Username);
         } else {
           setUserName("ไม่พบชื่อผู้ใช้");
         }
@@ -65,8 +65,8 @@ export default function Navbar({ activePage }) {
               <path d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/>
             </svg>
           </div>
-          <span className="text-black font-semibold" title={userName}>
-            {typeof userName === "string" && userName.length > 9 ? `${userName.slice(0, 9)}...` : userName}
+          <span className="text-black font-semibold" title={Username}>
+            {typeof Username === "string" && Username.length > 9 ? `${Username.slice(0, 9)}...` : Username}
           </span>
         </div>
       </div>
