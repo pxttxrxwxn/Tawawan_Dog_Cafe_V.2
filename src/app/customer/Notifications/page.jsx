@@ -28,25 +28,27 @@ export default function Notifications() {
         .catch((err) => console.error(err));
     }, []);
 
+    const handleDelete = async (notificationID) => {
+      try {
+        const res = await fetch("/api/notifications", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notificationID }),
+        });
 
-    const handleDelete = async (id) => {
-        try {
-            const res = await fetch("/api/notifications", {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id }),
-            });
-
-            const result = await res.json();
-            if (result.success) {
-            setNotifications((prev) => prev.filter((item) => item.id !== id));
-            } else {
-            console.error("Failed to delete:", result.error);
-            }
-        } catch (err) {
-            console.error("Error deleting notification:", err);
+        const result = await res.json();
+        if (result.success) {
+          setNotifications((prev) =>
+            prev.filter((item) => item.NotificationID !== notificationID)
+          );
+        } else {
+          console.error("Failed to delete:", result.error);
         }
+      } catch (err) {
+        console.error("Error deleting notification:", err);
+      }
     };
+
     const handleDeleteAll = async () => {
         try {
             const res = await fetch("/api/notifications", {
@@ -106,7 +108,7 @@ export default function Notifications() {
 
               <div
                 className="cursor-pointer"
-                onClick={() => handleDelete(item.id)}
+                onClick={() => handleDelete(item.NotificationID)}
                 dangerouslySetInnerHTML={{
                   __html: 
                   item.svgbincheck || item.svgbinckage || item.svgbintruck || "",

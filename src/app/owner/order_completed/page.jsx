@@ -14,7 +14,7 @@ export default function OrderCompleted() {
             })
             .then((text) => {
             const data = text ? JSON.parse(text) : [];
-            const completedOrders = data.filter(order => order.status.toLowerCase() === "complete");
+            const completedOrders = data.filter(order => order.OrderStatus.toLowerCase() === "complete");
             setOrders(completedOrders);
             })
             .catch((err) => console.error("Failed to load orders:", err));
@@ -24,7 +24,9 @@ export default function OrderCompleted() {
         const day = String(date.getDate()).padStart(2, "0");
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const year = String(date.getFullYear()).slice(-2);
-        return `${day}/${month}/${year}`;
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${day}/${month}/${year}  |  เวลา: ${hours}:${minutes}`;
     };
     return (
         <div className="min-h-screen">
@@ -75,17 +77,17 @@ export default function OrderCompleted() {
                                 <tbody>
                                     {orders.map((order, index) => (
                                         <tr key={index} className="bg-white">
-                                            <td className="border border-black px-4 py-2">{order.ordernumber}</td>
-                                            <td className="border border-black px-4 py-2">{formatDate(order.date)} | เวลา: {order.time}</td>
-                                            <td className="border border-black px-4 py-2">{order.tableNumber}</td>
+                                            <td className="border border-black px-4 py-2">{order.OrderID}</td>
+                                            <td className="border border-black px-4 py-2">{formatDate(order.OrderDateTime)}</td>
+                                            <td className="border border-black px-4 py-2">{order.TableNumber}</td>
                                             <td className="border border-black px-4 py-2">
-                                                {order.items.map((item, index) => (
-                                                    <div key={index} className="flex justify-start p-2">
-                                                        {item.quantity}x {item.name}{item.type ? `${item.type}` : ""}
+                                                {order.OrderDescription.map((item, idx) => (
+                                                    <div key={idx} className="flex justify-start p-2">
+                                                        {item.Quantity}x {item.MenuName}{item.Type  ? `${item.Type }` : ""}
                                                     </div>
                                                 ))}
                                             </td>
-                                            <td className="border border-black px-4 py-2">{order.total} บาท</td>
+                                            <td className="border border-black px-4 py-2">{order.Total} บาท</td>
                                         </tr>
                                     ))}
                                 </tbody>
