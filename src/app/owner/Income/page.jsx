@@ -18,11 +18,24 @@ export default function Income() {
           
           const mergedData = incomeData.map((income) => {
             const matchingOrder = orderData.find(
-              (order) => order.incomeid === income.incomeid
+              (order) => order.IncomeId === income.IncomeId
             );
+
+            const dateTime = new Date(income.OrderDateTime);
+            const date = dateTime.toISOString();
+            const time = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
             return {
-              ...income,
-              ordernumber: matchingOrder ? matchingOrder.ordernumber : "",
+              ordernumber: matchingOrder ? matchingOrder.OrderID : "-",
+              tableNumber: income.TableNumber || "-",
+              date,
+              time,
+              items: income.OrderDescription.map((item) => ({
+                name: item.MenuName,
+                type: item.Type,
+                quantity: item.Quantity,
+              })),
+              total: income.Total,
             };
           });
 

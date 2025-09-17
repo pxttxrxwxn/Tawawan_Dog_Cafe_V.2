@@ -15,7 +15,7 @@ export default function Order_Customer() {
           ...item,
           basePrice: Number(item.basePrice),
           quantity: Number(item.quantity),
-          totalPrice: Number(item.totalPrice || item.basePrice * item.quantity),
+          totalPrice: Number(item.totalPrice || (item.basePrice) * item.quantity),
         }));
         setOrders(data);
         const total = data.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -34,10 +34,13 @@ export default function Order_Customer() {
   }, []);
 
   const updateTotal = (ordersData) => {
-    const updated = ordersData.map(item => ({
-      ...item,
-      totalPrice: Number(item.basePrice) * Number(item.quantity),
-    }));
+    const updated = ordersData.map(item => {
+      const base = Number(item.basePrice) + Number(item.typePrice || 0);
+      return {
+        ...item,
+        totalPrice: base * Number(item.quantity),
+    };
+  });
     setOrders(updated);
     localStorage.setItem("cart", JSON.stringify(updated));
     const total = updated.reduce((sum, i) => sum + i.totalPrice, 0);
@@ -61,7 +64,7 @@ export default function Order_Customer() {
         updatedOrders.splice(index, 1);
       } else {
         updatedOrders[index].quantity = newQuantity;
-        updatedOrders[index].totalPrice = Number(updatedOrders[index].basePrice) * newQuantity;
+        updatedOrders[index].totalPrice =(Number(updatedOrders[index].basePrice) + Number(updatedOrders[index].typePrice || 0)) * newQuantity;
       }
 
       updateTotal(updatedOrders);
@@ -80,6 +83,7 @@ export default function Order_Customer() {
     );
     updateTotal(updatedOrders);
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col">

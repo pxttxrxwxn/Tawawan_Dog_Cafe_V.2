@@ -39,20 +39,20 @@ export async function POST(req) {
         return new Response(JSON.stringify({ message: "ข้อมูลไม่ครบ" }), { status: 400 });
       }
 
-      if (users.some((u) => u.email === Email)) {
+      if (users.some((u) => u.Email.toLowerCase() === Email.toLowerCase())) {
         return new Response(JSON.stringify({ message: "อีเมลนี้ถูกใช้งานแล้ว" }), { status: 400 });
       }
 
       const OwnerID = await generateOwnerID(users);
 
-      users.push({ OwnerID, Username, Email, PasswordHash });
+      users.push({ OwnerID, Username, Email: Email.toLowerCase(), PasswordHash });
       await writeUsers(users);
 
       return new Response(JSON.stringify({ message: "สมัครสมาชิกสำเร็จ", OwnerID }), { status: 201 });
     }
 
     if (action === "login") {
-      const user = users.find((u) => u.Email === Email);
+      const user = users.find((u) => u.Email.toLowerCase() === Email.toLowerCase());
 
       if (!user) {
         return new Response(JSON.stringify({ error: "ไม่พบอีเมลนี้ในระบบ" }), { status: 401 });

@@ -73,16 +73,17 @@ export default function ListFood() {
         item.type === menu.type &&
         item.sugarLevel === menu.sugarLevel
     );
-
+    const typePrice = menu.typePrice || 0;
+    const basePrice = Number(menu.price) + Number(typePrice);
     if (index > -1) {
       cart[index].quantity += 1;
       cart[index].totalPrice = Number(cart[index].basePrice) * cart[index].quantity;
     } else {
       cart.push({
         ...menu,
-        basePrice: Number(menu.price),
+        basePrice,
         quantity: 1,
-        totalPrice: Number(menu.price),
+        totalPrice: basePrice,
       });
     }
 

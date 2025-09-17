@@ -2,12 +2,13 @@
 import React, { useEffect, useState } from "react";
 import PromptPayQR from "../../components/PromptPayQR";
 import Nabarorder from "../../components/Navbarorder";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Order_Customer_pay() {
   const [orders, setOrders] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [tableNumber, setTableNumber] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const selectedTable = localStorage.getItem("selectedTable");
@@ -50,7 +51,7 @@ export default function Order_Customer_pay() {
       const res = await fetch("/api/orders", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ all: true, tableNumber, customerid, cart, }),
+        body: JSON.stringify({ all: true, tableNumber, Customerid, cart, }),
       });
 
       if (!res.ok) {
@@ -71,7 +72,7 @@ export default function Order_Customer_pay() {
         Customerid,
         Svgcheck: `<svg xmlns="http://www.w3.org/2000/svg" height="70px" viewBox="0 -960 960 960" width="70px" fill="#000000"><path d="M480.07-100q-80.07 0-149.44-29.11-69.37-29.12-120.87-80.6-51.51-51.48-80.63-120.82Q100-399.87 100-479.93q0-79.45 29.12-148.82 29.12-69.37 80.61-120.88 51.49-51.5 120.84-80.94Q399.92-860 480-860q70.51 0 131.99 22.66 61.47 22.65 110.78 62.34l-32.23 33q-43.23-35-96.38-53.81-53.14-18.8-114.16-18.8-141.54 0-238.08 96.53-96.53 96.54-96.53 238.08 0 141.54 96.53 238.08 96.54 96.53 238.08 96.53 141.54 0 238.08-96.53 96.53-96.54 96.53-238.08 0-30-4.69-58.23-4.69-28.23-13.69-55l34.46-34.85q14.46 34.31 21.89 71.39Q860-519.61 860-480q0 80.08-29.42 149.43-29.42 69.35-80.9 120.84-51.49 51.49-120.82 80.61Q559.52-100 480.07-100ZM421-311.46 268.69-464.38l33.85-34.23L421-380.15l404.77-404.77 34.84 33.84L421-311.46Z"/></svg>`,
         NotificationDetail: "การสั่งสินค้าเสร็จสิ้น",
-        date: new Date().toLocaleString("th-TH", { hour12: false }),
+        NotificationDateTime: new Date().toLocaleString("th-TH", { hour12: false }),
         Svgbincheck: `<svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#D64545"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>`,
       };
       
@@ -98,6 +99,7 @@ export default function Order_Customer_pay() {
       localStorage.removeItem("cart");
       setOrders([]);
       setTotalAmount(0);
+      router.push("/customer/Completed_Order");
 
     } catch (err) {
       console.error(err);
@@ -115,7 +117,6 @@ export default function Order_Customer_pay() {
           รวม ({orders.length} รายการ):
           <span className="text-[#D64545] font-bold">{totalAmount} ฿</span>
         </h1>
-        <Link href="/customer/Completed_Order">
           <button
             className={`px-4 py-4 rounded-md text-2xl mr-6 text-white ${
               orders.length > 0
@@ -127,7 +128,6 @@ export default function Order_Customer_pay() {
           >
             ยืนยันการชำระเงิน
           </button>
-        </Link>
       </div>
     </div>
   );

@@ -42,9 +42,8 @@ export async function POST(req) {
 
       orders[index].OrderStatus = "complete";
 
-      const lastIncome = income.length ? income[income.length - 1] : null;
       const lastIncomeId = income.length
-        ? income[income.length - 1].incomeid
+        ? income[income.length - 1].IncomeId
         : "R1000";
       const nextIncomeId =
         "R" + (parseInt(lastIncomeId.substring(1)) + 1).toString().padStart(4, "0");
@@ -58,7 +57,7 @@ export async function POST(req) {
         IncomeId: nextIncomeId,
         OrderDescription: orders[index].OrderDescription,
         OrderDateTime: orders[index].OrderDateTime,
-        TableNumber: orders[index].tableNumber,
+        TableNumber: orders[index].TableNumber,
         Total,
       };
 
@@ -119,7 +118,7 @@ export async function POST(req) {
 
 export async function DELETE(req) {
   try {
-    const { tableNumber, customerid, cart } = await req.json();
+    const { tableNumber, Customerid, cart } = await req.json();
 
     if (!Array.isArray(cart) || cart.length === 0) {
       return NextResponse.json({ success: false, error: "No orders to process" });
@@ -152,7 +151,7 @@ export async function DELETE(req) {
       TableNumber: tableNumber || "ไม่ระบุ",
       Total: cart.reduce((sum, item) => sum + item.totalPrice, 0),
       OrderStatus: "Pending",
-      CustomerID: customerid || "ไม่ระบุ",
+      CustomerID: Customerid || "ไม่ระบุ",
     };
 
     orders.push(newOrderGroup);

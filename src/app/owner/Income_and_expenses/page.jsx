@@ -35,8 +35,8 @@ export default function IncomeAndExpenses() {
     fetch("/data/Income.json")
       .then((res) => res.json())
       .then((data) => {
-        const filtered = filterDataByDate(data, filter, "date");
-        const totalIncome = filtered.reduce((sum, order) => sum + (order.total || 0), 0);
+        const filteredIncome  = filterDataByDate(data, filter, "OrderDateTime");
+        const totalIncome = filteredIncome .reduce((sum, order) => sum + (order.Total  || 0), 0);
         setIncomeTotal(totalIncome);
       })
       .catch((err) => console.error("Error loading Income.json:", err));
@@ -44,8 +44,8 @@ export default function IncomeAndExpenses() {
     fetch("/data/expenses.json")
       .then((res) => res.json())
       .then((data) => {
-        const filtered = filterDataByDate(data, filter, "date");
-        const totalExpense = filtered.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+        const filteredExpense  = filterDataByDate(data, filter, "ExpenseDateTime");
+        const totalExpense = filteredExpense .reduce((sum, exp) => sum + (exp.Amount  || 0), 0);
         setExpenseTotal(totalExpense);
       })
       .catch((err) => console.error("Error loading expenses.json:", err));
