@@ -13,7 +13,18 @@ export default function ListFood() {
   useEffect(() => {
     fetch("/data/menus.json")
       .then(res => res.json())
-      .then(data => setMenus(data))
+      .then(data => {
+        const mappedMenus = data.map(item => ({
+          code: item.MenuID,
+          name: item.MenuName,
+          category: item.CategoryMenu,
+          price: item.Price,
+          desc: item.MenuDetail,
+          image: item.ImagePath,
+          type: item.Type || "",
+        }));
+        setMenus(mappedMenus);
+      })
       .catch(err => console.error("Error loading menus:", err));
   }, []);
 
