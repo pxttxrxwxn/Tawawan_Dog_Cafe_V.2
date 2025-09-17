@@ -21,14 +21,14 @@ export default function Expenses() {
   };
 
   const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("th-TH", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-};
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("th-TH", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -47,19 +47,19 @@ export default function Expenses() {
     e.preventDefault();
     const form = e.target;
 
-    if (!form.date.value || !form.detail.value || !form.amount.value || !form.category.value) {
+    if (!form.ExpenseDateTime.value || !form.Detail.value || !form.Amount.value || !form.CategoryExpense.value) {
       alert("กรุณากรอกข้อมูลให้ครบ");
       return;
     }
 
-    const ownerID = localStorage.getItem("OwnerID") || ""; 
+    const ownerID = localStorage.getItem("OwnerID") || "";
 
     const newExpense = {
       OwnerID: ownerID,
-      date: form.date.value,
-      detail: form.detail.value,
-      amount: Number(form.amount.value),
-      category: form.category.value,
+      ExpenseDateTime: form.ExpenseDateTime.value,
+      Detail: form.Detail.value,
+      Amount: Number(form.Amount.value),
+      CategoryExpense: form.CategoryExpense.value,
     };
 
     try {
@@ -103,7 +103,7 @@ export default function Expenses() {
   const filterExpenses = () => {
     const today = new Date();
     return expenses.filter((exp) => {
-      const expDate = new Date(exp.date);
+      const expDate = new Date(exp.ExpenseDateTime);
 
       if (filter === "today") {
         return (
@@ -132,8 +132,8 @@ export default function Expenses() {
     });
   };
 
-  const filteredExpenses = filterExpenses().sort((a, b) => new Date(a.date) - new Date(b.date));
-  const total = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const filteredExpenses = filterExpenses().sort((a, b) => new Date(a.ExpenseDateTime) - new Date(b.ExpenseDateTime));
+  const total = filteredExpenses.reduce((sum, exp) => sum + exp.Amount, 0);
 
   return (
     <div className="min-h-screen">
@@ -202,13 +202,13 @@ export default function Expenses() {
                   const originalIndex = expenses.indexOf(exp);
                   return (
                     <tr key={index}>
-                      <td className="border px-4 py-2">{formatDate(exp.date)}</td>
-                      <td className="border px-4 py-2">{exp.detail}</td>
+                      <td className="border px-4 py-2">{formatDate(exp.ExpenseDateTime)}</td>
+                      <td className="border px-4 py-2">{exp.Detail}</td>
                       <td className="border px-4 py-2 text-[#000000]">
                         <span className="text-[#D64545] font-bold text-xl">-</span>
-                        {exp.amount} บาท
+                        {exp.Amount} บาท
                       </td>
-                      <td className="border px-4 py-2">{exp.category}</td>
+                      <td className="border px-4 py-2">{exp.CategoryExpense}</td>
                       <td className="border border-black px-1 py-2">
                         <div className="flex justify-center items-center gap-5">
                           <button
@@ -262,8 +262,8 @@ export default function Expenses() {
                   </label>
                     <input
                       type="date"
-                      name="date"
-                      defaultValue={editingExpense ? editingExpense.date : ""}
+                      name="ExpenseDateTime"
+                      defaultValue={editingExpense ? editingExpense.ExpenseDateTime  : ""}
                       className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                     />
                 </div>
@@ -273,8 +273,8 @@ export default function Expenses() {
                   </label>
                   <input
                     type="text"
-                    name="detail"
-                    defaultValue={editingExpense ? editingExpense.detail : ""}
+                    name="Detail"
+                    defaultValue={editingExpense ? editingExpense.Detail  : ""}
                     placeholder="รายละเอียด"
                     className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   />
@@ -285,8 +285,8 @@ export default function Expenses() {
                   </label>
                   <input
                     type="number"
-                    name="amount"
-                    defaultValue={editingExpense ? editingExpense.amount : ""}
+                    name="Amount"
+                    defaultValue={editingExpense ? editingExpense.Amount  : ""}
                     placeholder="จำนวนเงิน"
                     className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   />
@@ -296,8 +296,8 @@ export default function Expenses() {
                     หมวดหมู่
                   </label>
                   <select
-                    name="category"
-                    defaultValue={editingExpense ? editingExpense.category : ""}
+                    name="CategoryExpense"
+                    defaultValue={editingExpense ? editingExpense.CategoryExpense  : ""}
                     className="border border-[#715045] rounded-md p-2 shadow-sm bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   >
                     <option value="" disabled hidden>หมวดหมู่</option>
