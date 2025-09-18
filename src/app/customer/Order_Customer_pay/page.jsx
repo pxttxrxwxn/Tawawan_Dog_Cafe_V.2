@@ -34,17 +34,14 @@ export default function Order_Customer_pay() {
   }, [orders]);
 
   const handleOrder = async () => {
-    const Customerid = localStorage.getItem("customerid", user.id);
+    let Customerid = localStorage.getItem("customerid");
     if (!Customerid) {
-      console.error("customerid not found in localStorage");
-      return;
+      Customerid = crypto.randomUUID();
+      localStorage.setItem("customerid", Customerid);
+      console.log("Generated new customerid:", Customerid);
     }
     const storedCart = localStorage.getItem("cart");
     const cart = storedCart ? JSON.parse(storedCart) : [];
-    if (!Customerid) {
-      console.error("customerid not found in localStorage");
-      return;
-    }
 
     if (cart.length === 0) {
       console.error("No orders to process");
