@@ -1,100 +1,95 @@
-import { promises as fs } from "fs";
-import path from "path";
-
-const filePath = path.join(process.cwd(), "public","data", "expenses.json");
-
-async function readData() {
-  try {
-    const data = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(data || "[]");
-  } catch (error) {
-    return [];
-  }
-}
-
-async function writeData(data) {
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-}
+import { NextResponse } from "next/server";
+import { supabaseAdmin } from "../../../lib/supabaseServer";
 
 export async function GET() {
-  const expenses = await readData();
-  return new Response(JSON.stringify(expenses), { status: 200 });
+  const { data, error } = await supabaseAdmin
+    .from("expenses")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
 }
 
 export async function POST(req) {
   try {
     const { OwnerID, ExpenseDateTime, Detail, Amount, CategoryExpense } = await req.json();
-    const expenses = await readData();
 
-    const lastExpense = expenses[expenses.length - 1];
-    const lastIDNumber = lastExpense ? parseInt(lastExpense.ExpenseID.slice(1)) : 0;
-    const newExpenseID = `E${(lastIDNumber + 1).toString().padStart(4, "0")}`;
+    const { data: lastRow } = await supabaseAdmin
+      .from("expenses")
+      .select("expense_id")
+      .order("expense_id", { ascending: false })
+      .limit(1);
 
-    const newExpense = {
-      ExpenseID: newExpenseID,
-      OwnerID,
-      ExpenseDateTime,
-      Detail,
-      Amount,
-      CategoryExpense,
-    };
+    let nextExpenseID = "E0001";
+    if (lastRow && lastRow.length > 0 && lastRow[0].expense_id) {
+      const lastNum = parseInt(lastRow[0].expense_id.replace(/^E/, "")) || 0;
+      nextExpenseID = `E${(lastNum + 1).toString().padStart(4, "0")}`;
+    }
 
-    expenses.push(newExpense);
-    await writeData(expenses);
+    const { data, error } = await supabaseAdmin
+      .from("expenses")
+      .insert([{
+        expense_id: nextExpenseID,
+        owner_id: OwnerID,
+        expense_datetime: ExpenseDateTime,
+        detail: Detail,
+        amount: Amount,
+        category_expense: CategoryExpense
+      }])
+      .select()
+      .single();
 
-    return new Response(JSON.stringify({ message: "เพิ่มสำเร็จ", newExpense }), { status: 201 });
+    if (error) throw error;
+    return NextResponse.json({ message: "เพิ่มสำเร็จ", newExpense: data }, { status: 201 });
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ error: "ไม่สามารถเพิ่มข้อมูลได้" }), { status: 500 });
+    return NextResponse.json({ error: "ไม่สามารถเพิ่มข้อมูลได้", details: error.message }, { status: 500 });
   }
 }
 
 export async function PUT(req) {
   try {
-    const { originalIndex, ExpenseDateTime, Detail, Amount, CategoryExpense } = await req.json();
-    const expenses = await readData();
+    const { ExpenseID, ExpenseDateTime, Detail, Amount, CategoryExpense } = await req.json();
 
-    if (originalIndex < 0 || originalIndex >= expenses.length) {
-      return new Response(JSON.stringify({ error: "ไม่พบข้อมูลที่ต้องการแก้ไข" }), { status: 404 });
-    }
+    const { data, error } = await supabaseAdmin
+      .from("expenses")
+      .update({
+         expense_datetime: ExpenseDateTime,
+         detail: Detail,
+         amount: Amount,
+         category_expense: CategoryExpense
+      })
+      .eq("expense_id", ExpenseID)
+      .select()
+      .single();
 
-    expenses[originalIndex] = {
-      ...expenses[originalIndex],
-      ExpenseDateTime,
-      Detail,
-      Amount,
-      CategoryExpense,
-    };
-
-    await writeData(expenses);
-    return new Response(JSON.stringify({ message: "แก้ไขสำเร็จ", updatedExpense: expenses[originalIndex] }), { status: 200 });
+    if (error) throw error;
+    return NextResponse.json({ message: "แก้ไขสำเร็จ", updatedExpense: data });
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ error: "ไม่สามารถแก้ไขได้" }), { status: 500 });
+    return NextResponse.json({ error: "ไม่สามารถแก้ไขได้", details: error.message }, { status: 500 });
   }
 }
 
 export async function DELETE(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const index = parseInt(searchParams.get("index"), 10);
+    const expenseID = searchParams.get("expenseID");
 
-    const expenses = await readData();
-    if (isNaN(index) || index < 0 || index >= expenses.length) {
-      return new Response(JSON.stringify({ error: "ไม่พบข้อมูลที่ต้องการลบ" }), {
-        status: 404,
-      });
+    if (!expenseID) {
+      return NextResponse.json({ error: "expenseID required" }, { status: 400 });
     }
 
-    const deletedExpense = expenses.splice(index, 1);
-    await writeData(expenses);
+    const { data, error } = await supabaseAdmin
+      .from("expenses")
+      .delete()
+      .eq("expense_id", expenseID)
+      .select();
 
-    return new Response(JSON.stringify({ message: "ลบสำเร็จ", deletedExpense }), {
-      status: 200,
-    });
+    if (error) throw error;
+    return NextResponse.json({ message: "ลบสำเร็จ", deleted: data });
   } catch (error) {
-    return new Response(JSON.stringify({ error: "ไม่สามารถลบได้" }), {
-      status: 500,
-    });
+    return NextResponse.json({ error: "ไม่สามารถลบได้", details: error.message }, { status: 500 });
   }
 }

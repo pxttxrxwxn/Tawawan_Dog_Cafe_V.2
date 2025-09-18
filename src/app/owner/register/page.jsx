@@ -30,8 +30,7 @@ export default function Register() {
   };
 
   const validateUsername = () => {
-    if (!username.trim()) setUsernameError("กรุณากรอกชื่อผู้ใช้");
-    else setUsernameError("");
+    setUsernameError(username.trim() ? "" : "กรุณากรอกชื่อผู้ใช้");
   };
 
   const validateEmail = () => {
@@ -45,13 +44,7 @@ export default function Register() {
     if (!password.trim()) {
       setPasswordError("กรุณากรอกรหัสผ่าน");
       setShowPasswordCriteria(true);
-    } else if (
-      !passwordCriteria.length ||
-      !passwordCriteria.upper ||
-      !passwordCriteria.lower ||
-      !passwordCriteria.number ||
-      !passwordCriteria.special
-    ) {
+    } else if (!Object.values(passwordCriteria).every(Boolean)) {
       setPasswordError("รหัสผ่านไม่ตรงตามเงื่อนไข");
       setShowPasswordCriteria(true);
     } else {
@@ -61,36 +54,41 @@ export default function Register() {
   };
 
   const validateConfirmPassword = () => {
-    if (confirmPassword !== password) 
-      {setConfirmPasswordError("รหัสผ่านไม่ตรงกัน");
-      setShowPasswordCriteria(true);
-      }
-    else {
+    if (!confirmPassword) {
       setConfirmPasswordError("");
-      setShowPasswordCriteria(false);
+    } else if (confirmPassword !== password) {
+      setConfirmPasswordError("รหัสผ่านไม่ตรงกัน");
+    } else {
+      setConfirmPasswordError("");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    validateUsername();
-    validateEmail();
-    validatePassword();
-    validateConfirmPassword();
+    const usernameValid = username.trim() !== "";
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const passwordValid = Object.values(passwordCriteria).every(Boolean);
+    const confirmPasswordValid = confirmPassword === password;
 
-    if (
-      usernameError ||
-      emailError ||
-      passwordError ||
-      confirmPasswordError
-    ) return;
+    if (!usernameValid || !emailValid || !passwordValid || !confirmPasswordValid) {
+      setUsernameError(usernameValid ? "" : "กรุณากรอกชื่อผู้ใช้");
+      setEmailError(emailValid ? "" : "รูปแบบอีเมลไม่ถูกต้อง");
+      setPasswordError(passwordValid ? "" : "รหัสผ่านไม่ตรงตามเงื่อนไข");
+      setConfirmPasswordError(confirmPasswordValid ? "" : "รหัสผ่านไม่ตรงกัน");
+      return;
+    }
 
     try {
       const response = await fetch("/api/owner", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "register", Username: username, Email: email, PasswordHash: password }),
+        body: JSON.stringify({
+          action: "register",
+          Username: username,
+          Email: email,
+          Password: password,
+        }),
       });
 
       const resData = await response.json();
@@ -99,11 +97,8 @@ export default function Register() {
         alert("สมัครสำเร็จ! กำลังไปหน้าเข้าสู่ระบบ");
         router.push("/owner/sign_in");
       } else {
-        if (resData.message === "อีเมลนี้ถูกใช้งานแล้ว") {
-          setEmailError("อีเมลนี้ถูกใช้งานแล้ว");
-        } else {
-          alert("เกิดข้อผิดพลาด: " + (resData.error || "ไม่สามารถบันทึกข้อมูลได้"));
-        }
+        if (resData.error === "อีเมลนี้ถูกใช้งานแล้ว") setEmailError(resData.error);
+        else alert("เกิดข้อผิดพลาด: " + (resData.error || "ไม่สามารถบันทึกข้อมูลได้"));
       }
     } catch (error) {
       alert("เกิดข้อผิดพลาด: " + error.message);
@@ -128,7 +123,10 @@ export default function Register() {
                 id="username"
                 placeholder="ชื่อผู้ใช้งาน"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  if (e.target.value.trim()) setUsernameError("");
+                }}
                 onFocus={validateUsername}
                 onBlur={validateUsername}
                 className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black font-Inter 
@@ -146,7 +144,10 @@ export default function Register() {
                 id="email"
                 placeholder="tawawandogcafe@gmail.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (e.target.value.trim()) setEmailError("");
+                }}
                 onFocus={validateEmail}
                 onBlur={validateEmail}
                 className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black font-Inter 
@@ -156,58 +157,71 @@ export default function Register() {
             </div>
 
             <div className="w-full">
-            <label htmlFor="password" className="text-[18px] font-Inter text-[#715045] block mb-1">
-              รหัสผ่าน ({password.length} ตัวอักษร)
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                placeholder="รหัสผ่าน"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onFocus={validatePassword}
-                onBlur={validatePassword}
-                className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black pr-10 font-Inter 
-                  ${passwordError ? "border-red-500" : "border-[#A1724E]"}`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#F17F1F] hover:text-[#d36f0d] focus:outline-none"
-                aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
-                tabIndex={-1}
-              >
-                {showPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="#000000"><path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Z"/></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="#000000"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>
-                )}
+              <label htmlFor="password" className="text-[18px] font-Inter text-[#715045] block mb-1">
+                รหัสผ่าน ({password.length} ตัวอักษร)
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="รหัสผ่าน"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (e.target.value.trim()) setPasswordError("");
+
+                    const criteria = {
+                      length: e.target.value.length >= 8,
+                      upper: /[A-Z]/.test(e.target.value),
+                      lower: /[a-z]/.test(e.target.value),
+                      number: /[0-9]/.test(e.target.value),
+                      special: /[!@#$%^&*]/.test(e.target.value),
+                    };
+                    setShowPasswordCriteria(!Object.values(criteria).every(Boolean));
+                  }}
+                  onFocus={validatePassword}
+                  onBlur={validatePassword}
+                  autoComplete="new-password"
+                  className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black pr-10 font-Inter 
+                    ${passwordError ? "border-red-500" : "border-[#A1724E]"}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#F17F1F] hover:text-[#d36f0d] focus:outline-none"
+                  aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="#000000"><path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Z"/></svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="#000000"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>
+                  )}
               </button>
             </div>
 
-            {passwordError && <p className="text-xs text-red-500 mt-1">{passwordError}</p>}
+              {passwordError && <p className="text-xs text-red-500 mt-1">{passwordError}</p>}
 
-            {showPasswordCriteria && (
-              <div className="text-[16px] mt-2 space-y-1 text-[#845C44]">
-                <p className={passwordCriteria.length ? "text-green-600" : "text-red-500"}>
-                  {passwordCriteria.length ? "✔️" : "❌"} รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร
-                </p>
-                <p className={passwordCriteria.upper ? "text-green-600" : "text-red-500"}>
-                  {passwordCriteria.upper ? "✔️" : "❌"} ตัวพิมพ์ใหญ่ A-Z อย่างน้อย 1 ตัว
-                </p>
-                <p className={passwordCriteria.lower ? "text-green-600" : "text-red-500"}>
-                  {passwordCriteria.lower ? "✔️" : "❌"} ตัวพิมพ์เล็ก a-z อย่างน้อย 1 ตัว
-                </p>
-                <p className={passwordCriteria.number ? "text-green-600" : "text-red-500"}>
-                  {passwordCriteria.number ? "✔️" : "❌"} ตัวเลข 0-9 อย่างน้อย 1 ตัว
-                </p>
-                <p className={passwordCriteria.special ? "text-green-600" : "text-red-500"}>
-                  {passwordCriteria.special ? "✔️" : "❌"} สัญลักษณ์พิเศษ !@#$%^&* อย่างน้อย 1 ตัว
-                </p>
-              </div>
-            )}
-          </div>
+              {showPasswordCriteria && (
+                <div className="text-[16px] mt-2 space-y-1 text-[#845C44]">
+                  <p className={passwordCriteria.length ? "text-green-600" : "text-red-500"}>
+                    {passwordCriteria.length ? "✔️" : "❌"} รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร
+                  </p>
+                  <p className={passwordCriteria.upper ? "text-green-600" : "text-red-500"}>
+                    {passwordCriteria.upper ? "✔️" : "❌"} ตัวพิมพ์ใหญ่ A-Z อย่างน้อย 1 ตัว
+                  </p>
+                  <p className={passwordCriteria.lower ? "text-green-600" : "text-red-500"}>
+                    {passwordCriteria.lower ? "✔️" : "❌"} ตัวพิมพ์เล็ก a-z อย่างน้อย 1 ตัว
+                  </p>
+                  <p className={passwordCriteria.number ? "text-green-600" : "text-red-500"}>
+                    {passwordCriteria.number ? "✔️" : "❌"} ตัวเลข 0-9 อย่างน้อย 1 ตัว
+                  </p>
+                  <p className={passwordCriteria.special ? "text-green-600" : "text-red-500"}>
+                    {passwordCriteria.special ? "✔️" : "❌"} สัญลักษณ์พิเศษ !@#$%^&* อย่างน้อย 1 ตัว
+                  </p>
+                </div>
+              )}
+            </div>
 
           <div className="relative w-full">
             <label htmlFor="confirmPassword" className="text-[18px] font-Inter text-[#715045] block mb-1">
@@ -219,7 +233,17 @@ export default function Register() {
                 id="confirmPassword"
                 placeholder="ยืนยันรหัสผ่าน"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  if (!e.target.value) {
+                    setConfirmPasswordError("");
+                    return;
+                  }
+                  if (e.target.value === password) {
+                    setConfirmPasswordError("");
+                }else{
+                  setConfirmPasswordError("รหัสผ่านไม่ตรงกัน");
+                }}}
                 onFocus={validateConfirmPassword}
                 onBlur={validateConfirmPassword}
                 className={`mt-1 w-full rounded-md border px-4 py-2 placeholder-[#DDDDDD] bg-white focus:outline-none text-black pr-10 font-Inter 

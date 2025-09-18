@@ -7,38 +7,46 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    fetch("/data/Notifications.json")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch Notifications.json");
-        return res.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const mappedData = data.map((item) => ({
-            ...item,
-            svgcheck: item.Svgcheck || "",
-            svgpackage: item.Svgpackage || "",
-            svgbincheck: item.Svgbincheck || "",
-            svgbinckage: item.Svgbinckage || "",
-            svgtruck: item.Svgtruck || "",
-            title: item.NotificationDetail || "", 
-            date: item.NotificationDateTime || "",
-          }));
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch("/api/notifications");
+        if (!res.ok) throw new Error("Failed to fetch notifications");
+        const data = await res.json();
 
-          const sortedNotifications = mappedData.sort((a, b) => {
-            const numA = parseInt(a.NotificationID.replace("N", ""), 10);
-            const numB = parseInt(b.NotificationID.replace("N", ""), 10);
-            return numB - numA;
-          });
+        if (Array.isArray(data)) {
+          const sortedNotifications = data
+            .map((item) => ({
+              ...item,
+              title: item.title || "",
+              date: item.created_at || "",
+            }))
+            .sort((a, b) => {
+              const numA = parseInt(a.notification_id.replace("N", ""), 10);
+              const numB = parseInt(b.notification_id.replace("N", ""), 10);
+              return numB - numA;
+            });
 
           setNotifications(sortedNotifications);
         } else {
-          console.error("Notifications.json is not an array", data);
           setNotifications([]);
         }
-      })
-      .catch((err) => console.error(err));
+      } catch (err) {
+        console.error(err);
+        setNotifications([]);
+      }
+    };
+
+    fetchNotifications();
   }, []);
+    const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(-2);
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${day}/${month}/${year}   ${hours}:${minutes}`;
+  };
 
   const handleDelete = async (notificationID) => {
     try {
@@ -50,7 +58,7 @@ export default function Notifications() {
       const result = await res.json();
       if (result.success) {
         setNotifications((prev) =>
-          prev.filter((item) => item.NotificationID !== notificationID)
+          prev.filter((item) => item.notification_id !== notificationID)
         );
       } else {
         console.error("Failed to delete:", result.error);
@@ -68,9 +76,7 @@ export default function Notifications() {
         body: JSON.stringify({ all: true }),
       });
       const result = await res.json();
-      if (result.success) {
-        setNotifications([]);
-      }
+      if (result.success) setNotifications([]);
     } catch (err) {
       console.error("Error deleting all notifications:", err);
     }
@@ -95,31 +101,27 @@ export default function Notifications() {
         <div className="flex flex-col justify-center items-center gap-4">
           {notifications.map((item) => (
             <div
-              key={item.NotificationID}
+              key={item.notification_id}
               className="w-[40%] bg-[#FFFFFF] flex justify-between items-center rounded-3xl mb-4 p-4"
             >
               <div
                 dangerouslySetInnerHTML={{
-                  __html: item.svgcheck || item.svgtruck || item.svgpackage || "",
+                  __html: item.svgtitle || "", 
                 }}
               />
 
               <div className="flex flex-col justify-center items-center">
                 {item.title && (
-                  <h1 className="text-[#000000] text-[24px]">
-                    {item.title}
-                  </h1>
+                  <h1 className="text-[#000000] text-[24px]">{item.title}</h1>
                 )}
-                <p className="text-[#757575] text-[20px]">
-                  {item.date}
-                </p>
+                <p className="text-[#757575] text-[20px]">{formatDate(item.date)}</p>
               </div>
 
               <div
                 className="cursor-pointer"
-                onClick={() => handleDelete(item.NotificationID)}
+                onClick={() => handleDelete(item.notification_id)}
                 dangerouslySetInnerHTML={{
-                  __html: item.svgbincheck || item.svgbinckage || item.svgbintruck || "",
+                  __html: item.svgbin || "",
                 }}
               />
             </div>

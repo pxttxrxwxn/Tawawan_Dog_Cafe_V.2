@@ -32,23 +32,40 @@ export default function IncomeAndExpenses() {
   };
 
   useEffect(() => {
-    fetch("/data/Income.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const filteredIncome  = filterDataByDate(data, filter, "OrderDateTime");
-        const totalIncome = filteredIncome .reduce((sum, order) => sum + (order.Total  || 0), 0);
-        setIncomeTotal(totalIncome);
-      })
-      .catch((err) => console.error("Error loading Income.json:", err));
+    const fetchIncome = async () => {
+      try {
+        const res = await fetch("/api/income");
+        const data = await res.json();
 
-    fetch("/data/expenses.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const filteredExpense  = filterDataByDate(data, filter, "ExpenseDateTime");
-        const totalExpense = filteredExpense .reduce((sum, exp) => sum + (exp.Amount  || 0), 0);
+        const filteredIncome = filterDataByDate(data, filter, "order_datetime");
+        const totalIncome = filteredIncome.reduce(
+          (sum, order) => sum + (order.total || 0),
+          0
+        );
+        setIncomeTotal(totalIncome);
+      } catch (err) {
+        console.error("Error fetching income:", err);
+      }
+    };
+
+    const fetchExpenses = async () => {
+      try {
+        const res = await fetch("/api/expenses");
+        const data = await res.json();
+
+        const filteredExpenses = filterDataByDate(data, filter, "expense_datetime");
+        const totalExpense = filteredExpenses.reduce(
+          (sum, exp) => sum + (exp.amount || 0),
+          0
+        );
         setExpenseTotal(totalExpense);
-      })
-      .catch((err) => console.error("Error loading expenses.json:", err));
+      } catch (err) {
+        console.error("Error fetching expenses:", err);
+      }
+    };
+
+    fetchIncome();
+    fetchExpenses();
   }, [filter]);
 
   const netTotal = incomeTotal - expenseTotal;

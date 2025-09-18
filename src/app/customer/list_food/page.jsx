@@ -11,17 +11,17 @@ export default function ListFood() {
   const [recommendedMenus, setRecommendedMenus] = useState([]);
 
   useEffect(() => {
-    fetch("/data/menus.json")
+    fetch("/api/menus")
       .then(res => res.json())
       .then(data => {
         const mappedMenus = data.map(item => ({
-          code: item.MenuID,
-          name: item.MenuName,
-          category: item.CategoryMenu,
-          price: item.Price,
-          desc: item.MenuDetail,
-          image: item.ImagePath,
-          type: item.Type || "",
+          code: item.menu_id,
+          name: item.menu_name,
+          category: item.category_menu,
+          price: item.price,
+          desc: item.menu_detail,
+          image: item.image_path,
+          type: item.type || "",
         }));
         setMenus(mappedMenus);
       })
@@ -38,20 +38,28 @@ export default function ListFood() {
   useEffect(() => {
     if (menus.length === 0) return;
 
-    fetch("/data/Income.json")
+    fetch("/api/income")
       .then(res => res.json())
       .then(data => {
-        const itemCount = {};
-        data.forEach(order =>
-          order.items.forEach(item => {
-            itemCount[item.name] = (itemCount[item.name] || 0) + item.quantity;
-          })
-        );
 
-        const sortedMenus = menus
-          .filter(menu => itemCount[menu.name])
-          .sort((a, b) => itemCount[b.name] - itemCount[a.name])
+        const menuSales = {};
+
+        data.forEach(income => {
+          income.order_description.forEach(item => {
+            if (!menuSales[item.MenuName]) menuSales[item.MenuName] = 0;
+            menuSales[item.MenuName] += item.Quantity;
+          });
+        });
+
+        const topMenus = Object.entries(menuSales)
+          .map(([name, sold]) => ({ name, sold }))
+          .sort((a, b) => b.sold - a.sold)
           .slice(0, 3);
+
+        const sortedMenus = topMenus.map(tm => {
+          const menu = menus.find(m => m.name === tm.name);
+          return menu ? { ...menu, sold: tm.sold } : null;
+        }).filter(Boolean);
 
         if (sortedMenus.length < 3) {
           const remaining = menus.filter(m => !sortedMenus.find(sm => sm.code === m.code));

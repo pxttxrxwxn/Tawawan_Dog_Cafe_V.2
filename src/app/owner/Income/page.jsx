@@ -4,109 +4,106 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbarincome_and_expenses";
 
 export default function Income() {
-    const [orders, setOrders] = useState([]);
-    const [filter, setFilter] = useState("all");
-    
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const incomeRes = await fetch("/data/Income.json");
-          const incomeData = await incomeRes.json();
+  const [orders, setOrders] = useState([]);
+  const [filter, setFilter] = useState("all");
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const incomeRes = await fetch("/api/income");
+        const incomeData = await incomeRes.json();
+        
 
-          const orderRes = await fetch("/data/Order_Income.json");
-          const orderData = await orderRes.json();
-          
-          const mergedData = incomeData.map((income) => {
-            const matchingOrder = orderData.find(
-              (order) => order.IncomeId === income.IncomeId
-            );
+        const orderRes = await fetch("/api/orders");
+        const orderData = await orderRes.json();
 
-            const dateTime = new Date(income.OrderDateTime);
-            const date = dateTime.toISOString();
-            const time = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            return {
-              ordernumber: matchingOrder ? matchingOrder.OrderID : "-",
-              tableNumber: income.TableNumber || "-",
-              date,
-              time,
-              items: income.OrderDescription.map((item) => ({
-                name: item.MenuName,
-                type: item.Type,
-                quantity: item.Quantity,
-              })),
-              total: income.Total,
-            };
-          });
-
-          setOrders(mergedData);
-        } catch (err) {
-          console.error(err);
-        }
-      };
-
-      fetchData();
-    }, []);
-
-    const formatDate = (dateStr) => {
-        const date = new Date(dateStr);
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = String(date.getFullYear()).slice(-2);
-        return `${day}/${month}/${year}`;
-    };
-    const filterOrders = () => {
-      const today = new Date();
-      return orders.filter((order) => {
-        if (!order.date) return false;
-        const orderDate = new Date(order.date);
-
-        if (filter === "today") {
-          return (
-            orderDate.getDate() === today.getDate() &&
-            orderDate.getMonth() === today.getMonth() &&
-            orderDate.getFullYear() === today.getFullYear()
+        const mergedData = incomeData.map((income) => {
+          const matchingOrder = orderData.find(
+            (order) => {
+              return order.order_id === (income.order_id || order.order_id);
+            }
           );
-        }
 
-        if (filter === "week") {
-          const startOfWeek = new Date(today);
-          startOfWeek.setDate(today.getDate() - today.getDay());
-          const endOfWeek = new Date(today);
-          endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
-          return orderDate >= startOfWeek && orderDate <= endOfWeek;
-        }
+          const dateTime = new Date(income.order_datetime);
+          const date = dateTime.toISOString();
+          const time = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        if (filter === "month") {
-          return (
-            orderDate.getMonth() === today.getMonth() &&
-            orderDate.getFullYear() === today.getFullYear()
-          );
-        }
+          return {
+            ordernumber: matchingOrder ? matchingOrder.order_id : "-",
+            tableNumber: income.table_number || "-",
+            date,
+            time,
+            items: income.order_description.map((item) => ({
+              name: item.MenuName,
+              type: item.Type,
+              quantity: item.Quantity,
+            })),
+            total: income.total,
+          };
+        });
 
-        return true;
-      });
+        setOrders(mergedData);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    const filteredOrders = filterOrders().sort((a, b) => new Date(a.date) - new Date(b.date));
+    fetchData();
+  }, []);
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
+  };
+
+  const filterOrders = () => {
+    const today = new Date();
+    return orders.filter((order) => {
+      if (!order.date) return false;
+      const orderDate = new Date(order.date);
+
+      if (filter === "today") {
+        return (
+          orderDate.getDate() === today.getDate() &&
+          orderDate.getMonth() === today.getMonth() &&
+          orderDate.getFullYear() === today.getFullYear()
+        );
+      }
+
+      if (filter === "week") {
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        const endOfWeek = new Date(today);
+        endOfWeek.setDate(today.getDate() + (6 - today.getDay()));
+        return orderDate >= startOfWeek && orderDate <= endOfWeek;
+      }
+
+      if (filter === "month") {
+        return (
+          orderDate.getMonth() === today.getMonth() &&
+          orderDate.getFullYear() === today.getFullYear()
+        );
+      }
+
+      return true;
+    });
+  };
+
+  const filteredOrders = filterOrders().sort((a, b) => new Date(a.date) - new Date(b.date));
+
   return (
     <div className="min-h-screen">
-
       <Navbar activePage="income" />
-      
       <div className="pt-[200px] px-10">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2 ml-[10%]">
-            <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            height="32px" 
-            viewBox="0 -960 960 960" 
-            width="32px" 
-            fill="#000000">
-              <path d="m136-240-56-56 296-298 160 160 208-206H640v-80h240v240h-80v-104L536-320 376-480 136-240Z"/></svg>
-            <h2 className="text-[#D64545] font-bold text-2xl">
-              รายรับ
-            </h2>
+            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#000000">
+              <path d="m136-240-56-56 296-298 160 160 208-206H640v-80h240v240h-80v-104L536-320 376-480 136-240Z"/>
+            </svg>
+            <h2 className="text-[#D64545] font-bold text-2xl">รายรับ</h2>
           </div>
 
           <div className="flex justify-end mb-4">
@@ -137,30 +134,24 @@ export default function Income() {
               <tbody>
                 {filteredOrders.map((order, index) => (
                   <tr key={index} className="bg-[#FFE8A3]">
-                    <td className="border border-black px-4 py-2 text-center">
-                      {order.ordernumber}
-                    </td>
-                    <td className="border border-black px-4 py-2 text-center">
-                      {formatDate(order.date)} | เวลา: {order.time}
-                    </td>
-                    <td className="border border-black px-4 py-2">
-                      {order.tableNumber}
-                    </td>
+                    <td className="border border-black px-4 py-2 text-center">{order.ordernumber}</td>
+                    <td className="border border-black px-4 py-2 text-center">{formatDate(order.date)} | เวลา: {order.time}</td>
+                    <td className="border border-black px-4 py-2">{order.tableNumber}</td>
                     <td className="border border-black px-4 py-2 text-center">
                       {order.items.map((item, index) => (
                         <div key={index} className="flex justify-start p-2">
-                          {item.quantity}x {item.name}{item.type ? `${item.type}` : ""}
+                          {item.quantity}x {item.name}{item.type ? ` ${item.type}` : ""}
                         </div>
                       ))}
                     </td>
                     <td className="border border-black px-4 py-2">{order.total} บาท</td>
                   </tr>
-                  ))}
+                ))}
               </tbody>
             </table>
           </div>
-          ) : (
-            <p className="text-center text-gray-500 mt-10">ไม่มีข้อมูลรายรับ</p>
+        ) : (
+          <p className="text-center text-gray-500 mt-10">ไม่มีข้อมูลรายรับ</p>
         )}
       </div>
     </div>

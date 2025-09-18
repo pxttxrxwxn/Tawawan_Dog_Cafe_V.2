@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from "next/link"
 import { useRouter } from "next/navigation";
 
-function SignIn() {
+export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,66 +25,59 @@ function SignIn() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  let hasError = false;
-  if (!email.trim()) {
-    setEmailError("กรุณากรอกอีเมล");
-    hasError = true;
-  } else {
-    setEmailError("");
-  }
-
-  if (!password.trim()) {
-    setPasswordError("กรุณากรอกรหัสผ่าน");
-    hasError = true;
-    setShowPasswordCriteria(true);
-  } else if (
-    !passwordCriteria.length ||
-    !passwordCriteria.upper ||
-    !passwordCriteria.lower ||
-    !passwordCriteria.number ||
-    !passwordCriteria.special
-  ) {
-    setPasswordError("รหัสผ่านไม่ตรงตามเงื่อนไขด้านล่าง");
-    hasError = true;
-    setShowPasswordCriteria(true);
-  } else {
-    setPasswordError("");
-    setShowPasswordCriteria(false);
-  }
-
-  if (hasError) return;
-
-  try {
-    const res = await fetch("/api/owner", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({action: "login", Email: email, PasswordHash: password }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      if (res.status === 401) {
-        setEmailError(data.error.includes("อีเมล") ? data.error : "");
-        setPasswordError(data.error.includes("รหัสผ่าน") ? data.error : "");
-      } else {
-        alert("เกิดข้อผิดพลาด: " + data.error);
-      }
-      return;
+    let hasError = false;
+    if (!email.trim()) {
+      setEmailError("กรุณากรอกอีเมล");
+      hasError = true;
+    } else {
+      setEmailError("");
     }
-    
-    localStorage.setItem("OwnerID", data.OwnerID);
-    localStorage.setItem("loggedInEmail", email);
 
-    router.push("/owner/order");
+    if (!password.trim()) {
+      setPasswordError("กรุณากรอกรหัสผ่าน");
+      hasError = true;
+      setShowPasswordCriteria(true);
+    } else {
+      setPasswordError("");
+      setShowPasswordCriteria(false);
+    }
 
-  } catch (error) {
-    alert("เกิดข้อผิดพลาด: " + error.message);
-  }
-};
+    if (hasError) return;
 
+    try {
+      const res = await fetch("/api/owner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "login",
+          Email: email,
+          Password: password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          setEmailError(data.error.includes("อีเมล") ? data.error : "");
+          setPasswordError(data.error.includes("รหัสผ่าน") ? data.error : "");
+        } else {
+          alert("เกิดข้อผิดพลาด: " + (data.error || "ไม่สามารถเข้าสู่ระบบได้"));
+        }
+        return;
+      }
+
+      localStorage.setItem("OwnerID", data.OwnerID);
+      localStorage.setItem("loggedInEmail", email);
+
+      router.push("/owner/order");
+
+    } catch (err) {
+      alert("เกิดข้อผิดพลาด: " + err.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#FFF8E7] flex items-center justify-center px-4">
@@ -186,5 +179,3 @@ function SignIn() {
     </div>
   );
 }
-
-export default SignIn;

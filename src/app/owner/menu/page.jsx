@@ -42,16 +42,6 @@ export default function Menu() {
   const openModal = (index = null) => {
     setEditingIndex(index);
     setIsModalOpen(true);
-    if (index !== null) {
-      setSelectedCategory(menus[index].CategoryMenu);
-      if (menus[index].CategoryMenu === "เครื่องดื่ม") {
-        setDrinkTypes({
-          ร้อน: menus[index].Type?.ร้อน || { checked: false, price: "" },
-          เย็น: menus[index].Type?.เย็น || { checked: false, price: "" },
-          ปั่น: menus[index].Type?.ปั่น || { checked: false, price: "" },
-        });
-      }
-    }
   };
 
   const closeModal = () => {
@@ -66,26 +56,33 @@ export default function Menu() {
     setMenuDesc("");
   };
 
+  const fetchMenus = async () => {
+    try {
+      const res = await fetch("/api/menus");
+      const data = await res.json();
+      const normalized = data.map((menu) => ({
+        MenuID: menu.menu_id,
+        MenuName: menu.menu_name,
+        CategoryMenu: menu.category_menu,
+        Type: menu.type,
+        Price: menu.price,
+        MenuDetail: menu.menu_detail,
+        ImagePath: menu.image_path,
+      }));
+      setMenus(normalized);
+    } catch (err) {
+      console.error("Error fetching menus:", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchMenus = async () => {
-      try {
-        const res = await fetch("/api/menus");
-        const data = await res.json();
-        setMenus(data);
-      } catch (err) {
-        console.error("Error fetching menus:", err);
-      }
-    };
     fetchMenus();
   }, []);
 
   const handleDrinkTypeChange = (type, field, value) => {
     setDrinkTypes((prev) => ({
       ...prev,
-      [type]: {
-        ...prev[type],
-        [field]: field === "checked" ? value : value,
-      },
+      [type]: { ...prev[type], [field]: value },
     }));
   };
 
@@ -159,33 +156,11 @@ export default function Menu() {
       formData.append("image", form.menuImage.files[0]);
     }
 
-    const fetchMenus = async () => {
-      try {
-        const res = await fetch("/api/menus");
-        const data = await res.json();
-        setMenus(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
     try {
-      const file = form.menuImage.files[0];
       if (editingMenu) {
         await fetch("/api/menus", { method: "PUT", body: formData });
-        setMenus((prev) =>
-          prev.map((m) =>
-            m.MenuID === originalCode
-              ? { ...newMenu, ImagePath: file ? URL.createObjectURL(file) : m.ImagePath }
-              : m
-          )
-        );
       } else {
         await fetch("/api/menus", { method: "POST", body: formData });
-        setMenus((prev) => [
-          ...prev,
-          { ...newMenu, ImagePath: file ? URL.createObjectURL(file) : "" },
-        ]);
       }
       await fetchMenus();
     } catch (err) {
@@ -193,21 +168,13 @@ export default function Menu() {
     }
 
     form.reset();
-    setMenuDesc("");
-    setSelectedCategory("");
-    setDrinkTypes({
-      ร้อน: { checked: false, price: "" },
-      เย็น: { checked: false, price: "" },
-      ปั่น: { checked: false, price: "" },
-    });
-    setEditingIndex(null);
-    setIsModalOpen(false);
+    closeModal();
   };
 
   const handleDelete = async (menuID) => {
     try {
       await fetch(`/api/menus?code=${menuID}`, { method: "DELETE" });
-      setMenus((prev) => prev.filter((m) => m.MenuID !== menuID));
+      await fetchMenus();
     } catch (err) {
       console.error(err);
     }
@@ -271,10 +238,10 @@ export default function Menu() {
                     <td className="border border-black px-4 py-2">{menu.MenuName}</td>
                     <td className="border border-black px-4 py-2">{menu.CategoryMenu}</td>
                     <td className="border border-black px-4 py-2">
-                      {menu.CategoryMenu === "เครื่องดื่ม" && typeof menu.Type  === "object"
-                        ? Object.entries(menu.Type )
-                            .filter(([_, data]) => data.checked)
-                            .map(([type, data]) => `${type} + ${data.price} `)
+                      {menu.CategoryMenu === "เครื่องดื่ม" && typeof menu.Type === "object"
+                        ? ["ร้อน", "เย็น", "ปั่น"]
+                            .filter((t) => menu.Type[t]?.checked)
+                            .map((t) => `${t} + ${menu.Type[t].price}`)
                             .join(", ")
                         : menu.Type  || "-"}
                     </td>

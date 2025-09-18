@@ -116,9 +116,9 @@ export default function ShowDetail() {
                       รูปแบบ
                     </h1>
                     <div className="flex gap-3">
-                      {Object.keys(menu.type).map((t) => {
+                      {["ร้อน", "เย็น", "ปั่น"].map((t) => {
                         const item = menu.type[t];
-                        if (!item.checked) return null;
+                        if (!item || !item.checked) return null;
                         return (
                           <button
                             key={t}

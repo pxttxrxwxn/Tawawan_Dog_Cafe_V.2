@@ -1,41 +1,47 @@
-import { promises as fs } from "fs";
-import path from "path";
+import { NextResponse } from "next/server";
+import { supabaseAdmin } from "../../../lib/supabaseServer";
 
-const notificationsFile = path.join(process.cwd(), "public/data/Notifications.json");
+export async function GET() {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("notifications")
+      .select("*")
+      .order("notification_id", { ascending: false });
+
+    if (error) throw error;
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
 
 export async function POST(req) {
   try {
     const body = await req.json();
 
-    let notifications = [];
-    try {
-      const data = await fs.readFile(notificationsFile, "utf-8");
-      notifications = JSON.parse(data);
-    } catch {
-      notifications = [];
+    let notificationID = body.NotificationID;
+    if (notificationID === "AUTO1" || notificationID === "AUTO2") {
+      const { data: lastRow } = await supabaseAdmin.from("notifications").select("notification_id").order("notification_id", { ascending: false }).limit(1);
+      let lastNum = 1000;
+      if (lastRow && lastRow.length > 0) lastNum = parseInt(lastRow[0].notification_id.replace(/^N/, ""), 10) || lastNum;
+      notificationID = `N${lastNum + 1}`;
     }
 
-    let lastNumber = 1000;
-    if (notifications.length > 0) {
-      const NotificationIDs = notifications
-        .map((item) => parseInt(item.NotificationID.replace("N", ""), 10))
-        .filter((num) => !isNaN(num));
-      if (NotificationIDs.length > 0) lastNumber = Math.max(...NotificationIDs);
-    }
+    const newRow = {
+      notification_id: notificationID,
+      svgtitle: body.svgtitle || null,
+      title: body.title || null,
+      body: body.body || null,
+      meta: body.meta || null,
+      svgbin: body.svgbin || null
+    };
 
-    if (body.NotificationID === "AUTO1") {
-      body.NotificationID = `N${lastNumber + 1}`;
-    } else if (body.NotificationID === "AUTO2") {
-      body.NotificationID = `N${lastNumber + 1}`;
-    }
-
-    notifications.push(body);
-
-    await fs.writeFile(notificationsFile, JSON.stringify(notifications, null, 2));
-
-    return new Response(JSON.stringify({ success: true, id: body.id }), { status: 200 });
+    const { data, error } = await supabaseAdmin.from("notifications").insert([newRow]).select().single();
+    if (error) throw error;
+    return NextResponse.json({ success: true, id: notificationID });
   } catch (error) {
-    return new Response(JSON.stringify({ success: false, error: error.message }), { status: 500 });
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
@@ -44,25 +50,21 @@ export async function DELETE(req) {
     const body = await req.json();
 
     if (body.all) {
-      await fs.writeFile(notificationsFile, JSON.stringify([], null, 2));
-      return new Response(JSON.stringify({ success: true }), { status: 200 });
+      const { error } = await supabaseAdmin.from("notifications").delete().neq("notification_id", null);
+      if (error) throw error;
+      return NextResponse.json({ success: true });
     }
 
     const { notificationID } = body;
-    const data = await fs.readFile(notificationsFile, "utf-8");
-    let notifications = JSON.parse(data);
+    const { error } = await supabaseAdmin
+      .from("notifications")
+      .delete()
+      .eq("notification_id", notificationID);
+    if (error) throw error;
 
-    const updated = notifications.filter(
-      (item) => item.NotificationID !== notificationID
-    );
-
-    await fs.writeFile(notificationsFile, JSON.stringify(updated, null, 2));
-
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
-      status: 500,
-    });
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 

@@ -10,18 +10,13 @@ export default function Navbar({ activePage }) {
     const fetchUser = async () => {
       try {
         const Email = localStorage.getItem("loggedInEmail");
-        console.log("email from localStorage:", Email);
+        if (!Email) return;
 
-        const res = await fetch("/data/owner.json");
+        const res = await fetch(`/api/owner/me?email=${Email}`);
         const data = await res.json();
 
-        const user = data.find((u) => u.Email === Email);
-
-        if (user && user.Username) {
-          setUserName(user.Username);
-        } else {
-          setUserName("ไม่พบชื่อผู้ใช้");
-        }
+        if (data.username) setUserName(data.username);
+        else setUserName("ไม่พบชื่อผู้ใช้");
       } catch (error) {
         console.error(error);
         setUserName("ไม่พบชื่อผู้ใช้");

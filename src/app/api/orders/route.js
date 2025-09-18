@@ -1,144 +1,85 @@
-import { promises as fs } from "fs";
-import path from "path";
 import { NextResponse } from "next/server";
-
-const ordersFilePath = path.join(process.cwd(), "public/data/orders.json");
-const incomeFilePath = path.join(process.cwd(), "public/data/income.json");
-const orderIncomeFilePath = path.join(process.cwd(), "public/data/Order_Income.json");
-const orderMenuFilePath = path.join(process.cwd(), "public/data/Order_menu.json");
-
-async function readFile(filePath) {
-  try {
-    const data = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(data);
-  } catch (err) {
-    console.error(`Error reading ${filePath}:`, err);
-    return [];
-  }
-}
-
-async function writeFile(filePath, data) {
-  try {
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
-  } catch (err) {
-    console.error(`Error writing ${filePath}:`, err);
-    throw err;
-  }
-}
+import { supabaseAdmin } from "../../../lib/supabaseServer";
 
 export async function POST(req) {
   try {
     const body = await req.json();
 
     if (body.OrderID) {
-      const orders = await readFile(ordersFilePath);
-      const income = await readFile(incomeFilePath);
-      const orderIncome = await readFile(orderIncomeFilePath);
-
-      const index = orders.findIndex(o => o.OrderID === body.OrderID);
-      if (index === -1) {
-        return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      const { data: order, error: e1 } = await supabaseAdmin
+        .from("orders")
+        .select("*")
+        .eq("order_id", body.OrderID)
+        .limit(1)
+        .single();
+      if (e1 || !order) {
+        return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
       }
 
-      orders[index].OrderStatus = "complete";
+      await supabaseAdmin
+        .from("orders")
+        .update({ order_status: "complete" })
+        .eq("order_id", body.OrderID);
 
-      const lastIncomeId = income.length
-        ? income[income.length - 1].IncomeId
-        : "R1000";
-      const nextIncomeId =
-        "R" + (parseInt(lastIncomeId.substring(1)) + 1).toString().padStart(4, "0");
+      const { data: lastIncome } = await supabaseAdmin
+        .from("income")
+        .select("income_id")
+        .order("income_id", { ascending: false })
+        .limit(1);
 
-      const Total= orders[index].OrderDescription.reduce(
-        (sum, item) => sum + (item.TotalPrice || 0),
+      let nextIncomeId = "R1001";
+      if (lastIncome && lastIncome.length > 0) {
+        const lastNum = parseInt(lastIncome[0].income_id.replace(/^R/, ""), 10) || 1000;
+        nextIncomeId = `R${lastNum + 1}`;
+      }
+
+      const Total = (order.order_description || []).reduce(
+        (s, it) => s + (it.TotalPrice || 0),
         0
       );
 
       const newIncome = {
-        IncomeId: nextIncomeId,
-        OrderDescription: orders[index].OrderDescription,
-        OrderDateTime: orders[index].OrderDateTime,
-        TableNumber: orders[index].TableNumber,
-        Total,
+        income_id: nextIncomeId,
+        order_description: order.order_description,
+        order_datetime: order.order_datetime,
+        table_number: order.table_number,
+        total: Total,
       };
 
-      income.push(newIncome);
+      await supabaseAdmin.from("income").insert([newIncome]);
+      await supabaseAdmin
+        .from("order_income")
+        .insert([{ order_id: order.order_id, income_id: nextIncomeId }]);
 
-      const newOrderIncome = {
-        OrderID: orders[index].OrderID,
-        IncomeId: nextIncomeId,
-      };
-
-      orderIncome.push(newOrderIncome);
-
-      await writeFile(orderIncomeFilePath, orderIncome);
-      await writeFile(incomeFilePath, income);
-      await writeFile(ordersFilePath, orders);
-
-      return NextResponse.json({ 
-        success: true, 
-        income: newIncome, 
-        orderIncome: newOrderIncome
-      });
-    }
-    const index = cart.findIndex(
-      o =>
-        o.code === newOrder.code &&
-        o.type === newOrder.type &&
-        o.sugarLevel === newOrder.sugarLevel &&
-        (newOrder.note ? o.note === newOrder.note : true)
-    );
-
-    if (index > -1) {
-      cart[index].quantity += newOrder.quantity || 1;
-      cart[index].totalPrice =
-        (cart[index].basePrice + (cart[index].typePrice || 0)) *
-        cart[index].quantity;
-    } else {
-      const basePrice = Number(newOrder.basePrice || newOrder.price || 0);
-      const typePrice = Number(newOrder.typePrice || 0);
-      const quantity = Number(newOrder.quantity || 1);
-      const totalPrice = (basePrice + typePrice) * quantity;
-
-      cart.push({
-        ...newOrder,
-        basePrice,
-        typePrice,
-        quantity,
-        totalPrice,
-      });
+      return NextResponse.json({ success: true, income: newIncome });
     }
 
-    await writeFile(cartFilePath, cart);
-    return NextResponse.json({ success: true, cart });
-  } catch (err) {
-    console.error("POST error:", err);
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
-  }
-}
-
-export async function DELETE(req) {
-  try {
-    const { tableNumber, Customerid, cart } = await req.json();
-
+    const { tableNumber, Customerid, cart } = body;
     if (!Array.isArray(cart) || cart.length === 0) {
-      return NextResponse.json({ success: false, error: "No orders to process" });
+      return NextResponse.json(
+        { success: false, error: "No orders to process" },
+        { status: 400 }
+      );
     }
 
-    const orders = await readFile(ordersFilePath);
+    const { data: lastOrder } = await supabaseAdmin
+      .from("orders")
+      .select("order_id")
+      .order("order_id", { ascending: false })
+      .limit(1);
 
-    const lastOrderID = orders.length
-      ? orders[orders.length - 1].OrderID
-      : "O1000";
-    const nextOrderID =
-      "O" + (parseInt(lastOrderID.substring(1)) + 1).toString().padStart(4, "0");
+    let nextOrderID = "O1001";
+    if (lastOrder && lastOrder.length > 0) {
+      const lastNum = parseInt(lastOrder[0].order_id.replace(/^O/, ""), 10) || 1000;
+      nextOrderID = `O${lastNum + 1}`;
+    }
 
-    const now = new Date();
-    const date = now.toISOString().split("T")[0];
-    const time = now.toTimeString().split(" ")[0];
+    const now = new Date().toISOString();
+    const totalSum = cart.reduce((s, item) => s + (item.totalPrice || 0), 0);
 
     const newOrderGroup = {
-      OrderID: nextOrderID,
-      OrderDescription: cart.map(item => ({
+      order_id: nextOrderID,
+      order_description: cart.map((item) => ({
         MenuID: item.code,
         MenuName: item.name,
         Type: item.type,
@@ -147,38 +88,34 @@ export async function DELETE(req) {
         TotalPrice: item.totalPrice,
         Note: item.note,
       })),
-      OrderDateTime: `${date} ${time}`,
-      TableNumber: tableNumber || "ไม่ระบุ",
-      Total: cart.reduce((sum, item) => sum + item.totalPrice, 0),
-      OrderStatus: "Pending",
-      CustomerID: Customerid || "ไม่ระบุ",
+      order_datetime: now,
+      table_number: tableNumber || "ไม่ระบุ",
+      total: totalSum,
+      order_status: "Pending",
+      customer_id: Customerid || "ไม่ระบุ",
     };
 
-    orders.push(newOrderGroup);
-    await writeFile(ordersFilePath, orders);
+    await supabaseAdmin.from("orders").insert([newOrderGroup]);
 
-    const orderMenu = await readFile(orderMenuFilePath);
-    const newOrderMenuEntries = cart.map(item => ({
-      OrderID: nextOrderID,
-      MenuID: item.code,
-      Quantity: item.quantity,
+    const orderMenuEntries = cart.map((item) => ({
+      order_id: nextOrderID,
+      menu_id: item.code,
+      quantity: item.quantity,
     }));
-    orderMenu.push(...newOrderMenuEntries);
-    await writeFile(orderMenuFilePath, orderMenu);
+    await supabaseAdmin.from("order_menu").insert(orderMenuEntries);
 
     return NextResponse.json({ success: true, order: newOrderGroup });
-  } catch (err) {
-    console.error("DELETE error:", err);
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   }
 }
 
 export async function GET() {
-  try {
-    const orders = await readFile(ordersFilePath);
-    return NextResponse.json(orders);
-  } catch (err) {
-    console.error("GET error:", err);
-    return NextResponse.json([], { status: 500 });
-  }
+  const { data, error } = await supabaseAdmin.from("orders").select("*").order("order_datetime", { ascending: false });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
 }

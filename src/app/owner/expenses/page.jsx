@@ -5,30 +5,8 @@ import Navbar from "../../components/Navbarincome_and_expenses";
 export default function Expenses() {
   const [expenses, setExpenses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingExpense, setEditingExpense] = useState(null);
   const [filter, setFilter] = useState("all");
-
-  const editingExpense = editingIndex !== null ? expenses[editingIndex] : null;
-
-  const openModal = (index = null) => {
-    setEditingIndex(index);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setEditingIndex(null);
-    setIsModalOpen(false);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("th-TH", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -42,6 +20,26 @@ export default function Expenses() {
     };
     fetchExpenses();
   }, []);
+
+  const openModal = (expense = null) => {
+    setEditingExpense(expense);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setEditingExpense(null);
+    setIsModalOpen(false);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("th-TH", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -67,11 +65,20 @@ export default function Expenses() {
         await fetch("/api/expenses", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...newExpense, originalIndex: editingIndex }),
+          body: JSON.stringify({
+            ExpenseID: editingExpense.expense_id,
+            ExpenseDateTime: newExpense.ExpenseDateTime,
+            Detail: newExpense.Detail,
+            Amount: newExpense.Amount,
+            CategoryExpense: newExpense.CategoryExpense
+          }),
         });
+
         setExpenses((prev) =>
-          prev.map((exp, idx) =>
-            idx === editingIndex ? { ...prev[idx], ...newExpense } : exp
+          prev.map((exp) =>
+            exp.expense_id === editingExpense.expense_id
+              ? { ...exp, ...newExpense }
+              : exp
           )
         );
       } else {
@@ -91,10 +98,10 @@ export default function Expenses() {
     closeModal();
   };
 
-  const handleDelete = async (index) => {
+  const handleDelete = async (expenseID) => {
     try {
-      await fetch(`/api/expenses?index=${index}`, { method: "DELETE" });
-      setExpenses((prev) => prev.filter((_, idx) => idx !== index));
+      await fetch(`/api/expenses?expenseID=${expenseID}`, { method: "DELETE" });
+      setExpenses((prev) => prev.filter((exp) => exp.expense_id !== expenseID));
     } catch (err) {
       console.error(err);
     }
@@ -103,7 +110,7 @@ export default function Expenses() {
   const filterExpenses = () => {
     const today = new Date();
     return expenses.filter((exp) => {
-      const expDate = new Date(exp.ExpenseDateTime);
+      const expDate = new Date(exp.expense_datetime);
 
       if (filter === "today") {
         return (
@@ -132,9 +139,11 @@ export default function Expenses() {
     });
   };
 
-  const filteredExpenses = filterExpenses().sort((a, b) => new Date(a.ExpenseDateTime) - new Date(b.ExpenseDateTime));
-  const total = filteredExpenses.reduce((sum, exp) => sum + exp.Amount, 0);
+  const filteredExpenses = filterExpenses().sort(
+    (a, b) => new Date(a.expense_datetime) - new Date(b.expense_datetime)
+  );
 
+  const total = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
   return (
     <div className="min-h-screen">
       <Navbar activePage="expenses" />
@@ -202,17 +211,17 @@ export default function Expenses() {
                   const originalIndex = expenses.indexOf(exp);
                   return (
                     <tr key={index}>
-                      <td className="border px-4 py-2">{formatDate(exp.ExpenseDateTime)}</td>
-                      <td className="border px-4 py-2">{exp.Detail}</td>
+                      <td className="border px-4 py-2">{formatDate(exp.expense_datetime)}</td>
+                      <td className="border px-4 py-2">{exp.detail}</td>
                       <td className="border px-4 py-2 text-[#000000]">
                         <span className="text-[#D64545] font-bold text-xl">-</span>
-                        {exp.Amount} บาท
+                        {exp.amount} บาท
                       </td>
-                      <td className="border px-4 py-2">{exp.CategoryExpense}</td>
+                      <td className="border px-4 py-2">{exp.category_expense}</td>
                       <td className="border border-black px-1 py-2">
                         <div className="flex justify-center items-center gap-5">
                           <button
-                            onClick={() => openModal(originalIndex)}
+                            onClick={() => openModal(exp)}
                             className="cursor-pointer"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px"
@@ -225,7 +234,7 @@ export default function Expenses() {
                             </svg>
                           </button>
                           <button
-                            onClick={() => handleDelete(originalIndex)}
+                            onClick={() => handleDelete(exp.expense_id)}
                             className="cursor-pointer"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px"
@@ -263,7 +272,7 @@ export default function Expenses() {
                     <input
                       type="date"
                       name="ExpenseDateTime"
-                      defaultValue={editingExpense ? editingExpense.ExpenseDateTime  : ""}
+                      defaultValue={editingExpense?.expense_datetime? editingExpense.expense_datetime.split("T")[0] : ""}
                       className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                     />
                 </div>
@@ -274,7 +283,7 @@ export default function Expenses() {
                   <input
                     type="text"
                     name="Detail"
-                    defaultValue={editingExpense ? editingExpense.Detail  : ""}
+                    defaultValue={editingExpense?.detail || ""}
                     placeholder="รายละเอียด"
                     className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   />
@@ -286,7 +295,7 @@ export default function Expenses() {
                   <input
                     type="number"
                     name="Amount"
-                    defaultValue={editingExpense ? editingExpense.Amount  : ""}
+                    defaultValue={editingExpense?.amount || ""}
                     placeholder="จำนวนเงิน"
                     className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   />
@@ -297,7 +306,7 @@ export default function Expenses() {
                   </label>
                   <select
                     name="CategoryExpense"
-                    defaultValue={editingExpense ? editingExpense.CategoryExpense  : ""}
+                    defaultValue={editingExpense?.category_expense || ""}
                     className="border border-[#715045] rounded-md p-2 shadow-sm bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   >
                     <option value="" disabled hidden>หมวดหมู่</option>

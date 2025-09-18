@@ -1,98 +1,205 @@
-import { promises as fs } from "fs";
-import path from "path";
 import { NextResponse } from "next/server";
+import { supabaseAdmin } from "../../../lib/supabaseServer";
 
-const dataFile = path.join(process.cwd(),"public", "data", "menus.json");
-const uploadDir = path.join(process.cwd(), "public", "uploads");
+const BUCKET_NAME = "menu-images";
 
-async function readData() {
-  try {
-    const data = await fs.readFile(dataFile, "utf8");
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
+function normalizeDrinkType(rawType) {
+  const defaultType = {
+    "ร้อน": { checked: false, price: 0 },
+    "เย็น": { checked: false, price: 0 },
+    "ปั่น": { checked: false, price: 0 },
+  };
+
+  if (!rawType || typeof rawType !== "object") return defaultType;
+
+  return ["ร้อน", "เย็น", "ปั่น"].reduce((acc, key) => {
+    acc[key] = {
+      checked: rawType[key]?.checked || false,
+      price: Number(rawType[key]?.price) || 0,
+    };
+    return acc;
+  }, {});
 }
 
-async function writeData(data) {
-  await fs.writeFile(dataFile, JSON.stringify(data, null, 2));
+async function ensureBucketExists(bucketName) {
+  try {
+    const { data: buckets, error: listErr } = await supabaseAdmin.storage.listBuckets();
+    if (listErr) throw listErr;
+
+    const exists = buckets.some((b) => b.name === bucketName);
+    if (exists) return true;
+
+    const { data, error: createErr } = await supabaseAdmin.storage.createBucket(bucketName, {
+      public: true,
+    });
+    if (createErr) throw createErr;
+    return true;
+  } catch (err) {
+    console.error("Error checking/creating bucket:", err);
+    return false;
+  }
 }
 
 export async function GET() {
-  const menus = await readData();
-  return NextResponse.json(menus);
+  const { data, error } = await supabaseAdmin
+    .from("menus")
+    .select("*")
+    .order("menu_name", { ascending: true });
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
 }
 
 export async function POST(req) {
-  const formData = await req.formData();
-  const menus = await readData();
+  try {
+    const formData = await req.formData();
+    const ownerID = formData.get("OwnerID") || "";
+    const MenuID = formData.get("code");
+    const MenuName = formData.get("name");
+    const CategoryMenu = formData.get("category");
+    const TypeRaw = formData.get("type") ? JSON.parse(formData.get("type")) : null;
+    const Type = CategoryMenu === "เครื่องดื่ม" ? normalizeDrinkType(TypeRaw) : TypeRaw;
+    const Price = parseFloat(formData.get("price") || 0);
+    const MenuDetail = formData.get("desc");
+    const file = formData.get("image");
 
-  const ownerID = formData.get("OwnerID") || "";
-  const MenuID = formData.get("code");
-  const MenuName = formData.get("name");
-  const CategoryMenu = formData.get("category");
-  const Type = formData.get("type") ? JSON.parse(formData.get("type")) : "";
-  const Price = formData.get("price");
-  const MenuDetail = formData.get("desc");
-  const file = formData.get("image");
+    let imageUrl = null;
 
-  let imageUrl = null;
-  if (file && file.name) {
-    await fs.mkdir(uploadDir, { recursive: true });
-    const filePath = path.join(uploadDir, file.name);
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(filePath, buffer);
-    imageUrl = `/uploads/${file.name}`;
+    if (file && file.size) {
+      const bucketReady = await ensureBucketExists(BUCKET_NAME);
+      if (!bucketReady) {
+        return NextResponse.json(
+          { error: `ไม่สามารถสร้าง bucket "${BUCKET_NAME}"` },
+          { status: 500 }
+        );
+      }
+
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const safeFileName = file.name
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9.\-_]/g, "_");
+
+      const fileName = `menus/${Date.now()}-${safeFileName}`;
+
+      const { error: upErr } = await supabaseAdmin.storage
+        .from(BUCKET_NAME)
+        .upload(fileName, buffer, { contentType: file.type });
+
+      if (upErr) throw upErr;
+
+      const { data: publicData } = supabaseAdmin.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+      imageUrl = publicData?.publicUrl || null;
+    }
+
+    const newMenu = {
+      owner_id: ownerID,
+      menu_id: MenuID,
+      menu_name: MenuName,
+      category_menu: CategoryMenu,
+      type: Type,
+      price: Price,
+      menu_detail: MenuDetail,
+      image_path: imageUrl
+    };
+
+    const { data, error } = await supabaseAdmin
+      .from("menus")
+      .insert([newMenu])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return NextResponse.json(data, { status: 201 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: error.message || "เกิดข้อผิดพลาด" }, { status: 500 });
   }
-
-  const newMenu = { OwnerID: ownerID, MenuID, MenuName, CategoryMenu, Type, Price, MenuDetail, ImagePath: imageUrl };
-  menus.push(newMenu);
-  await writeData(menus);
-
-  return NextResponse.json(newMenu);
 }
 
 export async function PUT(req) {
-  const formData = await req.formData();
-  const menus = await readData();
+  try {
+    const formData = await req.formData();
+    const originalCode = formData.get("originalCode");
+    const MenuID = formData.get("code");
+    const MenuName = formData.get("name");
+    const CategoryMenu = formData.get("category");
+    const TypeRaw = formData.get("type") ? JSON.parse(formData.get("type")) : null;
+    const Type = CategoryMenu === "เครื่องดื่ม" ? normalizeDrinkType(TypeRaw) : TypeRaw;
+    const Price = parseFloat(formData.get("price") || 0);
+    const MenuDetail = formData.get("desc");
+    const file = formData.get("image");
 
-  const originalCode = formData.get("originalCode");
-  const ownerID = formData.get("OwnerID") || "";
-  const MenuID = formData.get("code");
-  const MenuName = formData.get("name");
-  const CategoryMenu = formData.get("category");
-  const Type = formData.get("type") ? JSON.parse(formData.get("type")) : "";
-  const Price = formData.get("price");
-  const MenuDetail = formData.get("desc");
-  const file = formData.get("image");
+    const { data: existing, error: e1 } = await supabaseAdmin
+      .from("menus")
+      .select("*")
+      .eq("menu_id", originalCode)
+      .limit(1)
+      .single();
+    if (e1) throw e1;
 
-  const idx = menus.findIndex((m) => m.MenuID === originalCode);
-  if (idx === -1) {
-    return NextResponse.json({ error: "Menu not found" }, { status: 404 });
+    let imageUrl = existing.image_path;
+
+    if (file && file.size) {
+      const bucketReady = await ensureBucketExists(BUCKET_NAME);
+      if (!bucketReady) {
+        return NextResponse.json(
+          { error: `ไม่สามารถสร้าง bucket "${BUCKET_NAME}"` },
+          { status: 500 }
+        );
+      }
+
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const safeFileName = file.name
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9.\-_]/g, "_");
+
+      const fileName = `menus/${Date.now()}-${safeFileName}`;
+
+      const { error: upErr } = await supabaseAdmin.storage
+        .from(BUCKET_NAME)
+        .upload(fileName, buffer, { contentType: file.type });
+
+      if (upErr) throw upErr;
+
+      const { data: publicData } = supabaseAdmin.storage.from(BUCKET_NAME).getPublicUrl(fileName);
+      imageUrl = publicData?.publicUrl || null;
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("menus")
+      .update({
+        menu_id: MenuID,
+        menu_name: MenuName,
+        category_menu: CategoryMenu,
+        type: Type,
+        price: Price,
+        menu_detail: MenuDetail,
+        image_path: imageUrl
+      })
+      .eq("menu_id", originalCode)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: error.message || "เกิดข้อผิดพลาด" }, { status: 500 });
   }
-
-  let imageUrl = menus[idx].ImagePath;
-  if (file && file.name) {
-    await fs.mkdir(uploadDir, { recursive: true });
-    const filePath = path.join(uploadDir, file.name);
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(filePath, buffer);
-    imageUrl = `/uploads/${file.name}`;
-  }
-
-  menus[idx] = { OwnerID: ownerID, MenuID, MenuName, CategoryMenu, Type, Price, MenuDetail, ImagePath: imageUrl };
-  await writeData(menus);
-
-  return NextResponse.json(menus[idx]);
 }
 
 export async function DELETE(req) {
-  const { searchParams } = new URL(req.url);
-  const code = searchParams.get("code");
+  try {
+    const { searchParams } = new URL(req.url);
+    const code = searchParams.get("code");
+    if (!code) return NextResponse.json({ error: "code required" }, { status: 400 });
 
-  let menus = await readData();
-  menus = menus.filter((m) => m.MenuID !== code);
-  await writeData(menus);
-
-  return NextResponse.json({ success: true });
+    const { data, error } = await supabaseAdmin.from("menus").delete().eq("menu_id", code).select();
+    if (error) throw error;
+    return NextResponse.json({ success: true, deleted: data });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }

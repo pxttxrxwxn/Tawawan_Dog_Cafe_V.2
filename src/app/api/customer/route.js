@@ -1,45 +1,39 @@
-import fs from "fs";
-import path from "path";
-
-const filePath = path.join(process.cwd(), "public", "data", "customer.json");
+import { supabaseAdmin } from "../../../lib/supabaseServer";
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const { tableNumber } = body;
+    const { table_number } = await req.json();
+    console.log("ได้รับ table_number:", table_number);
 
-    if (!tableNumber) {
-      return new Response(JSON.stringify({ error: "tableNumber is required" }), {
-        status: 400,
-      });
+    if (!table_number) {
+      return new Response(JSON.stringify({ error: "table_number required" }), { status: 400 });
     }
 
-    let customers = [];
-    if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, "utf-8");
-      customers = data ? JSON.parse(data) : [];
-    }
+    const { data: allCustomers, error } = await supabaseAdmin
+      .from("customers")
+      .select("customer_id");
+
+    if (error) throw error;
 
     let lastId = 1000;
-    if (customers.length > 0) {
-      const lastCustomer = customers[customers.length - 1];
-      lastId = parseInt(lastCustomer.CustomerID.replace("C", ""));
+    if (allCustomers && allCustomers.length > 0) {
+      const ids = allCustomers.map(c => parseInt(c.customer_id.replace("C", ""), 10));
+      lastId = Math.max(...ids);
     }
 
     const newCustomer = {
-      CustomerID: `C${lastId + 1}`,
-      TableNumber: tableNumber.toString(),
+      customer_id: `C${lastId + 1}`,
+      table_number,
     };
 
-    customers.push(newCustomer);
+    console.log("กำลัง insert:", newCustomer);
 
-    fs.writeFileSync(filePath, JSON.stringify(customers, null, 2));
+    const { error: insertError } = await supabaseAdmin.from("customers").insert([newCustomer]);
+    if (insertError) throw insertError;
 
     return new Response(JSON.stringify(newCustomer), { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
-      status: 500,
-    });
+  } catch (err) {
+    console.error("POST /customers:", err.message);
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
   }
 }

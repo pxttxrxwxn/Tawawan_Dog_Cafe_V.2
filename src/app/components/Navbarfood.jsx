@@ -28,9 +28,9 @@ export default function Navbar() {
 
     const loadNotifications = async () => {
       try {
-        const res = await fetch("/data/Notifications.json");
+        const res = await fetch("/api/notifications");
         const data = await res.json();
-        setNotificationsCount(data.length);
+        setNotificationsCount(Array.isArray(data) ? data.length : 0);
       } catch {
         setNotificationsCount(0);
       }
@@ -39,10 +39,13 @@ export default function Navbar() {
     loadCart();
     loadNotifications();
 
-    const interval = setInterval(loadCart, 1000);
-    const interval2 = setInterval(loadNotifications, 1000);
+    const cartInterval = setInterval(loadCart, 1000);
+    const notifInterval = setInterval(loadNotifications, 5000);
 
-    return () => {clearInterval(interval); clearInterval(interval2);};
+    return () => {
+      clearInterval(cartInterval);
+      clearInterval(notifInterval);
+    };
   }, []);
 
   const buttons = [

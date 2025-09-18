@@ -28,9 +28,9 @@ export default function Navbar({ activePage }) {
 
     const loadNotifications = async () => {
       try {
-        const res = await fetch("/data/Notifications.json");
+        const res = await fetch("/api/notifications");
         const data = await res.json();
-        setNotificationsCount(data.length);
+        setNotificationsCount(Array.isArray(data) ? data.length : 0);
       } catch {
         setNotificationsCount(0);
       }
@@ -39,16 +39,19 @@ export default function Navbar({ activePage }) {
     loadCart();
     loadNotifications();
 
-    const interval = setInterval(loadCart, 1000);
-    const notificationIntervalinterval = setInterval(loadNotifications, 1000);
+    const cartInterval = setInterval(loadCart, 1000);
+    const notifInterval = setInterval(loadNotifications, 5000);
 
-    return () => {clearInterval(interval); clearInterval(notificationIntervalinterval);};
+    return () => {
+      clearInterval(cartInterval);
+      clearInterval(notifInterval);
+    };
   }, []);
 
   const buttons = [
-    { id: 1, label: "1", key: "1",baseColor: "#F4A261" , text: "ตะกร้าของฉัน"},
-    { id: 2, label: "2", key: "2",baseColor: "#D7D6D6" , text: "สั่งซื้อสินค้า" },
-    { id: 3, label: "3", key: "3",baseColor: "#D7D6D6" , text: "ข้อมูลการชำระเงิน"},
+    { id: 1, label: "1", key: "1", baseColor: "#F4A261", text: "ตะกร้าของฉัน" },
+    { id: 2, label: "2", key: "2", baseColor: "#D7D6D6", text: "สั่งซื้อสินค้า" },
+    { id: 3, label: "3", key: "3", baseColor: "#D7D6D6", text: "ข้อมูลการชำระเงิน" },
   ];
 
   return (

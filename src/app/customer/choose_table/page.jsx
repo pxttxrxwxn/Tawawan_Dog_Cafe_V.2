@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -10,14 +9,14 @@ export default function ChooseTable() {
       const res = await fetch("/api/customer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tableNumber }),
+        body: JSON.stringify({ table_number: tableNumber }),
       });
 
       const data = await res.json();
       console.log("Saved:", data);
 
       localStorage.setItem("selectedTable", tableNumber);
-      localStorage.setItem("CustomerID", data.CustomerID);
+      localStorage.setItem("CustomerID", data.customer_id);
     } catch (err) {
       console.error("Error saving customer:", err);
     }
