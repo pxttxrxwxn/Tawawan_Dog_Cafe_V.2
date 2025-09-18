@@ -34,7 +34,11 @@ export default function Order_Customer_pay() {
   }, [orders]);
 
   const handleOrder = async () => {
-    const Customerid = localStorage.getItem("customerid");
+    const Customerid = localStorage.getItem("customerid", user.id);
+    if (!Customerid) {
+      console.error("customerid not found in localStorage");
+      return;
+    }
     const storedCart = localStorage.getItem("cart");
     const cart = storedCart ? JSON.parse(storedCart) : [];
     if (!Customerid) {
