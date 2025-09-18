@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ChooseTable() {
+  const router = useRouter();
+
   const handleSelectTable = async (tableNumber) => {
     try {
       const res = await fetch("/api/customer", {
@@ -16,7 +18,9 @@ export default function ChooseTable() {
       console.log("Saved:", data);
 
       localStorage.setItem("selectedTable", tableNumber);
-      localStorage.setItem("CustomerID", data.customer_id);
+      localStorage.setItem("customerid", data.customer_id);
+
+      router.push("/customer/list_food");
     } catch (err) {
       console.error("Error saving customer:", err);
     }
@@ -37,29 +41,27 @@ export default function ChooseTable() {
 
               <div className="flex flex-row justify-center gap-[150px] mt-[80px]">
                 {[1, 2, 3].map((num) => (
-                  <Link
+                  <button
                     key={num}
-                    href="/customer/list_food"
                     onClick={() => handleSelectTable(num)}
                     className="flex flex-col justify-center items-center w-[150px] h-[150px] rounded-sm bg-white text-4xl text-[#000000]"
                   >
                     <span>โต๊ะ</span>
                     <span>{num}</span>
-                  </Link>
+                  </button>
                 ))}
               </div>
 
               <div className="flex flex-row justify-center gap-[150px] mt-[150px]">
                 {[4, 5].map((num) => (
-                  <Link
+                  <button
                     key={num}
-                    href="/customer/list_food"
                     onClick={() => handleSelectTable(num)}
                     className="flex flex-col justify-center items-center w-[150px] h-[150px] rounded-sm bg-white text-4xl text-[#000000]"
                   >
                     <span>โต๊ะ</span>
                     <span>{num}</span>
-                  </Link>
+                  </button>
                 ))}
               </div>
             </div>
