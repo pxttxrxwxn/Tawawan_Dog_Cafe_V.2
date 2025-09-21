@@ -9,7 +9,10 @@ export default function Notifications() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const res = await fetch("/api/notifications");
+        const storedCustomerID = localStorage.getItem("CustomerID") || "";
+        if (!storedCustomerID) return;
+
+        const res = await fetch(`/api/notifications?customer_id=${storedCustomerID}`);
         if (!res.ok) throw new Error("Failed to fetch notifications");
         const data = await res.json();
 

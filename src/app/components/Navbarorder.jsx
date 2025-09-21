@@ -8,44 +8,55 @@ export default function Navbar({ activePage }) {
   const [orderCount, setOrderCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
 
+  const loadCart = () => {
+    const cart = localStorage.getItem("cart");
+    if (cart) {
+      try {
+        const data = JSON.parse(cart);
+        setOrderCount(data.length);
+      } catch {
+        setOrderCount(0);
+      }
+    } else {
+      setOrderCount(0);
+    }
+  };
+
+  const loadNotifications = async (customerID) => {
+    if (!customerID) return;
+    try {
+      const res = await fetch(`/api/notifications?customer_id=${customerID}`);
+      const data = await res.json();
+      setNotificationsCount(Array.isArray(data) ? data.length : 0);
+    } catch {
+      setNotificationsCount(0);
+    }
+  };
+
   useEffect(() => {
     const selectedTable = localStorage.getItem("selectedTable");
     if (selectedTable) setTableNumber(selectedTable);
 
-    const loadCart = () => {
-      const cart = localStorage.getItem("cart");
-      if (cart) {
-        try {
-          const data = JSON.parse(cart);
-          setOrderCount(data.length);
-        } catch {
-          setOrderCount(0);
-        }
-      } else {
-        setOrderCount(0);
+    const waitForCustomerID = setInterval(() => {
+      const storedCustomerID = localStorage.getItem("CustomerID");
+      if (storedCustomerID) {
+        loadNotifications(storedCustomerID);
+        loadCart();
+
+        const cartInterval = setInterval(loadCart, 1000);
+        const notifInterval = setInterval(() => loadNotifications(storedCustomerID), 5000);
+
+        clearInterval(waitForCustomerID);
+
+        const cleanup = () => {
+          clearInterval(cartInterval);
+          clearInterval(notifInterval);
+        };
+        window.addEventListener("beforeunload", cleanup);
       }
-    };
+    }, 500);
 
-    const loadNotifications = async () => {
-      try {
-        const res = await fetch("/api/notifications");
-        const data = await res.json();
-        setNotificationsCount(Array.isArray(data) ? data.length : 0);
-      } catch {
-        setNotificationsCount(0);
-      }
-    };
-
-    loadCart();
-    loadNotifications();
-
-    const cartInterval = setInterval(loadCart, 1000);
-    const notifInterval = setInterval(loadNotifications, 5000);
-
-    return () => {
-      clearInterval(cartInterval);
-      clearInterval(notifInterval);
-    };
+    return () => clearInterval(waitForCustomerID);
   }, []);
 
   const buttons = [

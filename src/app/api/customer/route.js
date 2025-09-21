@@ -31,7 +31,11 @@ export async function POST(req) {
     const { error: insertError } = await supabaseAdmin.from("customers").insert([newCustomer]);
     if (insertError) throw insertError;
 
-    return new Response(JSON.stringify(newCustomer), { status: 201 });
+    return new Response(JSON.stringify({
+      success: true,
+      customer_id: newCustomer.customer_id,
+      table_number: newCustomer.table_number
+    }), { status: 201 });
   } catch (err) {
     console.error("POST /customers:", err.message);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });

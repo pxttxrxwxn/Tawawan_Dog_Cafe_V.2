@@ -1,17 +1,26 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabaseServer";
 
-export async function GET() {
+export async function GET(req) {
   try {
-    const { data, error } = await supabaseAdmin
-      .from("notifications")
-      .select("*")
-      .order("notification_id", { ascending: false });
+    const { searchParams } = new URL(req.url);
+    const customer_id = searchParams.get("customer_id");
+
+    console.log("API GET /notifications, customer_id:", customer_id);
+
+    let query = supabaseAdmin.from("notifications").select("*");
+
+    if (customer_id) {
+      query = query.eq("customer_id", customer_id);
+    }
+
+    const { data, error } = await query.order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    return NextResponse.json(data);
+    return NextResponse.json(data || []);
   } catch (error) {
+    console.error("GET /api/notifications error:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
@@ -33,7 +42,8 @@ export async function POST(req) {
       svgtitle: body.svgtitle || null,
       title: body.title || null,
       body: body.body || null,
-      meta: body.meta || null,
+      customer_id: body.customer_id || null,
+      owner_id: body.owner_id || null,
       svgbin: body.svgbin || null
     };
 
@@ -41,6 +51,7 @@ export async function POST(req) {
     if (error) throw error;
     return NextResponse.json({ success: true, id: notificationID });
   } catch (error) {
+    console.error("POST /api/notifications error:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

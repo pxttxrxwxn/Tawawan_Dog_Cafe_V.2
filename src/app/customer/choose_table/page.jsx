@@ -18,7 +18,7 @@ export default function ChooseTable() {
       console.log("Saved:", data);
 
       localStorage.setItem("selectedTable", tableNumber);
-      localStorage.setItem("customerid", data.customer_id);
+      localStorage.setItem("CustomerID", data.customer_id);
 
       router.push("/customer/list_food");
     } catch (err) {
