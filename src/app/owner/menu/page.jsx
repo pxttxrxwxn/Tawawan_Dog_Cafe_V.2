@@ -68,7 +68,19 @@ export default function Menu() {
         Price: menu.price,
         MenuDetail: menu.menu_detail,
         ImagePath: menu.image_path,
-      }));
+      }))
+      .sort((a, b) => {
+        const prefixA = a.MenuID[0];
+        const prefixB = b.MenuID[0];
+        const numA = parseInt(a.MenuID.slice(1), 10);
+        const numB = parseInt(b.MenuID.slice(1), 10);
+
+        if (prefixA === prefixB) {
+          return numA - numB;
+        } else {
+          return prefixA.localeCompare(prefixB);
+        }
+      });
       setMenus(normalized);
     } catch (err) {
       console.error("Error fetching menus:", err);
