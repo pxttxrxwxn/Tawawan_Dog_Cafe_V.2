@@ -34,7 +34,7 @@ export default function Order_Customer_pay() {
   }, [orders]);
 
   const handleOrder = async () => {
-    let Customerid = localStorage.getItem("customerid");
+    let Customerid = localStorage.getItem("CustomerID");
     if (!Customerid) {
       Customerid = crypto.randomUUID();
       localStorage.setItem("customerid", Customerid);
