@@ -47,9 +47,27 @@ export async function POST(req) {
       };
 
       await supabaseAdmin.from("income").insert([newIncome]);
+      const { data: lastOI } = await supabaseAdmin
+        .from("order_income")
+        .select("order_income_id")
+        .order("order_income_id", { ascending: false })
+        .limit(1);
+
+      let nextOrderIncomeId = "OI1001";
+      if (lastOI && lastOI.length > 0) {
+        const lastNum = parseInt(lastOI[0].order_income_id.replace(/^OI/, ""), 10) || 1000;
+        nextOrderIncomeId = `OI${lastNum + 1}`;
+      }
+
       await supabaseAdmin
         .from("order_income")
-        .insert([{ order_id: order.order_id, income_id: nextIncomeId }]);
+        .insert([
+          {
+            order_income_id: nextOrderIncomeId,
+            order_id: order.order_id,
+            income_id: nextIncomeId,
+          },
+        ]);
 
       return NextResponse.json({ success: true, income: newIncome });
     }
@@ -97,7 +115,19 @@ export async function POST(req) {
 
     await supabaseAdmin.from("orders").insert([newOrderGroup]);
 
-    const orderMenuEntries = cart.map((item) => ({
+    const { data: lastOM } = await supabaseAdmin
+      .from("order_menu")
+      .select("order_menu_id")
+      .order("order_menu_id", { ascending: false })
+      .limit(1);
+
+    let lastNum = 1000;
+    if (lastOM && lastOM.length > 0) {
+      lastNum =
+        parseInt(lastOM[0].order_menu_id.replace(/^OM/, ""), 10) || 1000;
+    }
+    const orderMenuEntries = cart.map((item, idx) => ({
+      order_menu_id: `OM${lastNum + idx + 1}`,
       order_id: nextOrderID,
       menu_id: item.code,
       quantity: item.quantity,
