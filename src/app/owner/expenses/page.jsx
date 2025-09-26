@@ -293,18 +293,6 @@ export default function Expenses() {
                 </div>
                 <div className="flex flex-col">
                   <label htmlFor="menuCode" className="font-bold text-[#715045] text-lg mb-1">
-                    จำนวนเงิน [บาท]
-                  </label>
-                  <input
-                    type="number"
-                    name="Amount"
-                    defaultValue={editingExpense?.amount || ""}
-                    placeholder="จำนวนเงิน"
-                    className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <label htmlFor="menuCode" className="font-bold text-[#715045] text-lg mb-1">
                     รายละเอียด
                   </label>
                   <input
@@ -312,6 +300,18 @@ export default function Expenses() {
                     name="Detail"
                     defaultValue={editingExpense?.detail || ""}
                     placeholder="รายละเอียด"
+                    className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label htmlFor="menuCode" className="font-bold text-[#715045] text-lg mb-1">
+                    จำนวนเงิน [บาท]
+                  </label>
+                  <input
+                    type="number"
+                    name="Amount"
+                    defaultValue={editingExpense?.amount || ""}
+                    placeholder="จำนวนเงิน"
                     className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                   />
                 </div>
