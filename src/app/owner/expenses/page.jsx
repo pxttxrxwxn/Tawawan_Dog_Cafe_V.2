@@ -278,15 +278,18 @@ export default function Expenses() {
                 </div>
                 <div className="flex flex-col">
                   <label htmlFor="menuCode" className="font-bold text-[#715045] text-lg mb-1">
-                    รายละเอียด
+                    หมวดหมู่
                   </label>
-                  <input
-                    type="text"
-                    name="Detail"
-                    defaultValue={editingExpense?.detail || ""}
-                    placeholder="รายละเอียด"
-                    className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
-                  />
+                  <select
+                    name="CategoryExpense"
+                    defaultValue={editingExpense?.category_expense || ""}
+                    className="border border-[#715045] rounded-md p-2 shadow-sm bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                  >
+                    <option value="" disabled hidden>หมวดหมู่</option>
+                    <option value="วัตถุดิบ">วัตถุดิบ</option>
+                    <option value="ค่าแรง">ค่าแรง</option>
+                    <option value="ค่าใช้จ่ายทั่วไป">ค่าใช้จ่ายทั่วไป</option>
+                  </select>
                 </div>
                 <div className="flex flex-col">
                   <label htmlFor="menuCode" className="font-bold text-[#715045] text-lg mb-1">
@@ -302,30 +305,27 @@ export default function Expenses() {
                 </div>
                 <div className="flex flex-col">
                   <label htmlFor="menuCode" className="font-bold text-[#715045] text-lg mb-1">
-                    หมวดหมู่
+                    รายละเอียด
                   </label>
-                  <select
-                    name="CategoryExpense"
-                    defaultValue={editingExpense?.category_expense || ""}
-                    className="border border-[#715045] rounded-md p-2 shadow-sm bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
-                  >
-                    <option value="" disabled hidden>หมวดหมู่</option>
-                    <option value="วัตถุดิบ">วัตถุดิบ</option>
-                    <option value="ค่าแรง">ค่าแรง</option>
-                    <option value="ค่าใช้จ่ายทั่วไป">ค่าใช้จ่ายทั่วไป</option>
-                  </select>
+                  <input
+                    type="text"
+                    name="Detail"
+                    defaultValue={editingExpense?.detail || ""}
+                    placeholder="รายละเอียด"
+                    className="border border-[#715045] bg-white text-black p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                  />
                 </div>
                 <div className="flex justify-center gap-5">
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[#8D6E63] text-white rounded"
+                    className="px-8 py-2 bg-[#8D6E63] text-white rounded"
                   >
                     บันทึก
                   </button>
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="px-4 py-2 bg-[#D64545] text-white rounded"
+                    className="px-8 py-2 bg-[#D64545] text-white rounded"
                   >
                     ยกเลิก
                   </button>

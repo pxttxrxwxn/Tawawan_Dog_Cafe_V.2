@@ -105,7 +105,7 @@ export default function ShowDetail() {
                     {totalPrice} ฿
                   </h1>
                 </div>
-                <h1 className="text-xl font-bold text-center mb-2 text-[#757575]">
+                <h1 className="text-[16px] font-bold text-center mb-2 text-[#757575] mr-15">
                   {menu.desc}
                 </h1>
               </div>
@@ -173,20 +173,20 @@ export default function ShowDetail() {
                   <p className="text-red-500 font-bold">{error}</p>
                 )}
                 <div className="flex justify-end items-center gap-4">
-                  <div className="px-6 py-2 bg-[#F4A261] rounded-lg font-bold flex items-center gap-2 text-black mr-[5%]">
+                  <div className="px-2 py-2 bg-[#F4A261] rounded-lg font-bold flex items-center gap-2 text-black mr-[5%]">
                     <h1>+ {totalPrice}</h1>
                     <button onClick={handleAddToCart} className="cursor-pointer">เพิ่มไปตะกร้า</button>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-3 py-1 cursor-pointer"
+                        className="px-1 py-1 cursor-pointer"
                       >
                         -
                       </button>
                       <span className="text-xl">{quantity}</span>
                       <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="px-3 py-1 cursor-pointer"
+                        className="px-2 py-1 cursor-pointer"
                       >
                         +
                       </button>

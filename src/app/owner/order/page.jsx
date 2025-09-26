@@ -79,7 +79,7 @@ export default function Order() {
       <div className="min-h-screen bg-[#fdf6e3]">
 
       <div className="p-6 ">
-        <div className="mb-4 mt-[180px] pl-[80px] pr-[80px] flex">
+        <div className="mb-4 mt-[150px] pl-[80px] pr-[80px] flex">
           <Link href="/owner/order" className="w-[380px] h-[80px] p-5 rounded-sm bg-[#FFE7A1] flex items-center text-[#000000] cursor-pointer">
             <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -136,7 +136,7 @@ export default function Order() {
                       {order.order_description.map((item, index) => (
                         <div key={index} className='ml-5 text-[#000000] flex flex-col'>
                           <span>
-                            {item.Quantity}x {item.MenuName}{item.Type ? `${item.Type}` : ""} {item.SugarLevel ? ` ความหวาน ${item.SugarLevel}` : ""}
+                            {item.Quantity}x {item.MenuName}{item.Type ? `${item.Type}` : ""} {item.SugarLevel ? ` หวาน ${item.SugarLevel}` : ""}
                           </span>
                           {item.Note && item.Note.trim() !== "" && (
                             <span className="text-sm text-gray-600 ml-2">หมายเหตุ: {item.Note}</span>

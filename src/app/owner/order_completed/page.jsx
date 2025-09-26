@@ -41,7 +41,7 @@ export default function OrderCompleted() {
     <div className="min-h-screen">
       <Navbar activePage="order" />
       <div className="pt-6 pl-6 pr-6">
-        <div className="mb-4 mt-[180px] pl-[80px] pr-[80px] flex">
+        <div className="mb-4 mt-[150px] pl-[80px] pr-[80px] flex">
           <Link
             href="/owner/order"
             className="w-[400px] h-[80px] p-5 rounded-sm bg-[#FFE7A1] flex items-center text-[#000000] cursor-pointer"

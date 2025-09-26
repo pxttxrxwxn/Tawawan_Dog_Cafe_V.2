@@ -35,11 +35,11 @@ export default function ChooseTable() {
         <div className="mx-auto mt-[30px]">
           <div className="flex justify-center w-[925px] bg-[#FFE8A3] rounded-2xl">
             <div className="mt-[50px] mb-[50px]">
-              <p className="text-[40px] text-[#D64545] font-[Prompt]">
+              <p className="text-[40px] text-[#D64545] font-[Prompt] font-extralight">
                 โปรดเลือกหมายเลขโต๊ะที่ต้องการก่อนดำเนินการต่อ
               </p>
 
-              <div className="flex flex-row justify-center gap-[150px] mt-[80px]">
+              <div className="flex flex-row justify-center gap-[100px] mt-[80px]">
                 {[1, 2, 3].map((num) => (
                   <button
                     key={num}
@@ -52,7 +52,7 @@ export default function ChooseTable() {
                 ))}
               </div>
 
-              <div className="flex flex-row justify-center gap-[150px] mt-[150px]">
+              <div className="flex flex-row justify-center gap-[100px] mt-[80px]">
                 {[4, 5].map((num) => (
                   <button
                     key={num}
