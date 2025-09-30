@@ -151,7 +151,7 @@ export default function Income() {
             </table>
           </div>
         ) : (
-          <p className="text-center text-gray-500 mt-10">ไม่มีข้อมูลรายรับ</p>
+          <p className="text-center text-2xl font-bold text-[#D64545] mt-[10%]">ไม่มีข้อมูลรายรับ</p>
         )}
       </div>
     </div>
