@@ -8,10 +8,7 @@ export default function Order() {
   const [orders, setOrders] = useState([]);
   const [ownerID, setOwnerID] = useState("");
 
-  useEffect(() => {
-    const storedOwnerID = localStorage.getItem("OwnerID") || "";
-    setOwnerID(storedOwnerID);
-
+  const loadOrders = () => {
     fetch("/api/orders")
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not ok");
@@ -21,6 +18,18 @@ export default function Order() {
         setOrders(Array.isArray(data) ? data : []);
       })
       .catch((err) => console.error("fetch orders error:", err));
+  };
+
+  useEffect(() => {
+    const storedOwnerID = localStorage.getItem("OwnerID") || "";
+    setOwnerID(storedOwnerID);
+
+
+    loadOrders();
+
+    const cartInterval = setInterval(loadOrders, 3000);
+
+    return () => clearInterval(cartInterval);
   }, []);
 
   const formatDate = (dateStr) => {
