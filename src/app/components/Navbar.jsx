@@ -104,7 +104,6 @@ export default function Navbar({ activePage }) {
             </span>
           </div>
 
-          {/* Dropdown menu */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-40 bg-[#D64545] border border-gray-300 rounded-md shadow-lg z-50">
               <button
