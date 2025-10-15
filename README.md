@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Tawawan Dog Café 
+โปรเจกต์นี้เป็นส่วนหนึ่งของรายวิชา **Fundamental of Database System** และ **Software Process** พัฒนาโดย กลุ่มUP14 จากสาขาวิศวกรรมซอฟต์แวร์ มหาวิทยาลัยพะเยา ปีการศึกษา 2568 เพื่อมุ่งเน้นการพัฒนาซอฟต์แวร์ที่ตอบโจทย์การใช้งานจริงและเสริมสร้างทักษะด้านวิศวกรรมซอฟต์แวร์ให้กับนักศึกษา
 
-## Getting Started
+## รายละเอียดโครงการ
+**Tawawan Dog Café** พัฒนาขึ้นเพื่อเพิ่มประสิทธิภาพการจัดการร้านกาแฟสุนัข โดยระบบสามารถจัดการโต๊ะลูกค้า เมนูอาหารและเครื่องดื่ม ติดตามสถานะออเดอร์ และจัดทำรายงานสรุปยอดขาย ช่วยให้เจ้าของร้านและพนักงานบริหารจัดการร้านได้ง่ายและสะดวกยิ่งขึ้น
 
-First, run the development server:
+---
+## ที่มาและความสำคัญ
+ปัจจุบันร้านคาเฟ่ได้รับความนิยมสูง แต่กลับเผชิญปัญหาการจัดการ คำสั่งซื้อ เช่น การจดออเดอร์ผิดพลาด ลูกค้ารอคิวนาน และการชำระเงินล่าช้า ส่งผลให้ประสบการณ์ของลูกค้าลดลง เพื่อแก้ไขปัญหาเหล่านี้จึงได้พัฒนา “ระบบสั่งอาหารและเครื่องดื่มผ่านเว็บไซต์” ที่ช่วยให้ลูกค้าสามารถดูเมนู สั่ง และชำระเงินได้ด้วยตนเอง ลดข้อผิดพลาดในการรับออเดอร์ เพิ่มความรวดเร็วในการให้บริการ และเปิดโอกาสให้เจ้าของร้านจัดการเมนูหรือโปรโมชั่นได้อย่างสะดวก ทั้งยังรองรับการใช้งานผ่าน QR Code ในร้านหรือใช้งานล่วงหน้านอกสถานที่ เพื่อยกระดับมาตรฐานการให้บริการของคาเฟ่ในยุคดิจิทัล.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
+## วัตถุประสงค์
+- เพื่อให้ลูกค้าสามารถเข้าถึงร้านค้าได้โดยง่ายโดยไม่ต้องไปสั่งหน้าร้านมีเว็ปไซต์เป็นตัวกลาง
+-   เพิ่มยอดขายให้กับผู้ประกอบการร้านอาหารตามสั่ง
+-   เว็ปไซตจะช่วยสร้างเสริมภาพลักษณ์ที่น่าเชื่อถือให้กับร้านค้าและดึงดูดลูกค้าเข้ามา
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
+## กลุ่มผู้ใช้งานหลัก
+**Customer**
+-   นักศึกษา
+-   ผู้ปกครอง
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+**Owner**
+-   เจ้าของร้านTawawan Dog Café
+---
+## Table of Contents
+- [Team Job position](#
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Team Job position
+| **Student ID** | **Name**               | **Position**            |
+|-----------------|------------------------|--------------------------|
+| 67023008        | Apinya Sanghong        | UX/UI Designer           |
+| 67023109        | Inthitanan Pankaew     | Front-End Developer      |
+| 67026427        | Pattarawin Rungpanarat | Front-End Developer      |
+| 67026449        | Mutsaya Hwangji        | Functional Tester        |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## เทคโนโลยีที่ใช้
 
-## Deploy on Vercel
+- **Design:**
+  - **Figma** <a href="https://www.figma.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/figma-colored.svg" alt="Figma" title="Figma" width="20" height="20" style="vertical-align: middle;" /></a>
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Frontend:** 
+  - **Next.js 13+ (App Router)** <a href="https://nextjs.org/docs" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/nextjs-colored-dark.svg" alt="NextJs" title="NextJs" width="20" height="20" style="vertical-align: middle;" /></a>  
+  - **React** <a href="https://reactjs.org/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/react-colored.svg" alt="React" title="React" width="20" height="20" style="vertical-align: middle;" /></a>  
+  - **JavaScript** <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/javascript-colored.svg" alt="JavaScript" title="JavaScript" width="20" height="20" style="vertical-align: middle;" /></a>  
+  - **TailwindCSS** <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/tailwindcss-colored.svg" alt="TailwindCSS" title="TailwindCSS" width="20" height="20" style="vertical-align: middle;" /></a>
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Database:** 
+  - **Supabase** <a href="https://supabase.io/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/supabase-colored.svg" alt="Supabase" title="Supabase" width="20" height="20" style="vertical-align: middle;" /></a>
+
+---
+## Figma
+[Fig Tawawan_Dog_Cafe_V.2](https://www.figma.com/design/2wJkQzfOfAY033oJN8Ofo9/Project-G.UP14?node-id=1-2&t=66GEXJLVoQ84awMg-1)
+
+---
+## Demo
+[Demo Tawawan_Dog_Cafe_V.2](https://tawawan-dog-cafe-v-2.vercel.app/)
+
+---
+
+## Contact
+### หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่1ได้ที่:
+  -  อีเมล: naysasatadur5555@gmail.com
+  -  GitHub: [https://github.com/pxttxrxwxn](https://github.com/pxttxrxwxn)
+### หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่2ได้ที่:
+  -  อีเมล: 67023008@up.ac.th
+  -  GitHub: [https://github.com/Pookpikkkkk](https://github.com/Pookpikkkkk)
