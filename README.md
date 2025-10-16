@@ -25,7 +25,18 @@
 -   เจ้าของร้านTawawan Dog Café
 ---
 
+
 ## Table of Contents
+- [Tawawan Dog Café](#tawawan-dog-café)
+- [รายละเอียดโครงการ](#รายละเอียดโครงการ)
+- [ที่มาและความสำคัญ](#ที่มาและความสำคัญ)
+- [วัตถุประสงค์](#วัตถุประสงค์)
+- [กลุ่มผู้ใช้งานหลัก](#กลุ่มผู้ใช้งานหลัก)
+- [Team Job position](#team-job-position)
+- [เทคโนโลยีที่ใช้](#เทคโนโลยีที่ใช้)
+- [Figma](#figma)
+- [Demo](#demo)
+- [Contact](#contact)
 - [Tawawan Dog Café](#tawawan-dog-café)
 - [รายละเอียดโครงการ](#รายละเอียดโครงการ)
 - [ที่มาและความสำคัญ](#ที่มาและความสำคัญ)
@@ -76,8 +87,10 @@
 
 ## Contact
 **หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่1ได้ที่:**
+**หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่1ได้ที่:**
   -  อีเมล: naysasatadur5555@gmail.com
   -  GitHub: [https://github.com/pxttxrxwxn](https://github.com/pxttxrxwxn)
+**หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่2ได้ที่:**
 **หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่2ได้ที่:**
   -  อีเมล: 67023008@up.ac.th
   -  GitHub: [https://github.com/Pookpikkkkk](https://github.com/Pookpikkkkk)
