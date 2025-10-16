@@ -1,6 +1,6 @@
 <h2>
   <img src="public/logo.png" alt="หน้าแรกของโปรเจค" width="60" style="vertical-align: middle; margin-right: 8px;"/>
-  Tawawan Dog Café
+## Tawawan Dog Café
 </h2>
 
 
