@@ -20,6 +20,7 @@
 **Customer**
 -   นักศึกษา
 -   ผู้ปกครอง
+-  ผู้ใช้บริการร้าน Tawawan Dog Café
 
 **Owner**
 -   เจ้าของร้านTawawan Dog Café
