@@ -1,8 +1,8 @@
-## <h2 align="center">
-  <img src="public/logo.png" alt="หน้าแรกของโปรเจค" width="120" style="vertical-align: middle; border-radius: 12px;"/>
-  <br>
+<h2>
+  <img src="public/logo.png" alt="หน้าแรกของโปรเจค" width="60" style="vertical-align: middle; margin-right: 8px;"/>
   Tawawan Dog Café
 </h2>
+
 
 โปรเจกต์นี้เป็นส่วนหนึ่งของรายวิชา **Fundamental of Database System** และ **Software Process** พัฒนาโดย กลุ่มUP14 จากสาขาวิศวกรรมซอฟต์แวร์ มหาวิทยาลัยพะเยา ปีการศึกษา 2568 เพื่อมุ่งเน้นการพัฒนาซอฟต์แวร์ที่ตอบโจทย์การใช้งานจริงและเสริมสร้างทักษะด้านวิศวกรรมซอฟต์แวร์ให้กับนักศึกษา
 
