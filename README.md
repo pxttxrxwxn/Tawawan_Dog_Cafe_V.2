@@ -1,4 +1,5 @@
-## Tawawan Dog Café 
+## <img src="public/logo.png" alt="หน้าแรกของโปรเจค" width="60" style="vertical-align: middle; margin-right: 8px;"/> Tawawan Dog Café
+
 โปรเจกต์นี้เป็นส่วนหนึ่งของรายวิชา **Fundamental of Database System** และ **Software Process** พัฒนาโดย กลุ่มUP14 จากสาขาวิศวกรรมซอฟต์แวร์ มหาวิทยาลัยพะเยา ปีการศึกษา 2568 เพื่อมุ่งเน้นการพัฒนาซอฟต์แวร์ที่ตอบโจทย์การใช้งานจริงและเสริมสร้างทักษะด้านวิศวกรรมซอฟต์แวร์ให้กับนักศึกษา
 
 ## รายละเอียดโครงการ
@@ -23,8 +24,18 @@
 **Owner**
 -   เจ้าของร้านTawawan Dog Café
 ---
+
 ## Table of Contents
-- [Team Job position](#
+- [Tawawan Dog Café](#tawawan-dog-café)
+- [รายละเอียดโครงการ](#รายละเอียดโครงการ)
+- [ที่มาและความสำคัญ](#ที่มาและความสำคัญ)
+- [วัตถุประสงค์](#วัตถุประสงค์)
+- [กลุ่มผู้ใช้งานหลัก](#กลุ่มผู้ใช้งานหลัก)
+- [Team Job position](#team-job-position)
+- [เทคโนโลยีที่ใช้](#เทคโนโลยีที่ใช้)
+- [Figma](#figma)
+- [Demo](#demo)
+- [Contact](#contact)
 
 ---
 
@@ -64,9 +75,9 @@
 ---
 
 ## Contact
-### หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่1ได้ที่:
+**หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่1ได้ที่:**
   -  อีเมล: naysasatadur5555@gmail.com
   -  GitHub: [https://github.com/pxttxrxwxn](https://github.com/pxttxrxwxn)
-### หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่2ได้ที่:
+**หากมีคำถาม สามารถติดต่อผู้ดูแลโปรเจคคนที่2ได้ที่:**
   -  อีเมล: 67023008@up.ac.th
   -  GitHub: [https://github.com/Pookpikkkkk](https://github.com/Pookpikkkkk)
