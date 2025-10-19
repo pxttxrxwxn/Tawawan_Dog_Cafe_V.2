@@ -38,16 +38,6 @@
 - [Figma](#figma)
 - [Demo](#demo)
 - [Contact](#contact)
-- [Tawawan Dog Café](#tawawan-dog-café)
-- [รายละเอียดโครงการ](#รายละเอียดโครงการ)
-- [ที่มาและความสำคัญ](#ที่มาและความสำคัญ)
-- [วัตถุประสงค์](#วัตถุประสงค์)
-- [กลุ่มผู้ใช้งานหลัก](#กลุ่มผู้ใช้งานหลัก)
-- [Team Job position](#team-job-position)
-- [เทคโนโลยีที่ใช้](#เทคโนโลยีที่ใช้)
-- [Figma](#figma)
-- [Demo](#demo)
-- [Contact](#contact)
 
 ---
 
