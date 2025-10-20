@@ -128,7 +128,7 @@ export default function Order_Customer_pay() {
       <Nabarorder activePage="2" />
       <div className="mt-[187px]">
         <PromptPayQR />
-        <div className="text-center text-[#D64545] text-[20px]">
+        <div className="text-center text-[#D64545] text-[16px]">
           กรุณาชำระเงินภายในเวลา {formatTime(timeLeft)}
         </div>
       </div>
