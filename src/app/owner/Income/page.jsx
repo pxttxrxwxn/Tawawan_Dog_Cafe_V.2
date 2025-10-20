@@ -13,7 +13,7 @@ export default function Income() {
         const incomeRes = await fetch("/api/income");
         const incomeData = await incomeRes.json();
 
-        const orderIncomeRes = await fetch("/api/order_income");
+        const orderIncomeRes = await fetch("/api/orders");
         const orderIncomeData = await orderIncomeRes.json();
 
         const mergedData = incomeData.map((income) => {
@@ -40,6 +40,8 @@ export default function Income() {
             total: income.total,
           };
         });
+
+        mergedData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         setOrders(mergedData);
       } catch (err) {
