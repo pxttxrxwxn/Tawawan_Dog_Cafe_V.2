@@ -24,22 +24,21 @@ export default function Income() {
             (order) => String(order.order_id).trim() === String(income.order_id).trim()
           );
 
-
-
           const dateTime = new Date(income.order_datetime);
           const date = dateTime.toISOString();
           const time = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+          const items = JSON.parse(income.order_description).map((item) => ({
+            name: item.MenuName,
+            type: item.Type,
+            quantity: item.Quantity,
+          }));
           return {
             ordernumber: matchingOrder ? matchingOrder.order_id.trim() : income.order_id.trim(),
             tableNumber: income.table_number || "-",
             date,
             time,
-            items: income.order_description.map((item) => ({
-              name: item.MenuName,
-              type: item.Type,
-              quantity: item.Quantity,
-            })),
+            items,
             total: income.total,
           };
         });
