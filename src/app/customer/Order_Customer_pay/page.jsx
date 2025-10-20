@@ -3,11 +3,13 @@ import React, { useEffect, useState } from "react";
 import PromptPayQR from "../../components/PromptPayQR";
 import Nabarorder from "../../components/Navbarorder";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 export default function Order_Customer_pay() {
   const [orders, setOrders] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [tableNumber, setTableNumber] = useState("");
+  const [timeLeft, setTimeLeft] = useState(120);
   const router = useRouter();
 
   useEffect(() => {
@@ -32,6 +34,37 @@ export default function Order_Customer_pay() {
     const total = orders.reduce((sum, item) => sum + item.totalPrice, 0);
     setTotalAmount(total);
   }, [orders]);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      localStorage.removeItem("cart");
+
+      Swal.fire({
+        title: "การชำระเงินไม่สำเร็จ",
+        icon: "error",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      
+      setTimeout(() => {
+        router.push("/customer/list_food");
+      }, 2000);
+
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, router]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
 
   const handleOrder = async () => {
     let Customerid = localStorage.getItem("CustomerID");
@@ -59,7 +92,7 @@ export default function Order_Customer_pay() {
         console.error("Request failed with status:", res.status);
         return;
       }
-      
+
       const data = await res.json();
       console.log("API response:", data);
 
@@ -67,31 +100,17 @@ export default function Order_Customer_pay() {
         console.error("Order creation failed:", data);
         return;
       }
-      
+
       await fetch("/api/notifications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           NotificationID: "AUTO1",
-          svgtitle:`<svg xmlns="http://www.w3.org/2000/svg" height="70px" viewBox="0 -960 960 960" width="70px" fill="#000000"><path d="M480.07-100q-80.07 0-149.44-29.11-69.37-29.12-120.87-80.6-51.51-51.48-80.63-120.82Q100-399.87 100-479.93q0-79.45 29.12-148.82 29.12-69.37 80.61-120.88 51.49-51.5 120.84-80.94Q399.92-860 480-860q70.51 0 131.99 22.66 61.47 22.65 110.78 62.34l-32.23 33q-43.23-35-96.38-53.81-53.14-18.8-114.16-18.8-141.54 0-238.08 96.53-96.53 96.54-96.53 238.08 0 141.54 96.53 238.08 96.54 96.53 238.08 96.53 141.54 0 238.08-96.53 96.53-96.54 96.53-238.08 0-30-4.69-58.23-4.69-28.23-13.69-55l34.46-34.85q14.46 34.31 21.89 71.39Q860-519.61 860-480q0 80.08-29.42 149.43-29.42 69.35-80.9 120.84-51.49 51.49-120.82 80.61Q559.52-100 480.07-100ZM421-311.46 268.69-464.38l33.85-34.23L421-380.15l404.77-404.77 34.84 33.84L421-311.46Z"/></svg>`,
+          svgtitle: `<svg xmlns="http://www.w3.org/2000/svg" height="70px" viewBox="0 -960 960 960" width="70px" fill="#000000"><path d="M480.07-100q-80.07 0-149.44-29.11-69.37-29.12-120.87-80.6-51.51-51.48-80.63-120.82Q100-399.87 100-479.93q0-79.45 29.12-148.82 29.12-69.37 80.61-120.88 51.49-51.5 120.84-80.94Q399.92-860 480-860q70.51 0 131.99 22.66 61.47 22.65 110.78 62.34l-32.23 33q-43.23-35-96.38-53.81-53.14-18.8-114.16-18.8-141.54 0-238.08 96.53-96.53 96.54-96.53 238.08 0 141.54 96.53 238.08 96.54 96.53 238.08 96.53 141.54 0 238.08-96.53 96.53-96.54 96.53-238.08 0-30-4.69-58.23-4.69-28.23-13.69-55l34.46-34.85q14.46 34.31 21.89 71.39Q860-519.61 860-480q0 80.08-29.42 149.43-29.42 69.35-80.9 120.84-51.49 51.49-120.82 80.61Q559.52-100 480.07-100ZM421-311.46 268.69-464.38l33.85-34.23L421-380.15l404.77-404.77 34.84 33.84L421-311.46Z"/></svg>`,
           title: "การสั่งสินค้าเสร็จสิ้น",
           body: `โต๊ะ ${tableNumber} ได้ทำการชำระเงินเรียบร้อย`,
           customer_id: Customerid,
           owner_id: null,
-          svgbin:`<svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#D64545"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>`,
-        }),
-      });
-      await fetch("/api/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          NotificationID: "AUTO2",
-          svgtitle:`<svg xmlns="http://www.w3.org/2000/svg" height="70px" viewBox="0 -960 960 960" width="70px" fill="#000000"><path d="M457.31-155.92v-311.31L185.39-624.39V-320q0 3.08 1.53 5.77 1.54 2.69 4.62 4.61l265.77 153.7Zm45.38 0 265.77-153.7q3.08-1.92 4.62-4.61 1.53-2.69 1.53-5.77v-305L502.69-467.23v311.31Zm-51.54 48.61-282.3-163q-13.62-7.61-21.23-21.23-7.62-13.61-7.62-28.85v-319.22q0-15.24 7.62-28.85 7.61-13.62 21.23-21.23l282.3-163q13.62-7.62 28.85-7.62 15.23 0 28.85 7.62l282.3 163q13.62 7.61 21.23 21.23 7.62 13.61 7.62 28.85v319.22q0 15.24-7.62 28.85-7.61 13.62-21.23 21.23l-282.3 163q-13.62 7.62-28.85 7.62-15.23 0-28.85-7.62Zm185.93-490 111.23-64.38-262.16-151.69q-3.07-1.54-6.15-1.54-3.08 0-6.15 1.54l-104.31 60.15 267.54 155.92ZM480-505.54l112.08-65.61-268.93-155.16-112.07 64.62L480-505.54Z"/></svg>`,
-          title: "ทางร้านกำลังเตรียมสินค้า",
-          body: `ออเดอร์จากโต๊ะ ${tableNumber} กำลังอยู่ระหว่างการจัดเตรียม`,
-          customer_id: Customerid,
-          owner_id: null,
-          svgbin:`<svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px" fill="#D64545"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>`,
         }),
       });
 
@@ -99,7 +118,6 @@ export default function Order_Customer_pay() {
       setOrders([]);
       setTotalAmount(0);
       router.push("/customer/Completed_Order");
-
     } catch (err) {
       console.error(err);
     }
@@ -110,23 +128,27 @@ export default function Order_Customer_pay() {
       <Nabarorder activePage="2" />
       <div className="mt-[187px]">
         <PromptPayQR />
+        <div className="text-center text-[#D64545] text-[20px]">
+          กรุณาชำระเงินภายในเวลา {formatTime(timeLeft)}
+        </div>
       </div>
+
       <div className="bg-white flex justify-end items-center fixed bottom-0 left-0 w-full p-4 h-[100px] shadow-md gap-4">
         <h1 className="flex justify-between items-center text-black text-[20px]">
           รวม ({orders.length} รายการ):
           <span className="text-[#D64545] font-bold">{totalAmount} ฿</span>
         </h1>
-          <button
-            className={`px-4 py-4 rounded-md text-2xl mr-6 text-white ${
-              orders.length > 0
-                ? "bg-[#F79C4B] cursor-pointer"
-                : "bg-[#DDDDDD] cursor-not-allowed"
-            }`}
-            disabled={orders.length === 0}
-            onClick={handleOrder}
-          >
-            ยืนยันการชำระเงิน
-          </button>
+        <button
+          className={`px-4 py-4 rounded-md text-2xl mr-6 text-white ${
+            orders.length > 0
+              ? "bg-[#F79C4B] cursor-pointer"
+              : "bg-[#DDDDDD] cursor-not-allowed"
+          }`}
+          disabled={orders.length === 0}
+          onClick={handleOrder}
+        >
+          ยืนยันการชำระเงิน
+        </button>
       </div>
     </div>
   );
