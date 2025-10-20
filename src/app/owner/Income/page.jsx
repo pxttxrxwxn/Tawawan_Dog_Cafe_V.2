@@ -30,7 +30,9 @@ export default function Income() {
           );
 
           const matchingOrder = orderData.find(
-            (order) => orderIncome && String(order.order_id).trim() === String(orderIncome.order_id).trim()
+            (order) => {
+              return order.order_id === (income.order_id || order.order_id);
+            }
           );
 
           const dateTime = new Date(income.order_datetime);
@@ -45,7 +47,7 @@ export default function Income() {
           }));
 
           return {
-            ordernumber: matchingOrder ? matchingOrder.order_id.trim() : (orderIncome ? orderIncome.order_id.trim() : "-"),
+            ordernumber: matchingOrder ? matchingOrder.order_id : "-",
             tableNumber: income.table_number || "-",
             date,
             time,
