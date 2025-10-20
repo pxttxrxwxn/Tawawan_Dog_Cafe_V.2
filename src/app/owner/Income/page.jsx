@@ -21,7 +21,7 @@ export default function Income() {
 
         const mergedData = incomeData.map((income) => {
           const matchingOrder = orderData.find(
-            (order) => String(order.order_id) === String(income.order_id)
+            (order) => String(order.order_id).trim() === String(income.order_id).trim()
           );
 
 
@@ -31,7 +31,7 @@ export default function Income() {
           const time = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
           return {
-            ordernumber: matchingOrder ? matchingOrder.order_id : income.order_id,
+            ordernumber: matchingOrder ? matchingOrder.order_id.trim() : income.order_id.trim(),
             tableNumber: income.table_number || "-",
             date,
             time,
