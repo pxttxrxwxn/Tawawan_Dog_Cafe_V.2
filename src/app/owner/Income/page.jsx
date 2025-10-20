@@ -13,22 +13,25 @@ export default function Income() {
         const incomeRes = await fetch("/api/income");
         const incomeData = await incomeRes.json();
 
-        const orderIncomeRes = await fetch("/api/orders");
-        const orderIncomeData = await orderIncomeRes.json();
+        const orderRes  = await fetch("/api/orders");
+        const orderData  = await orderRes.json();
+
+        console.log("incomeData:", incomeData);
+        console.log("orderData:", orderData);
 
         const mergedData = incomeData.map((income) => {
-          const matchingOrderIncome = orderIncomeData.find(
-            (oi) => oi.income_id.trim() === income.income_id.trim()
+          const matchingOrder = orderData.find(
+            (order) => String(order.order_id) === String(income.order_id)
           );
 
-          const orderNumber = matchingOrderIncome ? matchingOrderIncome.order_id.trim() : "-";
+
 
           const dateTime = new Date(income.order_datetime);
           const date = dateTime.toISOString();
           const time = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
           return {
-            ordernumber: orderNumber,
+            ordernumber: matchingOrder ? matchingOrder.order_id : income.order_id,
             tableNumber: income.table_number || "-",
             date,
             time,
