@@ -10,25 +10,14 @@ export default function Income() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-
         const incomeRes = await fetch("/api/income");
         const incomeData = await incomeRes.json();
+        
 
         const orderRes = await fetch("/api/orders");
         const orderData = await orderRes.json();
 
-        const orderIncomeRes = await fetch("/api/order_income");
-        const orderIncomeData = await orderIncomeRes.json();
-
-        console.log("incomeData:", incomeData);
-        console.log("orderData:", orderData);
-        console.log("orderIncomeData:", orderIncomeData);
-
         const mergedData = incomeData.map((income) => {
-          const orderIncome = orderIncomeData.find(
-            (oi) => String(oi.income_id).trim() === String(income.income_id).trim()
-          );
-
           const matchingOrder = orderData.find(
             (order) => {
               return order.order_id === (income.order_id || order.order_id);
@@ -39,26 +28,21 @@ export default function Income() {
           const date = dateTime.toISOString();
           const time = dateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-          // parse JSON string ของ order_description
-          const items = JSON.parse(income.order_description).map((item) => ({
-            name: item.MenuName,
-            type: item.Type,
-            quantity: item.Quantity,
-          }));
-
           return {
             ordernumber: matchingOrder ? matchingOrder.order_id : "-",
             tableNumber: income.table_number || "-",
             date,
             time,
-            items,
+            items: income.order_description.map((item) => ({
+              name: item.MenuName,
+              type: item.Type,
+              quantity: item.Quantity,
+            })),
             total: income.total,
           };
         });
 
-        mergedData.sort((a, b) => new Date(b.date) - new Date(a.date));
         setOrders(mergedData);
-
       } catch (err) {
         console.error(err);
       }
