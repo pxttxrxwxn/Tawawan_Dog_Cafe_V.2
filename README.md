@@ -72,7 +72,7 @@
 
 ---
 ## Demo
-[Demo Tawawan_Dog_Cafe_V.2]([https://tawawan-dog-cafe-v-2.vercel.app/](https://tawawan-dog-cafe-v-2-omega.vercel.app/))
+[https://tawawan-dog-cafe-v-2.vercel.app/](https://tawawan-dog-cafe-v-2-omega.vercel.app/)
 
 ---
 
