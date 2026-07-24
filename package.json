@@ -18,7 +18,7 @@
     "bcryptjs": "^3.0.2",
     "formidable": "^3.5.4",
     "multer": "^2.0.2",
-    "next": "^15.4.6",
+    "next": "15.4.10",
     "next-connect": "^1.0.0",
     "node-cron": "^4.2.1",
     "promptpay-qr": "^0.5.0",
